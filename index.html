@@ -34,14 +34,14 @@
   </style>
 </head>
 <body>
-  <!-- GIF principal -->
+  <!-- GIF -->
   <img src="https://luxu-1.github.io/KING.gif" alt="Gif animado">
 
-  <!-- Botón para controlar la música -->
+  <!-- Botón -->
   <button onclick="toggleAudio()">Activar música 🎵</button>
 
-  <!-- Reproductor oculto -->
-  <audio id="bg-music" autoplay loop muted>
+  <!-- Audio -->
+  <audio id="bg-music" loop>
     <source src="https://luxu-1.github.io/DEVICE_KING.mp3" type="audio/mpeg">
     Tu navegador no soporta audio en HTML5.
   </audio>
@@ -49,14 +49,20 @@
   <script>
     const audio = document.getElementById("bg-music");
     const button = document.querySelector("button");
+    let isPlaying = false;
 
     function toggleAudio() {
-      if (audio.muted) {
-        audio.muted = false;
-        button.textContent = "🔇";
+      if (!isPlaying) {
+        audio.play().then(() => {
+          isPlaying = true;
+          button.textContent = "Silenciar música 🔇";
+        }).catch(err => {
+          console.log("Error al reproducir:", err);
+        });
       } else {
-        audio.muted = true;
-        button.textContent = "🎵";
+        audio.pause();
+        isPlaying = false;
+        button.textContent = "Activar música 🎵";
       }
     }
   </script>
