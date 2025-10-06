@@ -8,24 +8,27 @@
     body {
       background-color: black;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
+      flex-direction: column;
     }
+    /* Botón de música fijo */
     .controls {
-      position: absolute;
-      top: 20px;
-      font-size: 40px;
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      font-size: 35px;
       color: white;
       cursor: pointer;
       user-select: none;
+      z-index: 10;
     }
     img {
-      max-width: 80%;
-      max-height: 80%;
       cursor: pointer;
+      max-width: 100%;
+      height: auto;
     }
   </style>
 </head>
@@ -60,12 +63,7 @@
       } else {
         audio.pause();
         isPlaying = false;
-        toggle.textContent = "🔇"; // icono cuando está muteado
-      }
-    }
-  </script>
-</body>
-</html>
+        toggle.textContent = "🔇"; // icono cu
 
     });
   </script>
