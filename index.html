@@ -67,4 +67,30 @@
   </a>
 
   <!-- Audio -->
-  <audio id="b
+  <audio id="bg-music" loop>
+    <source src="https://luxu-1.github.io/DEVICE_KING.mp3" type="audio/mpeg">
+    Tu navegador no soporta audio en HTML5.
+  </audio>
+
+  <script>
+    const audio = document.getElementById("bg-music");
+    const toggle = document.getElementById("audio-toggle");
+    let isPlaying = false;
+
+    function toggleAudio() {
+      if (!isPlaying) {
+        audio.play().then(() => {
+          isPlaying = true;
+          toggle.textContent = "🎵";
+        }).catch(err => {
+          console.log("Autoplay bloqueado:", err);
+        });
+      } else {
+        audio.pause();
+        isPlaying = false;
+        toggle.textContent = "🔇";
+      }
+    }
+  </script>
+</body>
+</html>
