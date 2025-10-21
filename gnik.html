@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>slatcarf era hteet siH</title>
+  <link rel="icon" type="image/png" href="icon.ico">
+  <style>
+    body {
+      background-color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .controls {
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      font-size: 35px;
+      color: black;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    img {
+      cursor: pointer;
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <!-- Control de audio -->
+  <div class="controls" onclick="toggleAudio()" id="audio-toggle">🔇</div>
+
+  <!-- GIF alternativo -->
+  <img src="https://luxu-1.github.io/GNIK.gif" alt="Gif alternativo">
+
+  <!-- Audio alternativo -->
+  <audio id="bg-music" loop>
+    <source src="https://luxu-1.github.io/GNIK_ECIVED.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const audio = document.getElementById("bg-music");
+    const toggle = document.getElementById("audio-toggle");
+    let isPlaying = false;
+
+    function toggleAudio() {
+      if (!isPlaying) {
+        audio.play().then(() => {
+          isPlaying = true;
+          toggle.textContent = "🎵";
+        }).catch(err => {
+          console.log("Autoplay bloqueado:", err);
+        });
+      } else {
+        audio.pause();
+        isPlaying = false;
+        toggle.textContent = "🔇";
+      }
+    }
+  </script>
+</body>
+</html>
