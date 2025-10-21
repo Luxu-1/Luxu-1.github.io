@@ -13,7 +13,10 @@
       height: 100vh;
       margin: 0;
       flex-direction: column;
+      position: relative;
+      overflow: hidden;
     }
+
     /* Botón de música fijo */
     .controls {
       position: fixed;
@@ -25,10 +28,29 @@
       user-select: none;
       z-index: 10;
     }
+
     img {
       cursor: pointer;
       max-width: 100%;
       height: auto;
+    }
+
+    /* Símbolo secreto "?" */
+    .secret {
+      position: fixed;
+      bottom: 15px;
+      left: 15px;
+      font-size: 25px;
+      color: rgba(255, 255, 255, 0.05); /* casi invisible */
+      cursor: pointer;
+      user-select: none;
+      z-index: 5;
+      transition: color 0.3s ease;
+    }
+
+    /* Se nota un poco más si pasás el mouse */
+    .secret:hover {
+      color: rgba(255, 255, 255, 0.3);
     }
   </style>
 </head>
@@ -36,36 +58,13 @@
   <!-- Control de audio -->
   <div class="controls" onclick="toggleAudio()" id="audio-toggle">🔇</div>
 
+  <!-- Símbolo secreto -->
+  <a class="secret" href="https://luxu-1.github.io/gnik.html">?</a>
+
   <!-- GIF cliqueable -->
   <a href="https://luxu-1.github.io/hat.html">
     <img src="https://luxu-1.github.io/KING.gif" alt="Gif animado">
   </a>
 
   <!-- Audio -->
-  <audio id="bg-music" loop>
-    <source src="https://luxu-1.github.io/DEVICE_KING.mp3" type="audio/mpeg">
-    Tu navegador no soporta audio en HTML5.
-  </audio>
-
-  <script>
-    const audio = document.getElementById("bg-music");
-    const toggle = document.getElementById("audio-toggle");
-    let isPlaying = false;
-
-    function toggleAudio() {
-      if (!isPlaying) {
-        audio.play().then(() => {
-          isPlaying = true;
-          toggle.textContent = "🎵"; // icono cuando suena
-        }).catch(err => {
-          console.log("Autoplay bloqueado:", err);
-        });
-      } else {
-        audio.pause();
-        isPlaying = false;
-        toggle.textContent = "🔇"; // icono cuando está muteado
-      }
-    }
-  </script>
-</body>
-</html>
+  <audio id="b
