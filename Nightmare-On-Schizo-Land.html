@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Nightmares On Schizo-Land</title>
+  <title>Nightmare On Schizo-Land</title>
   <link rel="icon" type="image/png" href="NoS.ico">
   <style>
     body {
@@ -24,22 +24,27 @@
       width: 100%;
     }
 
-    /* Logo superior */
+    /* Logo */
     .logo {
       display: block;
-      margin: 0 auto 30px auto;
-      max-width: 640px;
+      margin: 0 auto 35px auto;
+      max-width: 420px;
       width: 80%;
       opacity: 0.85;
     }
 
-    /* Texto con degradado */
-    .gradient-text {
-      font-size: 18px;
-      line-height: 1.8;
+    /* Contenedor de texto */
+    .text-block {
       max-width: 700px;
       margin: 0 auto;
       padding: 0 20px;
+      font-size: 18px;
+      line-height: 1.9;
+    }
+
+    /* CADA RENGLÓN con su propio degradado */
+    .gradient-line {
+      margin: 18px 0;
 
       background: linear-gradient(
         to bottom,
@@ -65,20 +70,25 @@
       class="logo"
     >
 
-    <!-- TEXTO EDITABLE -->
-    <div class="gradient-text">
-      <p>
+    <!-- TEXTO -->
+    <div class="text-block">
+
+      <div class="gradient-line">
         Bienvenido a Nightmare On Schizo-Land.
-      </p>
+      </div>
 
-      <p>
-        Este lugar no existe para ser entendido,  
-        solo para ser observado.
-      </p>
+      <div class="gradient-line">
+        Este lugar no existe para ser entendido.
+      </div>
 
-      <p>
-        Nada de lo que veas acá está completamente quieto.
-      </p>
+      <div class="gradient-line">
+        Cada palabra observa de vuelta.
+      </div>
+
+      <div class="gradient-line">
+        Nada de esto ocurre por accidente.
+      </div>
+
     </div>
 
   </div>
