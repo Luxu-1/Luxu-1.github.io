@@ -52,25 +52,24 @@
       color: rgba(255, 255, 255, 0.3);
     }
 
-    /* IMAGEN OCULTA */
+    /* IMAGEN OCULTA EN ESQUINA SUPERIOR IZQUIERDA */
     .hidden-image {
       position: fixed;
-      inset: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: black;
-      opacity: 0.02;
+      top: 15px;
+      left: 15px;
+      width: 140px;
+      opacity: 0.03;
       transition: opacity 1.5s ease;
-      z-index: 3;
+      z-index: 4;
     }
 
     .hidden-image:hover {
-      opacity: 0.8;
+      opacity: 0.85;
     }
 
     .hidden-image img {
-      max-width: 70%;
+      width: 100%;
+      height: auto;
       filter: brightness(0.8);
     }
   </style>
@@ -83,7 +82,7 @@
   <!-- Símbolo secreto -->
   <a class="secret" href="https://luxu-1.github.io/gnik.html">?</a>
 
-  <!-- Imagen oculta que lleva a la nueva página -->
+  <!-- Imagen oculta -->
   <a class="hidden-image" href="Nightmare-On-Schizo-Land.html">
     <img src="https://luxu-1.github.io/NoS.png" alt="Hidden">
   </a>
@@ -96,6 +95,7 @@
   <!-- Audio -->
   <audio id="bg-music" loop>
     <source src="https://luxu-1.github.io/DEVICE_KING.mp3" type="audio/mpeg">
+    Tu navegador no soporta audio en HTML5.
   </audio>
 
   <script>
@@ -108,6 +108,8 @@
         audio.play().then(() => {
           isPlaying = true;
           toggle.textContent = "🎵";
+        }).catch(err => {
+          console.log("Autoplay bloqueado:", err);
         });
       } else {
         audio.pause();
