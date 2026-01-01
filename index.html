@@ -41,25 +41,52 @@
       bottom: 15px;
       left: 15px;
       font-size: 25px;
-      color: rgba(255, 255, 255, 0.005); /* casi invisible */
+      color: rgba(255, 255, 255, 0.005);
       cursor: pointer;
       user-select: none;
       z-index: 5;
       transition: color 0.3s ease;
     }
 
-    /* Se nota un poco más si pasás el mouse */
     .secret:hover {
       color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* IMAGEN OCULTA */
+    .hidden-image {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: black;
+      opacity: 0.02;
+      transition: opacity 1.5s ease;
+      z-index: 3;
+    }
+
+    .hidden-image:hover {
+      opacity: 0.8;
+    }
+
+    .hidden-image img {
+      max-width: 70%;
+      filter: brightness(0.8);
     }
   </style>
 </head>
 <body>
+
   <!-- Control de audio -->
   <div class="controls" onclick="toggleAudio()" id="audio-toggle">🔇</div>
 
   <!-- Símbolo secreto -->
   <a class="secret" href="https://luxu-1.github.io/gnik.html">?</a>
+
+  <!-- Imagen oculta que lleva a la nueva página -->
+  <a class="hidden-image" href="Nightmare-On-Schizo-Land.html">
+    <img src="https://luxu-1.github.io/NoS.png" alt="Hidden">
+  </a>
 
   <!-- GIF cliqueable -->
   <a href="https://luxu-1.github.io/hat.html">
@@ -69,7 +96,6 @@
   <!-- Audio -->
   <audio id="bg-music" loop>
     <source src="https://luxu-1.github.io/DEVICE_KING.mp3" type="audio/mpeg">
-    Tu navegador no soporta audio en HTML5.
   </audio>
 
   <script>
@@ -82,8 +108,6 @@
         audio.play().then(() => {
           isPlaying = true;
           toggle.textContent = "🎵";
-        }).catch(err => {
-          console.log("Autoplay bloqueado:", err);
         });
       } else {
         audio.pause();
@@ -92,5 +116,6 @@
       }
     }
   </script>
+
 </body>
 </html>
