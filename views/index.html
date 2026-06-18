@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>His teeth are fractals</title>
-  <link rel="icon" type="image/png" href="icon.ico">
+  <link rel="icon" type="image/png" href="/media/texture/icon.ico">
   <style>
     body {
       background-color: black;
@@ -27,6 +27,7 @@
       cursor: pointer;
       user-select: none;
       z-index: 10;
+      font-family: sans-serif; /* Para que los símbolos se vean bien */
     }
 
     img {
@@ -35,17 +36,19 @@
       height: auto;
     }
 
-    /* Símbolo secreto "?" */
+    /* Símbolo secreto "✦" */
     .secret {
       position: fixed;
       bottom: 15px;
       left: 15px;
-      font-size: 25px;
-      color: rgba(255, 255, 255, 0.005);
+      font-size: 28px;
+      color: rgba(255, 255, 255, 0.02);
       cursor: pointer;
       user-select: none;
       z-index: 5;
       transition: color 0.3s ease;
+      text-decoration: none;
+      font-family: sans-serif;
     }
 
     .secret:hover {
@@ -54,20 +57,20 @@
   </style>
 </head>
 <body>
-  <!-- Control de audio -->
-  <div class="controls" onclick="toggleAudio()" id="audio-toggle">🔇</div>
+  <!-- Control de audio (símbolos musicales) -->
+  <div class="controls" onclick="toggleAudio()" id="audio-toggle">♫</div>
 
-  <!-- Símbolo secreto -->
-  <a class="secret" href="https://luxu-1.github.io/gnik.html">?</a>
+  <!-- Símbolo secreto: enlace a gnik.html -->
+  <a class="secret" href="/views/gnik.html">✦</a>
 
-  <!-- GIF cliqueable -->
-  <a href="https://luxu-1.github.io/hat.html">
-    <img src="https://luxu-1.github.io/KING.gif" alt="Gif animado">
+  <!-- GIF cliqueable que lleva a hat.html -->
+  <a href="/views/hat.html">
+    <img src="/media/texture/KING.gif" alt="Gif animado">
   </a>
 
   <!-- Audio -->
   <audio id="bg-music" loop>
-    <source src="https://luxu-1.github.io/DEVICE_KING.mp3" type="audio/mpeg">
+    <source src="/media/sound/DEVICE_KING.mp3" type="audio/mpeg">
     Tu navegador no soporta audio en HTML5.
   </audio>
 
@@ -80,17 +83,16 @@
       if (!isPlaying) {
         audio.play().then(() => {
           isPlaying = true;
-          toggle.textContent = "🎵";
+          toggle.textContent = "♬"; // cambia a nota doble cuando suena
         }).catch(err => {
           console.log("Autoplay bloqueado:", err);
         });
       } else {
         audio.pause();
         isPlaying = false;
-        toggle.textContent = "🔇";
+        toggle.textContent = "♫"; // vuelve a la nota simple cuando está en pausa
       }
     }
   </script>
-
 </body>
 </html>
