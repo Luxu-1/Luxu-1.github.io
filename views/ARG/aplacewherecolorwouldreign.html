@@ -22,7 +22,6 @@
       font-family: 'Courier New', monospace;
     }
 
-    /* Contenedor principal */
     .container {
       position: relative;
       width: 90vmin;
@@ -32,12 +31,12 @@
       background-color: black;
       border: 2px solid #333;
       cursor: pointer;
-      overflow: hidden; /* ← CORREGIDO */
+      overflow: hidden;
       image-rendering: pixelated;
     }
 
-    /* Imagen oculta (pixelada) */
-    #hidden-image { /* ← CORREGIDO: antes era #-image */
+    /* Imagen oculta: siempre visible pero tapada por el canvas */
+    #hidden-image {
       position: absolute;
       top: 0;
       left: 0;
@@ -45,10 +44,9 @@
       height: 100%;
       object-fit: cover;
       image-rendering: pixelated;
-      opacity: 0;
-      transition: opacity 0.5s ease;
+      opacity: 1;               /* ← Ahora siempre visible */
       z-index: 1;
-      background-color: #2a2a2a; /* ← FONDO DE RESPALDO PARA TRANSPARENCIA */
+      background-color: black;  /* ← Fondo negro para transparencias */
     }
 
     /* Capa de rasgado (canvas) */
@@ -63,7 +61,6 @@
       touch-action: none;
     }
 
-    /* Texto de instrucción */
     .instruction {
       position: absolute;
       bottom: 20px;
@@ -79,7 +76,6 @@
       font-family: 'Courier New', monospace;
     }
 
-    /* Mensaje final (clic para continuar) */
     .final-message {
       position: absolute;
       top: 50%;
@@ -107,7 +103,6 @@
       text-shadow: 0 0 40px rgba(255, 255, 255, 0.6);
     }
 
-    /* Contador de progreso */
     .progress {
       position: absolute;
       bottom: 60px;
@@ -124,19 +119,11 @@
 </head>
 <body>
   <div class="container" id="container">
-    <!-- Imagen oculta (pixelada) -->
+    <!-- Imagen siempre visible debajo del canvas -->
     <img id="hidden-image" src="/media/texture/hiccolor.png" alt="Imagen oculta pixelada">
-    
-    <!-- Canvas para el rasgado -->
     <canvas id="scratch-canvas"></canvas>
-    
-    <!-- Texto de instrucción -->
     <div class="instruction" id="instruction">✦ Rasga la oscuridad ✦</div>
-    
-    <!-- Contador -->
     <div class="progress" id="progress">0%</div>
-    
-    <!-- Mensaje final -->
     <div class="final-message" id="final-message">
       ◈ has ganado ◈<br>
       <span style="font-size: 14px; opacity: 0.6;">haz clic para continuar</span>
@@ -155,9 +142,10 @@
       
       let isDrawing = false;
       let isRevealed = false;
-      let scratchRadius = 30;
-      let totalPixels = 0;
       const threshold = 0.70;
+
+      // Tamaño del "píxel" de rasgado (cuadrados)
+      const PIXEL_SIZE = 12; // Ajusta este valor para cambiar el tamaño del grano
 
       function resizeCanvas() {
         const rect = container.getBoundingClientRect();
@@ -166,12 +154,13 @@
         canvas.style.width = rect.width + 'px';
         canvas.style.height = rect.height + 'px';
         
+        // Rellenar el canvas de negro (capa opaca)
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        totalPixels = canvas.width * canvas.height;
         updateProgress();
       }
 
+      // Función de rasgado con cuadrados (estilo pixel art)
       function scratch(x, y) {
         if (isRevealed) return;
         
@@ -179,26 +168,16 @@
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
         
+        // Coordenadas en el canvas
         const cx = (x - rect.left) * scaleX;
         const cy = (y - rect.top) * scaleY;
         
-        const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, scratchRadius);
-        gradient.addColorStop(0, 'rgba(0,0,0,0)');
-        gradient.addColorStop(0.7, 'rgba(0,0,0,0.2)');
-        gradient.addColorStop(1, 'rgba(0,0,0,0.8)');
-        
+        // Dibujar un cuadrado (píxel) en modo "destination-out" para borrar
         ctx.globalCompositeOperation = 'destination-out';
-        ctx.beginPath();
-        ctx.arc(cx, cy, scratchRadius, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.arc(cx, cy, scratchRadius * 0.3, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0,0,0,1)';
-        ctx.fill();
-        
+        const half = PIXEL_SIZE / 2;
+        ctx.fillRect(cx - half, cy - half, PIXEL_SIZE, PIXEL_SIZE);
         ctx.globalCompositeOperation = 'source-over';
+        
         updateProgress();
       }
 
@@ -207,11 +186,12 @@
         const data = imageData.data;
         let transparent = 0;
         
-        for (let i = 3; i < data.length; i += 16) {
+        // Contar píxeles transparentes (alfa < 128)
+        for (let i = 3; i < data.length; i += 4) {
           if (data[i] < 128) transparent++;
         }
         
-        const total = Math.ceil(data.length / 16);
+        const total = data.length / 4;
         const percent = Math.min(100, Math.round((transparent / total) * 100));
         progress.textContent = percent + '%';
         
@@ -224,13 +204,13 @@
         isRevealed = true;
         instruction.style.opacity = '0';
         progress.style.opacity = '0';
-        hiddenImg.style.opacity = '1';
-        
+        // La imagen ya es visible, solo mostramos el mensaje
         setTimeout(() => {
           finalMsg.classList.add('show');
         }, 300);
       }
 
+      // Eventos de mouse
       function onMouseDown(e) {
         if (isRevealed) return;
         isDrawing = true;
@@ -249,6 +229,7 @@
         isDrawing = false;
       }
 
+      // Eventos táctiles
       function onTouchStart(e) {
         e.preventDefault();
         if (isRevealed) return;
@@ -278,6 +259,7 @@
         };
       }
 
+      // Clic en mensaje final o en el contenedor (cuando está revelado)
       finalMsg.addEventListener('click', function() {
         if (isRevealed) {
           window.location.href = '/views/hat.html';
