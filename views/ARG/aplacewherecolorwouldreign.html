@@ -13,7 +13,7 @@
     }
 
     body {
-      background-color: #1a1a1a;
+      background-color: #0A0A07;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -35,7 +35,6 @@
       image-rendering: pixelated;
     }
 
-    /* Imagen oculta: siempre visible pero tapada por el canvas */
     #hidden-image {
       position: absolute;
       top: 0;
@@ -49,7 +48,6 @@
       background-color: black;
     }
 
-    /* Capa de rasgado (canvas) */
     #scratch-canvas {
       position: absolute;
       top: 0;
@@ -61,73 +59,51 @@
       touch-action: none;
     }
 
-    .instruction {
+    /* Solo el porcentaje, sin textos extra */
+    .progress {
       position: absolute;
-      bottom: 20px;
+      bottom: 20px;               /* Lo subimos un poco */
       left: 50%;
       transform: translateX(-50%);
-      color: rgba(255, 255, 255, 0.1);
-      font-size: 14px;
-      letter-spacing: 2px;
+      color: rgba(255, 255, 255, 0.15);
+      font-size: 16px;
       z-index: 3;
       pointer-events: none;
-      text-transform: uppercase;
-      transition: opacity 0.8s ease;
       font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+      transition: opacity 0.8s ease;
     }
 
-    .final-message {
+    /* El mensaje final ahora es un simple destello sin texto */
+    .final-flash {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: white;
-      font-size: 24px;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       z-index: 4;
-      opacity: 0;
+      background-color: rgba(255, 255, 255, 0);
       pointer-events: none;
-      transition: opacity 0.8s ease;
-      text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-      text-align: center;
-      font-family: 'Courier New', monospace;
-      letter-spacing: 3px;
+      transition: background-color 0.3s ease;
     }
 
-    .final-message.show {
-      opacity: 1;
+    .final-flash.show {
+      background-color: rgba(255, 255, 255, 0.08);
       pointer-events: auto;
       cursor: pointer;
     }
 
-    .final-message:hover {
-      text-shadow: 0 0 40px rgba(255, 255, 255, 0.6);
-    }
-
-    .progress {
-      position: absolute;
-      bottom: 60px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: rgba(255, 255, 255, 0.05);
-      font-size: 12px;
-      z-index: 3;
-      pointer-events: none;
-      font-family: 'Courier New', monospace;
-      letter-spacing: 1px;
+    .final-flash.show:hover {
+      background-color: rgba(255, 255, 255, 0.15);
     }
   </style>
 </head>
 <body>
   <div class="container" id="container">
-    <!-- Imagen siempre visible debajo del canvas -->
-    <img id="hidden-image" src="/media/texture/hiccolor.png" alt="Imagen oculta pixelada">
+    <img id="hidden-image" src="/media/texture/hiccolor.png" alt="Imagen oculta">
     <canvas id="scratch-canvas"></canvas>
-    <div class="instruction" id="instruction">✦ Rasga la oscuridad ✦</div>
     <div class="progress" id="progress">0%</div>
-    <div class="final-message" id="final-message">
-      ◈ has ganado ◈<br>
-      <span style="font-size: 14px; opacity: 0.6;">haz clic para continuar</span>
-    </div>
+    <div class="final-flash" id="final-flash"></div>
   </div>
 
   <script>
@@ -135,16 +111,12 @@
       const container = document.getElementById('container');
       const canvas = document.getElementById('scratch-canvas');
       const ctx = canvas.getContext('2d');
-      const hiddenImg = document.getElementById('hidden-image');
-      const instruction = document.getElementById('instruction');
-      const progress = document.getElementById('progress');
-      const finalMsg = document.getElementById('final-message');
+      const progressEl = document.getElementById('progress');
+      const finalFlash = document.getElementById('final-flash');
       
       let isDrawing = false;
       let isRevealed = false;
-      const threshold = 0.45; // ← CAMBIADO A 45%
-
-      // Tamaño del "píxel" de rasgado (cuadrados)
+      const threshold = 0.45;
       const PIXEL_SIZE = 12;
 
       function resizeCanvas() {
@@ -188,7 +160,7 @@
         
         const total = data.length / 4;
         const percent = Math.min(100, Math.round((transparent / total) * 100));
-        progress.textContent = percent + '%';
+        progressEl.textContent = percent + '%';
         
         if (percent >= threshold * 100 && !isRevealed) {
           revealComplete();
@@ -198,22 +170,19 @@
       function revealComplete() {
         isRevealed = true;
         
-        // 🔥 AUTOCOMPLETAR: Borrar TODO el canvas de una vez
+        // Autocompletar
         ctx.globalCompositeOperation = 'destination-out';
         ctx.fillStyle = 'rgba(0,0,0,1)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.globalCompositeOperation = 'source-over';
         
-        // Actualizar progreso a 100%
-        progress.textContent = '100%';
+        progressEl.textContent = '100%';
+        progressEl.style.opacity = '0.3'; // se atenúa pero sigue visible
         
-        // Ocultar instrucciones y mostrar mensaje final
-        instruction.style.opacity = '0';
-        progress.style.opacity = '0';
-        
+        // Mostrar el flash final (área cliqueable)
         setTimeout(() => {
-          finalMsg.classList.add('show');
-        }, 400);
+          finalFlash.classList.add('show');
+        }, 300);
       }
 
       // Eventos de mouse
@@ -222,7 +191,6 @@
         isDrawing = true;
         const pos = getEventPos(e);
         scratch(pos.x, pos.y);
-        instruction.style.opacity = '0.3';
       }
 
       function onMouseMove(e) {
@@ -235,7 +203,6 @@
         isDrawing = false;
       }
 
-      // Eventos táctiles
       function onTouchStart(e) {
         e.preventDefault();
         if (isRevealed) return;
@@ -265,13 +232,8 @@
         };
       }
 
-      finalMsg.addEventListener('click', function() {
-        if (isRevealed) {
-          window.location.href = '/views/hat.html';
-        }
-      });
-
-      container.addEventListener('click', function(e) {
+      // Clic en el flash final redirige
+      finalFlash.addEventListener('click', function() {
         if (isRevealed) {
           window.location.href = '/views/hat.html';
         }
@@ -289,7 +251,7 @@
       canvas.addEventListener('touchmove', onTouchMove, { passive: false });
       canvas.addEventListener('touchend', onTouchEnd, { passive: false });
 
-      console.log('✦ Rasga la oscuridad...');
+      console.log('✦ Rasga la oscuridad (sin textos)');
     })();
   </script>
 </body>
