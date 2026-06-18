@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Shades</title>
+  <link rel="icon" type="image/png" href="/media/texture/icon.ico">
   <style>
     body {
       background-color: black;
@@ -11,18 +12,47 @@
       align-items: center;
       height: 100vh;
       margin: 0;
+      overflow: hidden;
     }
+    
     img {
       max-width: 80%;
       max-height: 80%;
       cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    img:hover {
+      transform: scale(1.02);
+    }
+
+    /* Símbolo para volver al índice */
+    .back {
+      position: fixed;
+      bottom: 15px;
+      left: 15px;
+      font-size: 28px;
+      color: rgba(255, 255, 255, 0.02);
+      cursor: pointer;
+      user-select: none;
+      z-index: 5;
+      transition: color 0.3s ease;
+      text-decoration: none;
+      font-family: sans-serif;
+    }
+
+    .back:hover {
+      color: rgba(255, 255, 255, 0.3);
     }
   </style>
 </head>
 <body>
-  <!-- Este podría llevar de vuelta al index si quieres -->
-  <a href="index.html">
-    <img src="https://luxu-1.github.io/darkness.gif" alt="Segundo gif">
+  <!-- GIF cliqueable que lleva al índice -->
+  <a href="/views/index.html">
+    <img src="/media/texture/darkness.gif" alt="Oscuridad animada">
   </a>
+
+  <!-- Símbolo para volver al índice -->
+  <a class="back" href="/views/index.html">◀</a>
 </body>
 </html>
