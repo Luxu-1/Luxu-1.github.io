@@ -122,11 +122,7 @@
     <!-- Imagen siempre visible debajo del canvas -->
     <img id="hidden-image" src="/media/texture/hiccolor.png" alt="Imagen oculta pixelada">
     <canvas id="scratch-canvas"></canvas>
-    <div class="instruction" id="instruction">✦ Rasga la oscuridad ✦</div>
     <div class="progress" id="progress">0%</div>
-    <div class="final-message" id="final-message">
-      ◈ has ganado ◈<br>
-      <span style="font-size: 14px; opacity: 0.6;">haz clic para continuar</span>
     </div>
   </div>
 
@@ -142,7 +138,7 @@
       
       let isDrawing = false;
       let isRevealed = false;
-      const threshold = 0.70;
+      const threshold = 0.50;
 
       // Tamaño del "píxel" de rasgado (cuadrados)
       const PIXEL_SIZE = 12; // Ajusta este valor para cambiar el tamaño del grano
