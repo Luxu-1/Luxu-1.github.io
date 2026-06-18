@@ -3,12 +3,335 @@
 <head>
   <meta charset="UTF-8">
   <title>His Fantasy</title>
+  <link rel="icon" type="image/png" href="/media/texture/icon.ico">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
     body {
-      background-color: black;
+      background-color: #1a1a1a;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      margin: 0;
+      overflow: hidden;
+      font-family: 'Courier New', monospace;
     }
+
+    /* Contenedor principal */
+    .container {
+      position: relative;
+      width: 90vmin;
+      height: 90vmin;
+      max-width: 800px;
+      max-height: 800px;
+      background-color: black;
+      border: 2px solid #333;
+      cursor: pointer;
+      overflow: hidden;
+      image-rendering: pixelated;
+    }
+
+    /* Imagen oculta (pixelada) */
+    #hidden-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: 1;
+    }
+
+    /* Capa de rasgado (canvas) */
+    #scratch-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      cursor: pointer;
+      touch-action: none;
+    }
+
+    /* Texto de instrucción */
+    .instruction {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255, 255, 255, 0.1);
+      font-size: 14px;
+      letter-spacing: 2px;
+      z-index: 3;
+      pointer-events: none;
+      text-transform: uppercase;
+      transition: opacity 0.8s ease;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* Mensaje final (clic para continuar) */
+    .final-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 24px;
+      z-index: 4;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+      text-align: center;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 3px;
+    }
+
+    .final-message.show {
+      opacity: 1;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    .final-message:hover {
+      text-shadow: 0 0 40px rgba(255, 255, 255, 0.6);
+    }
+
+    /* Contador de progreso */
+    .progress {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255, 255, 255, 0.05);
+      font-size: 12px;
+      z-index: 3;
+      pointer-events: none;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="container">
+    <!-- Imagen oculta (pixelada) -->
+    <img id="hidden-image" src="/media/texture/hiccolor.png" alt="Imagen oculta pixelada">
+    
+    <!-- Canvas para el rasgado -->
+    <canvas id="scratch-canvas"></canvas>
+    
+    <!-- Texto de instrucción -->
+    <div class="instruction" id="instruction">✦ Rasga la oscuridad ✦</div>
+    
+    <!-- Contador -->
+    <div class="progress" id="progress">0%</div>
+    
+    <!-- Mensaje final -->
+    <div class="final-message" id="final-message">
+      ◈ has ganado ◈<br>
+      <span style="font-size: 14px; opacity: 0.6;">haz clic para continuar</span>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const container = document.getElementById('container');
+      const canvas = document.getElementById('scratch-canvas');
+      const ctx = canvas.getContext('2d');
+      const hiddenImg = document.getElementById('hidden-image');
+      const instruction = document.getElementById('instruction');
+      const progress = document.getElementById('progress');
+      const finalMsg = document.getElementById('final-message');
+      
+      let isDrawing = false;
+      let isRevealed = false;
+      let scratchRadius = 30; // Tamaño del "rasgado"
+      let revealedPixels = 0;
+      let totalPixels = 0;
+      const threshold = 0.70; // 70% revelado para activar el mensaje
+
+      // Configurar canvas
+      function resizeCanvas() {
+        const rect = container.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+        
+        // Reiniciar el estado del canvas
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Calcular píxeles totales (para el progreso)
+        totalPixels = canvas.width * canvas.height;
+        revealedPixels = 0;
+        updateProgress();
+      }
+
+      // Función para rasgar (más eficiente)
+      function scratch(x, y) {
+        if (isRevealed) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        
+        const cx = (x - rect.left) * scaleX;
+        const cy = (y - rect.top) * scaleY;
+        
+        // Usar un círculo con degradado para un efecto más orgánico
+        const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, scratchRadius);
+        gradient.addColorStop(0, 'rgba(0,0,0,0)');
+        gradient.addColorStop(0.7, 'rgba(0,0,0,0.2)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0.8)');
+        
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(cx, cy, scratchRadius, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+        
+        // También hacer un rasgado más agresivo en el centro
+        ctx.beginPath();
+        ctx.arc(cx, cy, scratchRadius * 0.3, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,0,0,1)';
+        ctx.fill();
+        
+        ctx.globalCompositeOperation = 'source-over';
+        
+        // Actualizar progreso (estimado)
+        updateProgress();
+      }
+
+      // Actualizar porcentaje de revelado
+      function updateProgress() {
+        // Leer píxeles para calcular el progreso real
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        let transparent = 0;
+        
+        // Muestrear cada 4 píxeles para mejor rendimiento
+        for (let i = 3; i < data.length; i += 16) {
+          if (data[i] < 128) transparent++;
+        }
+        
+        const total = Math.ceil(data.length / 16);
+        const percent = Math.min(100, Math.round((transparent / total) * 100));
+        progress.textContent = percent + '%';
+        
+        // Si se alcanza el umbral, mostrar mensaje final
+        if (percent >= threshold * 100 && !isRevealed) {
+          revealComplete();
+        }
+      }
+
+      // Revelado completo
+      function revealComplete() {
+        isRevealed = true;
+        instruction.style.opacity = '0';
+        progress.style.opacity = '0';
+        
+        // Mostrar imagen completa
+        hiddenImg.style.opacity = '1';
+        
+        // Mostrar mensaje final
+        setTimeout(() => {
+          finalMsg.classList.add('show');
+        }, 300);
+      }
+
+      // Eventos de mouse
+      function onMouseDown(e) {
+        if (isRevealed) return;
+        isDrawing = true;
+        const pos = getEventPos(e);
+        scratch(pos.x, pos.y);
+        instruction.style.opacity = '0.3';
+      }
+
+      function onMouseMove(e) {
+        if (!isDrawing || isRevealed) return;
+        const pos = getEventPos(e);
+        scratch(pos.x, pos.y);
+      }
+
+      function onMouseUp() {
+        isDrawing = false;
+      }
+
+      // Eventos táctiles (para móviles)
+      function onTouchStart(e) {
+        e.preventDefault();
+        if (isRevealed) return;
+        const touch = e.touches[0];
+        const pos = getEventPos(touch);
+        isDrawing = true;
+        scratch(pos.x, pos.y);
+      }
+
+      function onTouchMove(e) {
+        e.preventDefault();
+        if (!isDrawing || isRevealed) return;
+        const touch = e.touches[0];
+        const pos = getEventPos(touch);
+        scratch(pos.x, pos.y);
+      }
+
+      function onTouchEnd() {
+        isDrawing = false;
+      }
+
+      // Obtener posición del evento
+      function getEventPos(e) {
+        const rect = container.getBoundingClientRect();
+        return {
+          x: e.clientX,
+          y: e.clientY
+        };
+      }
+
+      // Clic en el mensaje final (redirige)
+      finalMsg.addEventListener('click', function() {
+        if (isRevealed) {
+          window.location.href = '/views/hat.html'; // Cambia por donde quieras
+        }
+      });
+
+      // También clic en el contenedor cuando está revelado
+      container.addEventListener('click', function(e) {
+        if (isRevealed) {
+          window.location.href = '/views/hat.html';
+        }
+      });
+
+      // Redimensionar y reiniciar
+      window.addEventListener('resize', resizeCanvas);
+      
+      // Inicializar
+      resizeCanvas();
+
+      // Agregar event listeners
+      canvas.addEventListener('mousedown', onMouseDown);
+      canvas.addEventListener('mousemove', onMouseMove);
+      canvas.addEventListener('mouseup', onMouseUp);
+      canvas.addEventListener('mouseleave', onMouseUp);
+      
+      canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+      canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+      canvas.addEventListener('touchend', onTouchEnd, { passive: false });
+
+      // Efecto de píxeles al cargar (opcional)
+      console.log('✦ Rasga la oscuridad...');
+    })();
+  </script>
+</body>
+</html>
