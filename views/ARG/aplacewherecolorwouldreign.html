@@ -44,9 +44,9 @@
       height: 100%;
       object-fit: cover;
       image-rendering: pixelated;
-      opacity: 1;               /* ← Ahora siempre visible */
+      opacity: 1;
       z-index: 1;
-      background-color: black;  /* ← Fondo negro para transparencias */
+      background-color: black;
     }
 
     /* Capa de rasgado (canvas) */
@@ -122,7 +122,11 @@
     <!-- Imagen siempre visible debajo del canvas -->
     <img id="hidden-image" src="/media/texture/hiccolor.png" alt="Imagen oculta pixelada">
     <canvas id="scratch-canvas"></canvas>
+    <div class="instruction" id="instruction">✦ Rasga la oscuridad ✦</div>
     <div class="progress" id="progress">0%</div>
+    <div class="final-message" id="final-message">
+      ◈ has ganado ◈<br>
+      <span style="font-size: 14px; opacity: 0.6;">haz clic para continuar</span>
     </div>
   </div>
 
@@ -138,10 +142,10 @@
       
       let isDrawing = false;
       let isRevealed = false;
-      const threshold = 0.70;
+      const threshold = 0.45; // ← CAMBIADO A 45%
 
       // Tamaño del "píxel" de rasgado (cuadrados)
-      const PIXEL_SIZE = 12; // Ajusta este valor para cambiar el tamaño del grano
+      const PIXEL_SIZE = 12;
 
       function resizeCanvas() {
         const rect = container.getBoundingClientRect();
@@ -150,13 +154,11 @@
         canvas.style.width = rect.width + 'px';
         canvas.style.height = rect.height + 'px';
         
-        // Rellenar el canvas de negro (capa opaca)
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         updateProgress();
       }
 
-      // Función de rasgado con cuadrados (estilo pixel art)
       function scratch(x, y) {
         if (isRevealed) return;
         
@@ -164,11 +166,9 @@
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
         
-        // Coordenadas en el canvas
         const cx = (x - rect.left) * scaleX;
         const cy = (y - rect.top) * scaleY;
         
-        // Dibujar un cuadrado (píxel) en modo "destination-out" para borrar
         ctx.globalCompositeOperation = 'destination-out';
         const half = PIXEL_SIZE / 2;
         ctx.fillRect(cx - half, cy - half, PIXEL_SIZE, PIXEL_SIZE);
@@ -182,7 +182,6 @@
         const data = imageData.data;
         let transparent = 0;
         
-        // Contar píxeles transparentes (alfa < 128)
         for (let i = 3; i < data.length; i += 4) {
           if (data[i] < 128) transparent++;
         }
@@ -198,12 +197,23 @@
 
       function revealComplete() {
         isRevealed = true;
+        
+        // 🔥 AUTOCOMPLETAR: Borrar TODO el canvas de una vez
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillStyle = 'rgba(0,0,0,1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.globalCompositeOperation = 'source-over';
+        
+        // Actualizar progreso a 100%
+        progress.textContent = '100%';
+        
+        // Ocultar instrucciones y mostrar mensaje final
         instruction.style.opacity = '0';
         progress.style.opacity = '0';
-        // La imagen ya es visible, solo mostramos el mensaje
+        
         setTimeout(() => {
           finalMsg.classList.add('show');
-        }, 300);
+        }, 400);
       }
 
       // Eventos de mouse
@@ -255,7 +265,6 @@
         };
       }
 
-      // Clic en mensaje final o en el contenedor (cuando está revelado)
       finalMsg.addEventListener('click', function() {
         if (isRevealed) {
           window.location.href = '/views/hat.html';
