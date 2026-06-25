@@ -1,312 +1,223 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Zelda - Aventura CRT</title>
-  <link rel="icon" type="image/png" href="/media/texture/icon.ico">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
-    body {
-      background:#1a1a1a;
-      display:flex; justify-content:center; align-items:center;
-      height:100vh; overflow:hidden;
-      font-family:'Courier New',monospace;
-    }
-    .game-container {
-      position:relative;
-      background:#2a2a2a;
-      border:3px solid #444;
-      border-radius:8px;
-      padding:10px;
-      box-shadow:0 0 30px rgba(0,0,0,0.8);
-    }
-    canvas {
-      display:block;
-      width:500px;
-      height:500px;
-      image-rendering:pixelated;
-      image-rendering:crisp-edges;
-      background:#3a3a3a;
-      cursor:none;
-    }
-    .controls-info {
-      color:rgba(255,255,255,0.2);
-      text-align:center;
-      font-size:14px;
-      padding:8px 0;
-      letter-spacing:1px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controles Móvil + Tecla Z</title>
+    <style>
+        * { box-sizing: border-box; user-select: none; }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #1a1a2e;
+            font-family: sans-serif;
+            touch-action: pan-y; /* Evita zoom al tocar botones */
+        }
+        .game-container {
+            background: #16213e;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        /* El cuadrado que se mueve */
+        #player {
+            width: 50px;
+            height: 50px;
+            background: #e94560;
+            border-radius: 10px;
+            position: relative;
+            left: 0;
+            top: 0;
+            transition: left 0.1s, top 0.1s; /* Suavizado */
+            box-shadow: 0 0 20px #e9456080;
+        }
+        #game-board {
+            width: 300px;
+            height: 300px;
+            background: #0f3460;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+            touch-action: none; /* Para que el canvas no interfiera */
+        }
+        /* Controles táctiles */
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+        .ctrl-btn {
+            background: #533483;
+            border: none;
+            border-radius: 16px;
+            padding: 18px 0;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 4px 0 #2d1b4e;
+            touch-action: manipulation; /* Mejora respuesta táctil */
+        }
+        .ctrl-btn:active {
+            transform: scale(0.92);
+            box-shadow: 0 2px 0 #2d1b4e;
+        }
+        .ctrl-btn.action {
+            background: #e94560;
+            box-shadow: 0 4px 0 #a03248;
+            font-size: 1.8rem;
+        }
+        .empty { visibility: hidden; } /* Celda vacía para mantener grid */
 
-    /* ==================== OVERLAY CRT ==================== */
-    .crt-overlay {
-      position: absolute;
-      top: 10px;   /* Para que coincida con el padding del contenedor */
-      left: 10px;
-      width: calc(100% - 20px);
-      height: calc(100% - 20px);
-      pointer-events: none;  /* Permite que los clics pasen al canvas */
-      z-index: 10;
-      border-radius: 4px;    /* Para que siga el borde del canvas */
-      overflow: hidden;
-    }
-
-    /* Capa de scanlines (líneas horizontales) */
-    .crt-overlay::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: repeating-linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0.15) 0px,
-        rgba(0, 0, 0, 0.15) 2px,
-        transparent 2px,
-        transparent 4px
-      );
-      pointer-events: none;
-      z-index: 11;
-    }
-
-    /* Capa de viñeta (curvatura) y ligera oscuridad en bordes */
-    .crt-overlay::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: radial-gradient(
-        ellipse at center,
-        transparent 60%,
-        rgba(0, 0, 0, 0.4) 100%
-      );
-      pointer-events: none;
-      z-index: 12;
-    }
-
-    /* Animación de parpadeo sutil (flicker) */
-    @keyframes flicker {
-      0% { opacity: 0.97; }
-      50% { opacity: 1; }
-      100% { opacity: 0.97; }
-    }
-    .crt-overlay {
-      animation: flicker 0.15s infinite alternate;
-    }
-
-    /* Efecto de "pixel bleed" opcional: ligero brillo en scanlines (descomentar si se desea) */
-    /*
-    .crt-overlay {
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
-    }
-    */
-  </style>
+        /* Indicador de tecla Z */
+        .info {
+            color: #aaa;
+            text-align: center;
+            margin-top: 12px;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        .info kbd {
+            background: #222;
+            padding: 4px 12px;
+            border-radius: 8px;
+            color: #e94560;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-<div class="game-container">
-  <canvas id="gameCanvas" width="500" height="500"></canvas>
-  <div class="controls-info">WASD / Flechas para mover</div>
 
-  <!-- OVERLAY CRT -->
-  <div class="crt-overlay"></div>
+<div class="game-container">
+    <div id="game-board">
+        <div id="player"></div>
+    </div>
+
+    <!-- Botones táctiles -->
+    <div class="controls">
+        <div class="empty"></div> <!-- Arriba -->
+        <button class="ctrl-btn" id="btn-up">⬆</button>
+        <div class="empty"></div>
+
+        <button class="ctrl-btn" id="btn-left">⬅</button>
+        <button class="ctrl-btn action" id="btn-action">⚡ Z</button>
+        <button class="ctrl-btn" id="btn-right">➡</button>
+
+        <div class="empty"></div>
+        <button class="ctrl-btn" id="btn-down">⬇</button>
+        <div class="empty"></div>
+    </div>
+
+    <div class="info">
+        En PC presiona <kbd>Z</kbd> para acción
+    </div>
 </div>
 
 <script>
-  (function() {
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
+    (function() {
+        const player = document.getElementById('player');
+        const board = document.getElementById('game-board');
+        const BOARD_SIZE = 300;
+        const STEP = 20; // Píxeles por pulsación
 
-    // ==================== SPRITE SHEET ====================
-    const SPRITE_SHEET_URL = '/media/texture/sprite_sheet.png';
-    const SPRITE_W = 22;
-    const SPRITE_H = 28;
-    const SCALE = 2.18;
-    const CHAR_W = Math.round(SPRITE_W * SCALE);
-    const CHAR_H = Math.round(SPRITE_H * SCALE);
+        // Estado
+        let x = 0, y = 0;
 
-    const SPRITES = {
-      IDLE:      { col:0, row:0 },
-      WALK1:     { col:1, row:0 },
-      WALK2:     { col:2, row:0 },
-      SIDE_IDLE: { col:3, row:0 },
-      SIDE_WALK: { col:4, row:0 },
-    };
-
-    // ==================== JUGADOR ====================
-    const player = {
-      x: 250 - CHAR_W/2,
-      y: 250 - CHAR_H/2,
-      width: CHAR_W,
-      height: CHAR_H,
-      speed: 1.5,
-      dir: 'down',
-      moving: false,
-      frame: 0,
-      frameTimer: 0,
-      frameDelay: 10,
-      spriteCol: SPRITES.IDLE.col,
-      spriteRow: SPRITES.IDLE.row,
-      flipX: false,
-    };
-
-    // ==================== TECLAS ====================
-    const keys = { up:false, down:false, left:false, right:false };
-
-    // ==================== CARGA DE SPRITE SHEET ====================
-    const spriteSheet = new Image();
-    spriteSheet.src = SPRITE_SHEET_URL;
-    let sheetLoaded = false;
-
-    spriteSheet.onload = () => {
-      sheetLoaded = true;
-      console.log('✅ Sprite sheet cargado');
-    };
-    spriteSheet.onerror = () => {
-      console.error('❌ Error al cargar el sprite sheet. Verifica la ruta:', SPRITE_SHEET_URL);
-      ctx.fillStyle = 'red';
-      ctx.font = '16px monospace';
-      ctx.fillText('Error: no se encontró el sprite sheet', 150, 250);
-    };
-
-    // ==================== ACTUALIZACIÓN ====================
-    function update() {
-      let dx=0, dy=0;
-      if (keys.up) dy = -1;
-      if (keys.down) dy = 1;
-      if (keys.left) dx = -1;
-      if (keys.right) dx = 1;
-
-      if (dx!==0 && dy!==0) { dx*=0.7071; dy*=0.7071; }
-
-      const moving = (dx!==0 || dy!==0);
-      player.moving = moving;
-
-      if (moving) {
-        player.x += dx * player.speed;
-        player.y += dy * player.speed;
-        player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
-        player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
-
-        if (dx > 0) player.dir = 'right';
-        else if (dx < 0) player.dir = 'left';
-        else if (dy < 0) player.dir = 'up';
-        else if (dy > 0) player.dir = 'down';
-
-        player.frameTimer++;
-        if (player.frameTimer >= player.frameDelay) {
-          player.frameTimer = 0;
-          player.frame = 1 - player.frame;
+        // Límites
+        function clamp(value, max) {
+            return Math.max(0, Math.min(max, value));
         }
 
-        const dir = player.dir;
-        if (dir === 'up' || dir === 'down') {
-          player.spriteCol = (player.frame === 0) ? SPRITES.WALK1.col : SPRITES.WALK2.col;
-          player.spriteRow = SPRITES.WALK1.row;
-          player.flipX = false;
-        } else {
-          player.spriteCol = (player.frame === 0) ? SPRITES.SIDE_WALK.col : SPRITES.SIDE_IDLE.col;
-          player.spriteRow = SPRITES.SIDE_IDLE.row;
-          player.flipX = (dir === 'left');
+        function movePlayer(dx, dy) {
+            x = clamp(x + dx, BOARD_SIZE - 50);
+            y = clamp(y + dy, BOARD_SIZE - 50);
+            player.style.left = x + 'px';
+            player.style.top = y + 'px';
         }
-      } else {
-        const dir = player.dir;
-        if (dir === 'up' || dir === 'down') {
-          player.spriteCol = SPRITES.IDLE.col;
-          player.spriteRow = SPRITES.IDLE.row;
-          player.flipX = false;
-        } else {
-          player.spriteCol = SPRITES.SIDE_IDLE.col;
-          player.spriteRow = SPRITES.SIDE_IDLE.row;
-          player.flipX = (dir === 'left');
+
+        // --- ACCIÓN (tecla Z o botón táctil) ---
+        function doAction() {
+            // Ejemplo: cambia de color y da un "salto" visual
+            player.style.transition = 'all 0.15s';
+            player.style.transform = 'scale(1.4)';
+            player.style.background = '#f5c842';
+            player.style.boxShadow = '0 0 40px #f5c842';
+
+            setTimeout(() => {
+                player.style.transform = 'scale(1)';
+                player.style.background = '#e94560';
+                player.style.boxShadow = '0 0 20px #e9456080';
+                // Restauramos transición suave para movimiento
+                setTimeout(() => {
+                    player.style.transition = 'left 0.1s, top 0.1s';
+                }, 50);
+            }, 200);
         }
-        player.frame = 0;
-        player.frameTimer = 0;
-      }
-    }
 
-    // ==================== DIBUJADO ====================
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      // Fondo
-      ctx.fillStyle = '#2e5a3a';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#3a6b4a';
-      for (let i=0; i<canvas.width; i+=60) {
-        for (let j=0; j<canvas.height; j+=60) {
-          ctx.fillRect(i+5, j+5, 8, 8);
-          ctx.fillRect(i+20, j+20, 8, 8);
+        // --- EVENTOS TÁCTILES (con soporte para clics y toques largos) ---
+        function setupButton(id, dx, dy) {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+
+            // Prevenir comportamiento por defecto (scroll, zoom)
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (id === 'btn-action') {
+                    doAction();
+                } else {
+                    movePlayer(dx, dy);
+                }
+            }, { passive: false });
+
+            btn.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                if (id === 'btn-action') {
+                    doAction();
+                } else {
+                    movePlayer(dx, dy);
+                }
+            });
         }
-      }
 
-      if (sheetLoaded) {
-        const sx = player.spriteCol * SPRITE_W;
-        const sy = player.spriteRow * SPRITE_H;
-        ctx.imageSmoothingEnabled = false;
+        setupButton('btn-up', 0, -STEP);
+        setupButton('btn-down', 0, STEP);
+        setupButton('btn-left', -STEP, 0);
+        setupButton('btn-right', STEP, 0);
+        setupButton('btn-action', 0, 0); // No mueve, solo acción
 
-        if (player.flipX) {
-          ctx.save();
-          ctx.translate(player.x + player.width/2, player.y + player.height/2);
-          ctx.scale(-1, 1);
-          ctx.drawImage(
-            spriteSheet,
-            sx, sy, SPRITE_W, SPRITE_H,
-            -player.width/2, -player.height/2, player.width, player.height
-          );
-          ctx.restore();
-        } else {
-          ctx.drawImage(
-            spriteSheet,
-            sx, sy, SPRITE_W, SPRITE_H,
-            player.x, player.y, player.width, player.height
-          );
-        }
-      } else {
-        ctx.fillStyle = '#ff00ff';
-        ctx.fillRect(player.x, player.y, player.width, player.height);
-        ctx.fillStyle = 'white';
-        ctx.font = '12px monospace';
-        ctx.fillText('Cargando...', player.x+2, player.y+15);
-      }
-    }
+        // --- TECLA Z (acción) ---
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'z' || e.key === 'Z') {
+                e.preventDefault(); // Evita que la Z escriba en inputs
+                doAction();
+            }
+        });
 
-    // ==================== BUCLE ====================
-    function gameLoop() {
-      update();
-      draw();
-      requestAnimationFrame(gameLoop);
-    }
+        // También las flechas del teclado (opcional, para PC)
+        document.addEventListener('keydown', (e) => {
+            const key = e.key;
+            // Evita scroll con flechas
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+                e.preventDefault();
+            }
+            switch(key) {
+                case 'ArrowUp': movePlayer(0, -STEP); break;
+                case 'ArrowDown': movePlayer(0, STEP); break;
+                case 'ArrowLeft': movePlayer(-STEP, 0); break;
+                case 'ArrowRight': movePlayer(STEP, 0); break;
+            }
+        });
 
-    // ==================== EVENTOS DE TECLADO ====================
-    function handleKeyDown(e) {
-      const key = e.key;
-      if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(key)) e.preventDefault();
-      if (key === 'w'||key==='W'||key==='ArrowUp') keys.up = true;
-      if (key === 's'||key==='S'||key==='ArrowDown') keys.down = true;
-      if (key === 'a'||key==='A'||key==='ArrowLeft') keys.left = true;
-      if (key === 'd'||key==='D'||key==='ArrowRight') keys.right = true;
-    }
-    function handleKeyUp(e) {
-      const key = e.key;
-      if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(key)) e.preventDefault();
-      if (key === 'w'||key==='W'||key==='ArrowUp') keys.up = false;
-      if (key === 's'||key==='S'||key==='ArrowDown') keys.down = false;
-      if (key === 'a'||key==='A'||key==='ArrowLeft') keys.left = false;
-      if (key === 'd'||key==='D'||key==='ArrowRight') keys.right = false;
-    }
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-
-    // ==================== INICIO ====================
-    if (spriteSheet.complete && spriteSheet.naturalWidth !== 0) {
-      sheetLoaded = true;
-      console.log('✅ Sprite sheet cargado desde caché');
-    }
-    gameLoop();
-    console.log('🎮 Juego iniciado con overlay CRT.');
-  })();
+        // Posición inicial
+        movePlayer(0, 0);
+        console.log('Controles listos. Pulsa Z o botón ⚡');
+    })();
 </script>
 </body>
 </html>
