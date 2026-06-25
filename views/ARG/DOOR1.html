@@ -6,6 +6,7 @@
   <link rel="icon" type="image/png" href="/media/texture/icon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
+    /* ========== ESTILOS (igual que antes) ========== */
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
     body {
       background:#1a1a1a;
@@ -41,8 +42,6 @@
       cursor:none;
       touch-action: none;
     }
-
-    /* ==================== OVERLAY CRT ==================== */
     .crt-overlay {
       position: absolute;
       top: 10px;
@@ -94,8 +93,6 @@
     .crt-overlay {
       animation: flicker 0.15s infinite alternate;
     }
-
-    /* ==================== INFO BAR ==================== */
     .info-bar {
       display:flex;
       justify-content:space-between;
@@ -115,7 +112,6 @@
     .info-bar .highlight {
       color:rgba(255,255,255,0.4);
     }
-
     .controls-info {
       color:rgba(255,255,255,0.2);
       text-align:center;
@@ -123,8 +119,6 @@
       padding:4px 0;
       letter-spacing:1px;
     }
-
-    /* ==================== CONTROLES TÁCTILES ==================== */
     .touch-controls {
       display: none;
       width:100%;
@@ -166,7 +160,6 @@
     .dpad-down  { bottom:0; left:55px; }
     .dpad-left  { top:55px; left:0; }
     .dpad-right { top:55px; right:0; }
-
     .action-btn {
       width:80px;
       height:80px;
@@ -190,7 +183,6 @@
       border-color:rgba(255,200,50,0.8);
       transform:scale(0.92);
     }
-
     @media (pointer: coarse) {
       .touch-controls { display:flex; }
       .controls-info .pc-only { display:none; }
@@ -221,7 +213,6 @@
     <canvas id="gameCanvas" width="500" height="500"></canvas>
     <div class="crt-overlay"></div>
   </div>
-
   <div class="info-bar">
     <span>⬆ <span id="upCounter" class="highlight">0</span></span>
     <span>⬇ <span id="downCounter" class="highlight">0</span></span>
@@ -229,12 +220,10 @@
     <span>➡ <span id="rightCounter" class="highlight">0</span></span>
     <span>🚶 <span id="totalSteps" class="highlight">0</span></span>
   </div>
-
   <div class="controls-info">
     <span class="pc-only">WASD / Flechas · Z = acción / hablar</span>
     <span class="mobile-only">Botones táctiles</span>
   </div>
-
   <div class="touch-controls" id="touchControls">
     <div class="dpad" id="dpad">
       <button class="dpad-btn dpad-up" data-dir="up">▲</button>
@@ -266,11 +255,8 @@
       WALK2:     { col:2, row:0 },
       SIDE_IDLE: { col:3, row:0 },
       SIDE_WALK: { col:4, row:0 },
-      BABY_KING: { col:0, row:2 },
-      KING:      { col:1, row:2 },
-      ANGEL:     { col:0, row:1 },
-      CARTEL1:   { col:0, row:2 }, // Baby King está en row:2 col:0
-      // Ajuste: según tu tabla, Baby King está en fila 2, columna 0
+      BABY_KING: { col:0, row:3 },
+      KING:      { col:1, row:3 },
     };
 
     // ==================== JUGADOR ====================
@@ -300,7 +286,7 @@
       spriteCol: SPRITES.IDLE.col,
       spriteRow: SPRITES.IDLE.row,
       flipX: false,
-      talked: false, // para saber si ya habló
+      talked: false,
     };
 
     // ==================== BABY KING ====================
@@ -316,17 +302,16 @@
       talked: false,
     };
 
-    // ==================== SISTEMA DE DIÁLOGO ====================
+    // ==================== DIÁLOGO ====================
     const dialog = {
       active: false,
       text: '',
       displayText: '',
       charIndex: 0,
       charTimer: 0,
-      charDelay: 3, // frames entre letras (más lento)
-      speed: 'slow', // 'slow' o 'fast'
-      speaker: null, // 'clone' o 'babyKing'
-      onComplete: null,
+      charDelay: 5,
+      speed: 'slow',
+      speaker: null,
       complete: false,
     };
 
@@ -341,7 +326,7 @@
     // ==================== TECLAS ====================
     const keys = { up:false, down:false, left:false, right:false, action:false };
 
-    // ==================== UI ELEMENTS ====================
+    // ==================== UI ====================
     const upCounterEl = document.getElementById('upCounter');
     const downCounterEl = document.getElementById('downCounter');
     const leftCounterEl = document.getElementById('leftCounter');
@@ -356,39 +341,28 @@
       totalStepsEl.textContent = counters.total;
     }
 
-    // ==================== CARGA DE SPRITE SHEET ====================
+    // ==================== CARGA DE SPRITE ====================
     const spriteSheet = new Image();
     spriteSheet.src = SPRITE_SHEET_URL;
     let sheetLoaded = false;
+    spriteSheet.onload = () => { sheetLoaded = true; console.log('✅ Sprite sheet cargado'); };
+    spriteSheet.onerror = () => { console.error('❌ Error al cargar el sprite sheet.'); };
 
-    spriteSheet.onload = () => {
-      sheetLoaded = true;
-      console.log('✅ Sprite sheet cargado');
-    };
-    spriteSheet.onerror = () => {
-      console.error('❌ Error al cargar el sprite sheet. Verifica la ruta:', SPRITE_SHEET_URL);
-    };
-
-    // ==================== SONIDO (Web Audio) ====================
+    // ==================== SONIDO ====================
     let audioCtx = null;
-
     function playTickSound() {
       try {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        const oscillator = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        oscillator.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-        oscillator.type = 'square';
-        oscillator.frequency.value = 800 + Math.random() * 200;
-        gainNode.gain.value = 0.03;
-        oscillator.start();
-        oscillator.stop(audioCtx.currentTime + 0.03);
-      } catch (e) {
-        // Silenciar errores de audio
-      }
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'square';
+        osc.frequency.value = 800 + Math.random() * 200;
+        gain.gain.value = 0.03;
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.03);
+      } catch (e) {}
     }
 
     // ==================== DIÁLOGO ====================
@@ -402,62 +376,43 @@
       dialog.speed = speed;
       dialog.speaker = speaker;
       dialog.complete = false;
-      dialog.charDelay = (speed === 'slow') ? 5 : 1; // lento o rápido
-      console.log(`💬 Diálogo iniciado: "${text}" (${speed})`);
+      dialog.charDelay = (speed === 'slow') ? 5 : 1;
     }
 
     function updateDialog() {
-      if (!dialog.active) return;
-      if (dialog.complete) return;
-
+      if (!dialog.active || dialog.complete) return;
       dialog.charTimer++;
       if (dialog.charTimer >= dialog.charDelay) {
         dialog.charTimer = 0;
         if (dialog.charIndex < dialog.text.length) {
           dialog.displayText += dialog.text[dialog.charIndex];
           dialog.charIndex++;
-          playTickSound(); // Sonido al escribir
+          playTickSound();
         } else {
           dialog.complete = true;
-          console.log('✅ Diálogo completado');
         }
       }
     }
 
     function drawDialog() {
       if (!dialog.active) return;
-
-      const dialogWidth = canvas.width * 0.85;
-      const dialogHeight = 100;
-      const x = (canvas.width - dialogWidth) / 2;
-      const y = canvas.height - dialogHeight - 20;
-
-      // Fondo negro
+      const dw = canvas.width * 0.85, dh = 100;
+      const x = (canvas.width - dw) / 2, y = canvas.height - dh - 20;
       ctx.fillStyle = 'black';
       ctx.shadowColor = 'rgba(0,0,0,0.5)';
       ctx.shadowBlur = 20;
-      ctx.fillRect(x, y, dialogWidth, dialogHeight);
+      ctx.fillRect(x, y, dw, dh);
       ctx.shadowBlur = 0;
-
-      // Borde blanco (Undertale style)
       ctx.strokeStyle = 'white';
       ctx.lineWidth = 4;
-      ctx.strokeRect(x, y, dialogWidth, dialogHeight);
-
-      // Texto
+      ctx.strokeRect(x, y, dw, dh);
       ctx.fillStyle = 'white';
       ctx.font = '18px "Courier New", monospace';
       ctx.textBaseline = 'top';
-      ctx.imageSmoothingEnabled = false;
-
-      // Escribir el texto con márgenes
       const margin = 15;
-      const maxWidth = dialogWidth - margin * 2;
-      let lines = [];
-      let currentLine = '';
+      const maxWidth = dw - margin * 2;
+      let lines = [], currentLine = '';
       const words = dialog.displayText.split(' ');
-
-      // Dividir en líneas
       for (let word of words) {
         let testLine = currentLine + (currentLine ? ' ' : '') + word;
         if (ctx.measureText(testLine).width > maxWidth) {
@@ -468,53 +423,41 @@
         }
       }
       if (currentLine) lines.push(currentLine);
-
-      // Dibujar líneas
       const lineHeight = 26;
-      const startY = y + margin;
       for (let i = 0; i < Math.min(lines.length, 3); i++) {
-        ctx.fillText(lines[i], x + margin, startY + i * lineHeight);
+        ctx.fillText(lines[i], x + margin, y + margin + i * lineHeight);
       }
-
-      // Si el diálogo está completo, mostrar flecha parpadeante
       if (dialog.complete) {
         const blink = Math.floor(Date.now() / 500) % 2 === 0;
         if (blink) {
           ctx.fillStyle = 'white';
           ctx.font = '20px monospace';
-          ctx.fillText('▼', x + dialogWidth - 30, y + dialogHeight - 25);
+          ctx.fillText('▼', x + dw - 30, y + dh - 25);
         }
       }
     }
 
-    // ==================== TELEPORT PAC-MAN ====================
+    // ==================== TELEPORT ====================
     function teleportPlayer() {
       const margin = 20;
       if (player.y + player.height < -margin) {
         player.y = canvas.height + margin;
-        counters.up++;
-        counters.total++;
+        counters.up++; counters.total++;
         handleConsecutive('up');
         updateUI();
-      }
-      else if (player.y > canvas.height + margin) {
+      } else if (player.y > canvas.height + margin) {
         player.y = -player.height - margin;
-        counters.down++;
-        counters.total++;
+        counters.down++; counters.total++;
         handleConsecutive('down');
         updateUI();
-      }
-      else if (player.x + player.width < -margin) {
+      } else if (player.x + player.width < -margin) {
         player.x = canvas.width + margin;
-        counters.left++;
-        counters.total++;
+        counters.left++; counters.total++;
         handleConsecutive('left');
         updateUI();
-      }
-      else if (player.x > canvas.width + margin) {
+      } else if (player.x > canvas.width + margin) {
         player.x = -player.width - margin;
-        counters.right++;
-        counters.total++;
+        counters.right++; counters.total++;
         handleConsecutive('right');
         updateUI();
       }
@@ -567,39 +510,64 @@
       console.log('👑 ¡Baby King apareció!');
     }
 
+    // ==================== DESAPARECER AL MOVERSE ====================
+    let playerMovedAfterSpawn = false;
+
+    function checkMovementForDespawn() {
+      if (!clone.active && !babyKing.active) {
+        playerMovedAfterSpawn = false;
+        return;
+      }
+
+      const isMoving = (keys.up || keys.down || keys.left || keys.right);
+      
+      if (isMoving && !playerMovedAfterSpawn) {
+        playerMovedAfterSpawn = true;
+        
+        if (clone.active) {
+          clone.active = false;
+          clone.talked = false;
+          console.log('👥 Clon desapareció al moverse');
+        }
+        
+        if (babyKing.active) {
+          babyKing.active = false;
+          babyKing.talked = false;
+          console.log('👑 Baby King desapareció al moverse');
+        }
+      }
+      
+      if (!clone.active && !babyKing.active) {
+        playerMovedAfterSpawn = false;
+      }
+    }
+
     // ==================== INTERACCIÓN ====================
     function checkInteraction() {
       if (dialog.active) {
-        // Si el diálogo está completo, cerrarlo al presionar acción
         if (dialog.complete) {
           dialog.active = false;
           console.log('💬 Diálogo cerrado');
-          return;
         }
         return;
       }
 
-      // Distancia para interactuar
       const interactDist = 60;
 
-      // Verificar si el jugador está cerca del clon
       if (clone.active && !clone.talked) {
         const dx = player.x - clone.x;
         const dy = player.y - clone.y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < interactDist) {
+        if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
           startDialog('You loomed too high', 'clone', 'slow');
           clone.talked = true;
           return;
         }
       }
 
-      // Verificar si el jugador está cerca de Baby King
       if (babyKing.active && !babyKing.talked) {
         const dx = player.x - babyKing.x;
         const dy = player.y - babyKing.y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < interactDist) {
+        if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
           startDialog('I loomed too high', 'babyKing', 'slow');
           babyKing.talked = true;
           return;
@@ -607,7 +575,7 @@
       }
     }
 
-    // ==================== ACTUALIZACIÓN ====================
+    // ==================== UPDATE ====================
     function update() {
       let dx=0, dy=0;
       if (keys.up) dy = -1;
@@ -619,6 +587,9 @@
 
       const moving = (dx!==0 || dy!==0);
       player.moving = moving;
+
+      // ====== VERIFICAR DESAPARICIÓN ======
+      checkMovementForDespawn();
 
       if (moving && !dialog.active) {
         player.x += dx * player.speed;
@@ -661,20 +632,17 @@
         player.frameTimer = 0;
       }
 
-      // ====== ACTUALIZAR DIÁLOGO ======
       updateDialog();
 
-      // ====== ACCIÓN ======
       if (keys.action) {
         checkInteraction();
         keys.action = false;
       }
     }
 
-    // ==================== DIBUJADO ====================
+    // ==================== DRAW ====================
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      // Fondo
       ctx.fillStyle = '#2e5a3a';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#3a6b4a';
@@ -686,51 +654,30 @@
       }
 
       if (sheetLoaded) {
-        // ====== DIBUJAR CLON ======
         if (clone.active) {
           const sx = clone.spriteCol * SPRITE_W;
           const sy = clone.spriteRow * SPRITE_H;
           ctx.globalAlpha = 0.7;
-          ctx.drawImage(
-            spriteSheet,
-            sx, sy, SPRITE_W, SPRITE_H,
-            clone.x, clone.y, clone.width, clone.height
-          );
+          ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, clone.x, clone.y, clone.width, clone.height);
           ctx.globalAlpha = 1.0;
         }
 
-        // ====== DIBUJAR BABY KING ======
         if (babyKing.active) {
           const sx = babyKing.spriteCol * SPRITE_W;
           const sy = babyKing.spriteRow * SPRITE_H;
-          ctx.drawImage(
-            spriteSheet,
-            sx, sy, SPRITE_W, SPRITE_H,
-            babyKing.x, babyKing.y, babyKing.width, babyKing.height
-          );
+          ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, babyKing.x, babyKing.y, babyKing.width, babyKing.height);
         }
 
-        // ====== DIBUJAR JUGADOR ======
         const sx = player.spriteCol * SPRITE_W;
         const sy = player.spriteRow * SPRITE_H;
-        ctx.imageSmoothingEnabled = false;
-
         if (player.flipX) {
           ctx.save();
           ctx.translate(player.x + player.width/2, player.y + player.height/2);
           ctx.scale(-1, 1);
-          ctx.drawImage(
-            spriteSheet,
-            sx, sy, SPRITE_W, SPRITE_H,
-            -player.width/2, -player.height/2, player.width, player.height
-          );
+          ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, -player.width/2, -player.height/2, player.width, player.height);
           ctx.restore();
         } else {
-          ctx.drawImage(
-            spriteSheet,
-            sx, sy, SPRITE_W, SPRITE_H,
-            player.x, player.y, player.width, player.height
-          );
+          ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, player.x, player.y, player.width, player.height);
         }
       } else {
         ctx.fillStyle = '#ff00ff';
@@ -740,18 +687,17 @@
         ctx.fillText('Cargando...', player.x+2, player.y+15);
       }
 
-      // ====== DIBUJAR DIÁLOGO (siempre encima) ======
       drawDialog();
     }
 
-    // ==================== BUCLE ====================
+    // ==================== GAMELOOP ====================
     function gameLoop() {
       update();
       draw();
       requestAnimationFrame(gameLoop);
     }
 
-    // ==================== EVENTOS DE TECLADO ====================
+    // ==================== EVENTOS ====================
     function handleKeyDown(e) {
       const key = e.key;
       if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(key)) e.preventDefault();
@@ -762,10 +708,8 @@
       if (key === 'z'||key==='Z') {
         keys.action = true;
         e.preventDefault();
-        // También permitir cerrar diálogo con Z
         if (dialog.active && dialog.complete) {
           dialog.active = false;
-          console.log('💬 Diálogo cerrado con Z');
         }
       }
     }
@@ -822,11 +766,9 @@
         else if (dir === 'right') assignTouchEvents(btn, 'right', 'left');
       });
 
-      // Botón de acción: también cierra diálogo
       actionBtn.addEventListener('click', () => {
         if (dialog.active && dialog.complete) {
           dialog.active = false;
-          console.log('💬 Diálogo cerrado con botón táctil');
         } else {
           keys.action = true;
           checkInteraction();
@@ -834,12 +776,10 @@
         }
       });
 
-      // También touchstart para mejor respuesta
       actionBtn.addEventListener('touchstart', (e) => {
         e.preventDefault();
         if (dialog.active && dialog.complete) {
           dialog.active = false;
-          console.log('💬 Diálogo cerrado con botón táctil');
         } else {
           keys.action = true;
           checkInteraction();
@@ -852,14 +792,10 @@
     // ==================== INICIO ====================
     if (spriteSheet.complete && spriteSheet.naturalWidth !== 0) {
       sheetLoaded = true;
-      console.log('✅ Sprite sheet cargado desde caché');
     }
     gameLoop();
     updateUI();
-    console.log('🎮 Juego iniciado con sistema de diálogo Undertale.');
-    console.log('⬆ 6 pasos seguidos → Clon (dice: "You loomed too high")');
-    console.log('⬇ 8 pasos seguidos → Baby King (dice: "I loomed too high")');
-    console.log('🔹 Acércate y presiona Z para hablar.');
+    console.log('🎮 Juego iniciado. Los personajes desaparecen al moverte.');
   })();
 </script>
 </body>
