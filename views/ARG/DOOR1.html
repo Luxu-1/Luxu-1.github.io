@@ -51,14 +51,14 @@
     ctx.imageSmoothingEnabled = false;
 
     // ==================== SPRITE SHEET ====================
-    const SPRITE_SHEET_URL = '/media/texture/sprite_sheet.png'; // ¡Cambia por tu ruta!
+    const SPRITE_SHEET_URL = '/media/texture/sprite_sheet.png'; // Cambia por tu ruta
     const SPRITE_W = 22;
     const SPRITE_H = 28;
     const SCALE = 2.18;
     const CHAR_W = Math.round(SPRITE_W * SCALE);
     const CHAR_H = Math.round(SPRITE_H * SCALE);
 
-    // Definición de sprites según tu tabla (fila 0)
+    // Sprites según tu tabla (fila 0, columnas 0-4)
     const SPRITES = {
       IDLE:      { col:0, row:0 }, // parado frontal
       WALK1:     { col:1, row:0 }, // caminar frame 1
@@ -122,13 +122,11 @@
         player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
         player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
 
-        // Dirección
         if (dx > 0) player.dir = 'right';
         else if (dx < 0) player.dir = 'left';
         else if (dy < 0) player.dir = 'up';
         else if (dy > 0) player.dir = 'down';
 
-        // Animación
         player.frameTimer++;
         if (player.frameTimer >= player.frameDelay) {
           player.frameTimer = 0;
@@ -137,17 +135,12 @@
 
         const dir = player.dir;
         if (dir === 'up' || dir === 'down') {
-          // Vertical: alternar WALK1 y WALK2
           player.spriteCol = (player.frame === 0) ? SPRITES.WALK1.col : SPRITES.WALK2.col;
           player.spriteRow = SPRITES.WALK1.row;
           player.flipX = false;
         } else {
-          // Lateral: alternar SIDE_WALK y SIDE_IDLE
-          if (player.frame === 0) {
-            player.spriteCol = SPRITES.SIDE_WALK.col;
-          } else {
-            player.spriteCol = SPRITES.SIDE_IDLE.col;
-          }
+          // Lateral: alterna entre SIDE_WALK y SIDE_IDLE
+          player.spriteCol = (player.frame === 0) ? SPRITES.SIDE_WALK.col : SPRITES.SIDE_IDLE.col;
           player.spriteRow = SPRITES.SIDE_IDLE.row;
           player.flipX = (dir === 'left');
         }
@@ -163,13 +156,12 @@
           player.spriteRow = SPRITES.SIDE_IDLE.row;
           player.flipX = (dir === 'left');
         }
-        // Resetear animación
         player.frame = 0;
         player.frameTimer = 0;
       }
     }
 
-    // ==================== DIBUJADO ====================
+    // ==================== DIBUJADO (con flip mejorado) ====================
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       // Fondo
@@ -189,20 +181,28 @@
         ctx.imageSmoothingEnabled = false;
 
         if (player.flipX) {
+          // 🔄 Flip horizontal con scale(-1, 1)
+          ctx.save();
+          ctx.translate(player.x + player.width/2, player.y + player.height/2);
+          ctx.scale(-1, 1);
           ctx.drawImage(
             spriteSheet,
             sx, sy, SPRITE_W, SPRITE_H,
-            player.x + player.width, player.y,
-            -player.width, player.height
+            -player.width/2, -player.height/2, player.width, player.height
           );
+          ctx.restore();
         } else {
           ctx.drawImage(
             spriteSheet,
             sx, sy, SPRITE_W, SPRITE_H,
-            player.x, player.y,
-            player.width, player.height
+            player.x, player.y, player.width, player.height
           );
         }
+
+        // (Opcional) Mostrar dirección actual para depuración
+        // ctx.fillStyle = 'white';
+        // ctx.font = '16px monospace';
+        // ctx.fillText('Dir: '+player.dir+' flipX:'+player.flipX, 10, 20);
       } else {
         // Fallback
         ctx.fillStyle = '#ff00ff';
@@ -246,7 +246,7 @@
       console.log('✅ Sprite sheet cargado desde caché');
     }
     gameLoop();
-    console.log('🎮 Juego iniciado con sprite sheet de 4x6.');
+    console.log('🎮 Juego iniciado con flip corregido.');
   })();
 </script>
 </body>
