@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Zelda - Aventura</title>
+  <link rel="icon" type="image/png" href="/media/texture/icon.ico">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+    body {
+      background-color: #1a1a1a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Courier New', monospace;
+    }
+    .game-container {
+      position: relative;
+      background-color: #2a2a2a;
+      border: 3px solid #444;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.8);
+    }
+    canvas {
+      display: block;
+      width: 800px;
+      height: 600px;
+      background-color: #3a3a3a;
+      image-rendering: pixelated;
+      cursor: none;
+    }
+    .controls-info {
+      color: rgba(255,255,255,0.2);
+      text-align: center;
+      font-size: 14px;
+      padding: 8px 0;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+<div class="game-container">
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <div class="controls-info">WASD / Flechas para mover</div>
+</div>
+
+<script>
+  (function() {
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // ==================== CONFIGURACIÓN DEL SPRITE SHEET ====================
+    const SPRITE_SHEET_URL = '/media/texture/sprite_sheet.png'; // <-- CAMBIA ESTA RUTA POR TU SPRITE SHEET
+    const SPRITE_WIDTH = 22;
+    const SPRITE_HEIGHT = 28;
+    const SHEET_COLS = 6;    // columnas totales en la imagen
+    // Índices de columna (0-based) para cada sprite:
+    const IDLE = 0;
+    const WALK1 = 1;
+    const WALK2 = 2;
+    const SIDE_IDLE = 3;      // perfil quieto (no se usa, pero lo dejamos)
+    const SIDE_WALK1 = 4;     // perfil caminando 1
+    const SIDE_WALK2 = 5;     // perfil caminando 2 (si existe, pero solo usamos 4 y 5 para alternar)
+
+    // ==================== ESTADO DEL JUGADOR ====================
+    const player = {
+      x: 400 - SPRITE_WIDTH/2,
+      y: 300 - SPRITE_HEIGHT/2,
+      width: SPRITE_WIDTH,
+      height: SPRITE_HEIGHT,
+      speed: 3,
+      dir: 'down',       // 'up', 'down', 'left', 'right'
+      moving: false,
+      frame: 0,          // 0 o 1 para animación
+      frameTimer: 0,
+      frameDelay: 8,     // frames entre cambios de sprite (a 60fps)
+      spriteCol: IDLE,
+      flipX: false,      // para efecto espejo (izquierda)
+    };
+
+    // ==================== TECLAS ====================
+    const keys = {
+      up: false,
+      down: false,
+      left: false,
+      right: false
+    };
+
+    // ==================== CARGA DE SPRITE SHEET ====================
+    const spriteSheet = new Image();
+    spriteSheet.src = SPRITE_SHEET_URL;
+    let sheetLoaded = false;
+
+    spriteSheet.onload = () => {
+      sheetLoaded = true;
+      console.log('✅ Sprite sheet cargado correctamente');
+    };
+    spriteSheet.onerror = () => {
+      console.error('❌ Error al cargar el sprite sheet. Verifica la ruta:', SPRITE_SHEET_URL);
+      // Mostrar un mensaje en el canvas para que el usuario sepa
+      ctx.fillStyle = 'red';
+      ctx.font = '20px monospace';
+      ctx.fillText('Error: no se encontró el sprite sheet', 200, 300);
+    };
+
+    // ==================== ACTUALIZACIÓN ====================
+    function update() {
+      // Leer teclas y calcular dirección
+      let dx = 0, dy = 0;
+      if (keys.up) dy = -1;
+      if (keys.down) dy = 1;
+      if (keys.left) dx = -1;
+      if (keys.right) dx = 1;
+
+      // Normalizar diagonal
+      if (dx !== 0 && dy !== 0) {
+        dx *= 0.7071;
+        dy *= 0.7071;
+      }
+
+      const moving = (dx !== 0 || dy !== 0);
+      player.moving = moving;
+
+      // Actualizar posición
+      if (moving) {
+        player.x += dx * player.speed;
+        player.y += dy * player.speed;
+
+        // Limitar dentro del canvas
+        player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+        player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
+
+        // Determinar dirección para la animación
+        if (dx > 0) player.dir = 'right';
+        else if (dx < 0) player.dir = 'left';
+        else if (dy < 0) player.dir = 'up';
+        else if (dy > 0) player.dir = 'down';
+      }
+
+      // Seleccionar sprite según dirección y movimiento
+      if (!moving) {
+        // Quieto: siempre usar sprite IDLE (columna 0)
+        player.spriteCol = IDLE;
+        player.flipX = false;
+        player.frame = 0;
+      } else {
+        // Movimiento: animar
+        // Avanzar frame cada ciertos ticks
+        player.frameTimer++;
+        if (player.frameTimer >= player.frameDelay) {
+          player.frameTimer = 0;
+          player.frame = 1 - player.frame; // alternar entre 0 y 1
+        }
+
+        const dir = player.dir;
+        if (dir === 'up' || dir === 'down') {
+          // Vertical: usar sprites de caminar (WALK1 y WALK2)
+          player.spriteCol = (player.frame === 0) ? WALK1 : WALK2;
+          player.flipX = false;
+        } else if (dir === 'right') {
+          // Derecha: usar sprites de perfil caminando (SIDE_WALK1 y SIDE_WALK2)
+          player.spriteCol = (player.frame === 0) ? SIDE_WALK1 : SIDE_WALK2;
+          player.flipX = false;
+        } else if (dir === 'left') {
+          // Izquierda: mismo que derecha pero con flip horizontal
+          player.spriteCol = (player.frame === 0) ? SIDE_WALK1 : SIDE_WALK2;
+          player.flipX = true;
+        }
+      }
+    }
+
+    // ==================== DIBUJADO ====================
+    function draw() {
+      // Limpiar canvas con un fondo (puedes poner un tilemap o un color)
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Fondo sencillo: un patrón de cuadrícula tipo "Zelda"
+      ctx.fillStyle = '#2e5a3a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Dibujar algunos árboles o decoración (opcional)
+      ctx.fillStyle = '#3a6b4a';
+      for (let i = 0; i < canvas.width; i += 80) {
+        for (let j = 0; j < canvas.height; j += 80) {
+          ctx.fillRect(i+5, j+5, 10, 10);
+          ctx.fillRect(i+20, j+20, 10, 10);
+        }
+      }
+
+      // Dibujar al jugador si el sprite sheet está cargado
+      if (sheetLoaded) {
+        const col = player.spriteCol;
+        const row = 0; // asumimos que todos los sprites están en la fila 0
+
+        const sx = col * SPRITE_WIDTH;
+        const sy = row * SPRITE_HEIGHT;
+
+        ctx.save();
+        if (player.flipX) {
+          // Aplicar espejo horizontal
+          ctx.translate(player.x + player.width/2, player.y + player.height/2);
+          ctx.scale(-1, 1);
+          ctx.drawImage(spriteSheet,
+            sx, sy, SPRITE_WIDTH, SPRITE_HEIGHT,
+            -player.width/2, -player.height/2, player.width, player.height
+          );
+        } else {
+          ctx.drawImage(spriteSheet,
+            sx, sy, SPRITE_WIDTH, SPRITE_HEIGHT,
+            player.x, player.y, player.width, player.height
+          );
+        }
+        ctx.restore();
+      } else {
+        // Fallback: dibujar un cuadrado si no cargó el sprite
+        ctx.fillStyle = '#ff00ff';
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+        ctx.fillStyle = 'white';
+        ctx.font = '12px monospace';
+        ctx.fillText('Cargando...', player.x+2, player.y+15);
+      }
+    }
+
+    // ==================== BUCLE PRINCIPAL ====================
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // ==================== EVENTOS DE TECLADO ====================
+    function handleKeyDown(e) {
+      const key = e.key;
+      // Evitar scroll con flechas
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(key)) {
+        e.preventDefault();
+      }
+      // Mapear teclas
+      if (key === 'w' || key === 'W' || key === 'ArrowUp') keys.up = true;
+      if (key === 's' || key === 'S' || key === 'ArrowDown') keys.down = true;
+      if (key === 'a' || key === 'A' || key === 'ArrowLeft') keys.left = true;
+      if (key === 'd' || key === 'D' || key === 'ArrowRight') keys.right = true;
+    }
+
+    function handleKeyUp(e) {
+      const key = e.key;
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(key)) {
+        e.preventDefault();
+      }
+      if (key === 'w' || key === 'W' || key === 'ArrowUp') keys.up = false;
+      if (key === 's' || key === 'S' || key === 'ArrowDown') keys.down = false;
+      if (key === 'a' || key === 'A' || key === 'ArrowLeft') keys.left = false;
+      if (key === 'd' || key === 'D' || key === 'ArrowRight') keys.right = false;
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    // ==================== INICIO ====================
+    // Si el sprite sheet ya está cargado (por caché), iniciar
+    if (spriteSheet.complete && spriteSheet.naturalWidth !== 0) {
+      sheetLoaded = true;
+      console.log('✅ Sprite sheet cargado desde caché');
+    }
+    gameLoop();
+
+    // Opcional: redimensionar canvas si se quiere adaptar (no necesario)
+    console.log('🎮 Juego iniciado. Usa WASD o flechas para moverte.');
+  })();
+</script>
+</body>
+</html>
