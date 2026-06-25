@@ -24,8 +24,8 @@
       display:block;
       width:500px;
       height:500px;
-      image-rendering:pixelated; /* para CSS */
-      image-rendering:crisp-edges; /* para Firefox */
+      image-rendering:pixelated;
+      image-rendering:crisp-edges;
       background:#3a3a3a;
       cursor:none;
     }
@@ -48,42 +48,42 @@
   (function() {
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = false; // 🔥 EVITA SUAVIZADO
+    ctx.imageSmoothingEnabled = false;
 
-    // ==================== CONFIGURACIÓN DEL SPRITE SHEET ====================
+    // ==================== SPRITE SHEET ====================
     const SPRITE_SHEET_URL = '/media/texture/sprite_sheet.png';
-
-    // Tamaño original de cada sprite en el sheet (en píxeles)
     const SPRITE_W = 22;
     const SPRITE_H = 28;
-
-    // Escalamos el personaje para que sea más grande (ajusta este factor)
-    const SCALE = 2.18; // 22*2.18 ≈ 48, 28*2.18 ≈ 61 → redondeamos a 48x60
+    const SCALE = 2.18;
     const CHAR_W = Math.round(SPRITE_W * SCALE); // 48
-    const CHAR_H = Math.round(SPRITE_H * SCALE); // 61 (lo dejamos así o redondeamos a 60)
+    const CHAR_H = Math.round(SPRITE_H * SCALE); // 61
 
-    // Índices de sprite (columna, fila) – AJUSTA SEGÚN TU SPRITE SHEET
-    // Por defecto asumo que están en la fila 0, columnas 0-5
-    const IDX_IDLE = { col:0, row:0 };
-    const IDX_WALK1 = { col:1, row:0 };
-    const IDX_WALK2 = { col:2, row:0 };
-    const IDX_SIDE_WALK1 = { col:4, row:0 }; // <-- si tu perfil caminando está en columna 4
-    const IDX_SIDE_WALK2 = { col:5, row:0 }; // <-- si tienes un segundo perfil caminando
+    // Índices de sprite (columna, fila) según tu hoja de 4 filas x 6 columnas
+    const SPRITES = {
+      // Fila 0: frontal
+      IDLE:      { col:0, row:0 },
+      WALK1:     { col:1, row:0 },
+      WALK2:     { col:2, row:0 },
+      // Fila 1: lateral (perfil)
+      SIDE_IDLE: { col:4, row:1 },   // <-- perfil quieto
+      SIDE_WALK: { col:5, row:1 },   // <-- perfil caminando (alterna con SIDE_IDLE)
+    };
 
-    // ==================== ESTADO DEL JUGADOR ====================
+    // ==================== JUGADOR ====================
     const player = {
       x: 250 - CHAR_W/2,
       y: 250 - CHAR_H/2,
       width: CHAR_W,
       height: CHAR_H,
       speed: 1.5,
-      dir: 'down',
+      dir: 'down',      // 'up', 'down', 'left', 'right'
       moving: false,
       frame: 0,
       frameTimer: 0,
-      frameDelay: 8,
-      spriteCol: 0,
-      spriteRow: 0,
+      frameDelay: 10,   // más lento para que se vea bien
+      // Sprite actual
+      spriteCol: SPRITES.IDLE.col,
+      spriteRow: SPRITES.IDLE.row,
       flipX: false,
     };
 
@@ -120,45 +120,61 @@
       player.moving = moving;
 
       if (moving) {
+        // Movimiento
         player.x += dx * player.speed;
         player.y += dy * player.speed;
         player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
         player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
 
+        // Actualizar dirección
         if (dx > 0) player.dir = 'right';
         else if (dx < 0) player.dir = 'left';
         else if (dy < 0) player.dir = 'up';
         else if (dy > 0) player.dir = 'down';
-      }
 
-      // Seleccionar sprite
-      if (!moving) {
-        // IDLE
-        player.spriteCol = IDX_IDLE.col;
-        player.spriteRow = IDX_IDLE.row;
-        player.flipX = false;
-        player.frame = 0;
-      } else {
+        // Animación de caminata
         player.frameTimer++;
         if (player.frameTimer >= player.frameDelay) {
           player.frameTimer = 0;
-          player.frame = 1 - player.frame;
+          player.frame = 1 - player.frame; // alterna 0 y 1
         }
 
+        // Seleccionar sprite según dirección
         const dir = player.dir;
         if (dir === 'up' || dir === 'down') {
-          player.spriteCol = (player.frame === 0) ? IDX_WALK1.col : IDX_WALK2.col;
-          player.spriteRow = IDX_WALK1.row;
+          // Vertical: alternar entre WALK1 y WALK2 (fila 0)
+          player.spriteCol = (player.frame === 0) ? SPRITES.WALK1.col : SPRITES.WALK2.col;
+          player.spriteRow = SPRITES.WALK1.row;
           player.flipX = false;
-        } else if (dir === 'right') {
-          player.spriteCol = (player.frame === 0) ? IDX_SIDE_WALK1.col : IDX_SIDE_WALK2.col;
-          player.spriteRow = IDX_SIDE_WALK1.row;
-          player.flipX = false;
-        } else if (dir === 'left') {
-          player.spriteCol = (player.frame === 0) ? IDX_SIDE_WALK1.col : IDX_SIDE_WALK2.col;
-          player.spriteRow = IDX_SIDE_WALK1.row;
-          player.flipX = true;
+        } else { // left o right
+          // Lateral: alternar entre SIDE_WALK y SIDE_IDLE (fila 1)
+          // frame=0 → caminando, frame=1 → quieto (efecto de pasos)
+          if (player.frame === 0) {
+            player.spriteCol = SPRITES.SIDE_WALK.col;
+          } else {
+            player.spriteCol = SPRITES.SIDE_IDLE.col;
+          }
+          player.spriteRow = SPRITES.SIDE_IDLE.row;
+          // Si va a la izquierda, aplicar espejo
+          player.flipX = (dir === 'left');
         }
+      } else {
+        // ====== QUIETO: mantener dirección ======
+        const dir = player.dir;
+        if (dir === 'up' || dir === 'down') {
+          // Frontal quieto (fila 0, col 0)
+          player.spriteCol = SPRITES.IDLE.col;
+          player.spriteRow = SPRITES.IDLE.row;
+          player.flipX = false;
+        } else { // left o right
+          // Perfil quieto (fila 1, col 4)
+          player.spriteCol = SPRITES.SIDE_IDLE.col;
+          player.spriteRow = SPRITES.SIDE_IDLE.row;
+          player.flipX = (dir === 'left');
+        }
+        // Reiniciar animación
+        player.frame = 0;
+        player.frameTimer = 0;
       }
     }
 
@@ -180,10 +196,9 @@
         const sx = player.spriteCol * SPRITE_W;
         const sy = player.spriteRow * SPRITE_H;
 
-        ctx.imageSmoothingEnabled = false; // reafirmar
+        ctx.imageSmoothingEnabled = false;
 
         if (player.flipX) {
-          // Dibujar con ancho negativo (flip horizontal)
           ctx.drawImage(
             spriteSheet,
             sx, sy, SPRITE_W, SPRITE_H,
@@ -241,7 +256,7 @@
       console.log('✅ Sprite sheet cargado desde caché');
     }
     gameLoop();
-    console.log('🎮 Juego iniciado. Tamaño aumentado, sin suavizado.');
+    console.log('🎮 Juego iniciado. Dirección lateral mantenida al detenerse.');
   })();
 </script>
 </body>
