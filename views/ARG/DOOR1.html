@@ -6,7 +6,7 @@
   <link rel="icon" type="image/png" href="/media/texture/icon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
-    /* (Mismo CSS que antes) */
+    /* ========== ESTILOS (igual que antes) ========== */
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
     body {
       background:#1a1a1a;
@@ -38,11 +38,10 @@
       height:500px;
       image-rendering:pixelated;
       image-rendering:crisp-edges;
-      background:#2e5a3a;
+      background:#3a3a3a;
       cursor:none;
       touch-action: none;
     }
-    /* CRT, info, controles táctiles (igual que antes) */
     .crt-overlay {
       position: absolute;
       top: 10px;
@@ -680,8 +679,23 @@
       player.moving = moving;
 
       if (moving && !dialog.active) {
+        // Calculate new position
         let newX = player.x + dx * player.speed;
         let newY = player.y + dy * player.speed;
+        
+        // Boundary wrapping (Pac-Man style)
+        if (newX + player.width < 0) {
+          newX = canvas.width;
+        } else if (newX > canvas.width) {
+          newX = -player.width;
+        }
+        
+        if (newY + player.height < 0) {
+          newY = canvas.height;
+        } else if (newY > canvas.height) {
+          newY = -player.height;
+        }
+
         const testRect = { x: newX, y: newY, width: player.width, height: player.height };
 
         if (!isCollidingWithWorld(testRect)) {
@@ -689,7 +703,7 @@
           player.y = newY;
           teleportPlayer();
         } else {
-          // Intentar mover en un solo eje
+          // Try moving on single axis
           if (dx !== 0) {
             const testX = { x: newX, y: player.y, width: player.width, height: player.height };
             if (!isCollidingWithWorld(testX)) {
@@ -706,7 +720,7 @@
           }
         }
 
-        // Animación
+        // Animation
         if (dx > 0) player.dir = 'right';
         else if (dx < 0) player.dir = 'left';
         else if (dy < 0) player.dir = 'up';
@@ -729,7 +743,7 @@
           player.flipX = (dir === 'left');
         }
       } else if (!dialog.active) {
-        // Quieto
+        // Idle
         const dir = player.dir;
         if (dir === 'up' || dir === 'down') {
           player.spriteCol = SPRITES.IDLE.col;
@@ -755,18 +769,29 @@
     // ==================== DRAW ====================
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#2e5a3a';
+      
+      // MONOCHROMATIC BACKGROUND (grayscale)
+      ctx.fillStyle = '#353535';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // Subtle grid pattern in grayscale
+      ctx.fillStyle = '#454545';
+      for (let i=0; i<canvas.width; i+=60) {
+        for (let j=0; j<canvas.height; j+=60) {
+          ctx.fillRect(i+5, j+5, 8, 8);
+          ctx.fillRect(i+20, j+20, 8, 8);
+        }
+      }
+
       if (sheetLoaded) {
-        // Dibujar objetos del mundo
+        // Draw world objects
         for (let obj of worldObjects) {
           const sx = obj.spriteCol * SPRITE_W;
           const sy = obj.spriteRow * SPRITE_H;
           ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, obj.x, obj.y, obj.width, obj.height);
         }
 
-        // Clon
+        // Clone
         if (clone.active) {
           const sx = clone.spriteCol * SPRITE_W;
           const sy = clone.spriteRow * SPRITE_H;
@@ -782,7 +807,7 @@
           ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, babyKing.x, babyKing.y, babyKing.width, babyKing.height);
         }
 
-        // Jugador
+        // Player
         const sx = player.spriteCol * SPRITE_W;
         const sy = player.spriteRow * SPRITE_H;
         if (player.flipX) {
@@ -795,9 +820,9 @@
           ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, player.x, player.y, player.width, player.height);
         }
       } else {
-        ctx.fillStyle = '#ff00ff';
+        ctx.fillStyle = '#808080';
         ctx.fillRect(player.x, player.y, player.width, player.height);
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = '#e0e0e0';
         ctx.font = '12px monospace';
         ctx.fillText('Cargando...', player.x+2, player.y+15);
       }
@@ -905,11 +930,11 @@
     setupTouchControls();
 
     // ==================== INICIO ====================
-    // Verificar colisión inicial y reubicar si es necesario
+    // Verify initial collision and relocate if necessary
     function ensurePlayerSpawn() {
       const testRect = { x: player.x, y: player.y, width: player.width, height: player.height };
       if (isCollidingWithWorld(testRect)) {
-        // Buscar una posición libre (fuerza bruta)
+        // Search for free position (brute force)
         for (let y = 20; y < canvas.height - player.height - 20; y += 10) {
           for (let x = 20; x < canvas.width - player.width - 20; x += 10) {
             const test = { x, y, width: player.width, height: player.height };
@@ -929,13 +954,13 @@
     }
     gameLoop();
     updateUI();
-    // Reubicar si es necesario (se ejecuta después de cargar el sprite)
+    // Relocate if necessary (runs after sprite loads)
     setTimeout(ensurePlayerSpawn, 100);
 
     console.log('🎮 Juego iniciado con colisiones y objetos reubicados.');
     console.log('⬆ 6 pasos consecutivos → Clon');
     console.log('⬇ 8 pasos consecutivos → Baby King');
-    console.log('🔹 Acércate a Ángel o Carteles y presiona Z para hablar (diálogos null editables).');
+    console.log('✅ Fondo monocromático y movimiento mejorado.');
   })();
 </script>
 </body>
