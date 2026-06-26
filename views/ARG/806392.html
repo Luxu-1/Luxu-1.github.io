@@ -1,1 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        /* Contenedor de la K */
+        .k-container {
+            position: relative;
+            width: 80vmin;
+            height: 80vmin;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* La letra K gigante (máscara) */
+        .k-letter {
+            font-size: 70vmin;
+            font-weight: 900;
+            color: black; /* El color base no importa porque será recortado */
+            background: black;
+            /* Usamos clip-path para recortar la textura */
+            -webkit-background-clip: text;
+            background-clip: text;
+            /* La textura se aplica como fondo */
+            background-image: url('/media/texture/bellowtext.png');
+            background-size: 200% 200%; /* Para que se mueva */
+            background-position: 0% 0%;
+            /* Animación de movimiento diagonal */
+            animation: moveTexture 8s linear infinite;
+            /* Para que la textura se vea dentro de la letra */
+            -webkit-text-fill-color: transparent;
+            text-shadow: none;
+            user-select: none;
+            line-height: 1;
+            letter-spacing: -0.05em;
+        }
+
+        /* Animación de la textura en diagonal */
+        @keyframes moveTexture {
+            0% {
+                background-position: 0% 0%;
+            }
+            100% {
+                background-position: 100% 100%;
+            }
+        }
+
+        /* También podemos agregar un brillo extra con un segundo elemento (opcional) */
+        .k-letter::after {
+            content: 'K';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            font-size: 70vmin;
+            font-weight: 900;
+            color: transparent;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Ajuste para pantallas pequeñas */
+        @media (max-width: 600px) {
+            .k-letter {
+                font-size: 50vmin;
+            }
+            .k-letter::after {
+                font-size: 50vmin;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="k-container">
+        <div class="k-letter">K</div>
+    </div>
+</body>
+</html>
