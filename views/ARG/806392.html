@@ -1,108 +1,183 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            font-family: 'Arial Black', sans-serif;
-        }
-
-        /* Contenedor de la K */
-        .k-container {
-            position: relative;
-            width: 80vmin;
-            height: 80vmin;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
-
-        /* La letra K gigante (máscara) */
-        .k-letter {
-            font-size: 70vmin;
-            font-weight: 900;
-            color: black; /* El color base no importa porque será recortado */
-            background: black;
-            /* Usamos clip-path para recortar la textura */
-            -webkit-background-clip: text;
-            background-clip: text;
-            /* La textura se aplica como fondo */
-            background-image: url('/media/texture/bellowtext.png');
-            background-size: 200% 200%; /* Para que se mueva */
-            background-position: 0% 0%;
-            /* Animación de movimiento diagonal */
-            animation: moveTexture 8s linear infinite;
-            /* Para que la textura se vea dentro de la letra */
-            -webkit-text-fill-color: transparent;
-            text-shadow: none;
-            user-select: none;
-            line-height: 1;
-            letter-spacing: -0.05em;
-        }
-
-        /* Animación de la textura en diagonal */
-        @keyframes moveTexture {
-            0% {
-                background-position: 0% 0%;
-            }
-            100% {
-                background-position: 100% 100%;
-            }
-        }
-
-        /* También podemos agregar un brillo extra con un segundo elemento (opcional) */
-        .k-letter::after {
-            content: 'K';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            font-size: 70vmin;
-            font-weight: 900;
-            color: transparent;
-            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            pointer-events: none;
-            mix-blend-mode: overlay;
-            animation: glowPulse 3s ease-in-out infinite;
-        }
-
-        @keyframes glowPulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.8; }
-        }
-
-        /* Ajuste para pantallas pequeñas */
-        @media (max-width: 600px) {
-            .k-letter {
-                font-size: 50vmin;
-            }
-            .k-letter::after {
-                font-size: 50vmin;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>You Found The First</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Press Start 2P', monospace;
+    }
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      image-rendering: pixelated; /* para que la textura se vea nítida */
+      background: black;
+    }
+  </style>
 </head>
 <body>
-    <div class="k-container">
-        <div class="k-letter">K</div>
-    </div>
+  <canvas id="canvas"></canvas>
+  <script>
+    (function() {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+
+      // Ajustar tamaño al viewport
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      // ==================== CARGAR TEXTURA ====================
+      const textureImg = new Image();
+      textureImg.src = '/media/texture/bellowtext.png';
+      let textureLoaded = false;
+      textureImg.onload = () => {
+        textureLoaded = true;
+        console.log('✅ Textura bellowtext.png cargada');
+      };
+      textureImg.onerror = () => {
+        console.warn('⚠️ No se pudo cargar bellowtext.png, se usará patrón por defecto');
+        // Crear un patrón de cuadrícula como fallback
+        const fallbackCanvas = document.createElement('canvas');
+        fallbackCanvas.width = 64;
+        fallbackCanvas.height = 64;
+        const fctx = fallbackCanvas.getContext('2d');
+        fctx.fillStyle = '#444';
+        fctx.fillRect(0, 0, 64, 64);
+        fctx.fillStyle = '#666';
+        for (let i = 0; i < 64; i += 8) {
+          fctx.fillRect(i, 0, 2, 64);
+          fctx.fillRect(0, i, 64, 2);
+        }
+        textureImg.src = fallbackCanvas.toDataURL();
+        textureLoaded = true;
+      };
+
+      // ==================== PARÁMETROS DE LA K ====================
+      const LETTER = 'K';
+      const FONT_SIZE = Math.min(window.innerWidth, window.innerHeight) * 0.7; // 70% del lado más pequeño
+      const GLOW_LAYERS = 6; // número de capas de brillo
+      const GLOW_MAX_BLUR = 25; // desenfoque máximo en píxeles
+      const GLOW_MAX_SCALE = 1.4; // escala máxima del glow
+      const SPEED = 0.3; // velocidad de desplazamiento de la textura (píxeles por frame)
+
+      // Offset de la textura (se mueve en diagonal)
+      let offsetX = 0;
+      let offsetY = 0;
+
+      // ==================== DIBUJAR ====================
+      function draw() {
+        if (!textureLoaded) {
+          // Mostrar un mensaje de carga
+          ctx.fillStyle = 'white';
+          ctx.font = '20px monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('Cargando textura...', canvas.width/2, canvas.height/2);
+          requestAnimationFrame(draw);
+          return;
+        }
+
+        // Limpiar canvas (fondo negro)
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Crear patrón con la textura
+        const pattern = ctx.createPattern(textureImg, 'repeat');
+        // Desplazar el patrón en diagonal
+        pattern.setTransform(new DOMMatrix([1, 0, 0, 1, offsetX, offsetY]));
+
+        // Configurar la fuente
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = `bold ${FONT_SIZE}px "Press Start 2P", "Courier New", monospace`;
+
+        // Guardar estado
+        ctx.save();
+
+        // ========== DIBUJAR EL BRILLO (GLOW) CON TEXTURA ==========
+        // Dibujamos varias capas con escala creciente, opacidad decreciente y desenfoque
+        for (let i = GLOW_LAYERS; i >= 0; i--) {
+          const t = i / GLOW_LAYERS; // 0 a 1
+          const scale = 1 + t * (GLOW_MAX_SCALE - 1);
+          const opacity = 0.3 * (1 - t * 0.7); // de 0.3 a 0.09
+          const blur = t * GLOW_MAX_BLUR;
+
+          ctx.save();
+          ctx.translate(canvas.width / 2, canvas.height / 2);
+          ctx.scale(scale, scale);
+          ctx.filter = `blur(${blur}px)`;
+          ctx.globalAlpha = opacity;
+
+          // Rellenar la letra con el patrón (que tiene la textura)
+          ctx.fillStyle = pattern;
+          ctx.fillText(LETTER, 0, 0);
+
+          ctx.restore();
+        }
+
+        // ========== DIBUJAR LA K NÍTIDA (ENCIMA) ==========
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.filter = 'none';
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = pattern;
+        ctx.fillText(LETTER, 0, 0);
+        ctx.restore();
+
+        ctx.restore();
+
+        // ========== ACTUALIZAR OFFSET DE LA TEXTURA (movimiento diagonal) ==========
+        offsetX += SPEED;
+        offsetY += SPEED * 0.7; // movimiento diagonal no uniforme para más dinamismo
+
+        // Si el offset es muy grande, resetear para evitar que el patrón se desplace demasiado
+        if (offsetX > textureImg.width) offsetX -= textureImg.width;
+        if (offsetY > textureImg.height) offsetY -= textureImg.height;
+
+        requestAnimationFrame(draw);
+      }
+
+      // Iniciar animación cuando la textura esté cargada
+      if (textureImg.complete && textureImg.naturalWidth !== 0) {
+        textureLoaded = true;
+      }
+      // Si ya está cargada, comenzar; si no, la carga la iniciará el evento onload
+      if (textureLoaded) {
+        draw();
+      } else {
+        textureImg.onload = () => {
+          textureLoaded = true;
+          draw();
+        };
+      }
+
+      // Redimensionar también cambia el tamaño de la fuente
+      window.addEventListener('resize', () => {
+        resize();
+        // Actualizar el tamaño de la fuente (se recalcula en cada frame)
+        // No es necesario hacer nada más porque draw() usa FONT_SIZE calculado con el tamaño actual
+      });
+
+    })();
+  </script>
 </body>
 </html>
