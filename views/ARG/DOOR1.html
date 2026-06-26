@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
-    /* (Mismo CSS que antes) */
+    /* ========== ESTILOS ========== */
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
     body { background:#1a1a1a; display:flex; justify-content:center; align-items:center; min-height:100vh; overflow:hidden; font-family:'Courier New',monospace; touch-action: none; }
     .game-wrapper { display:flex; flex-direction:column; align-items:center; gap:12px; padding:10px; }
@@ -18,9 +18,21 @@
     .crt-overlay::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%); pointer-events: none; z-index: 12; }
     @keyframes flicker { 0% { opacity: 0.97; } 50% { opacity: 1; } 100% { opacity: 0.97; } }
     .crt-overlay { animation: flicker 0.15s infinite alternate; }
-    .info-bar { display:flex; justify-content:space-between; width:100%; max-width:500px; color:rgba(255,255,255,0.15); font-size:13px; letter-spacing:1px; padding:0 5px; display: none; }
-    .info-bar span { background:rgba(255,255,255,0.03); padding:4px 10px; border-radius:4px; border:1px solid rgba(255,255,255,0.05); display: none; }
-    .info-bar .highlight { color:rgba(255,255,255,0.4); display: none; }
+    
+    /* ===== INFO-BAR OCULTA (pero sin romper el layout) ===== */
+    .info-bar {
+      display: none; /* Oculta completamente la barra */
+    }
+    /* Si prefieres que ocupe espacio pero sea invisible, usa esto en lugar de display:none */
+    /*
+    .info-bar {
+      opacity: 0;
+      pointer-events: none;
+      height: 0;
+      overflow: hidden;
+    }
+    */
+    
     .controls-info { color:rgba(255,255,255,0.2); text-align:center; font-size:14px; padding:4px 0; letter-spacing:1px; }
     .touch-controls { display: none; width:100%; max-width:500px; justify-content:space-between; align-items:center; gap:20px; touch-action: none; padding:0 10px; }
     .dpad { position:relative; width:160px; height:160px; touch-action:none; }
@@ -34,7 +46,7 @@
     .action-btn:active { background:rgba(255,200,50,0.4); border-color:rgba(255,200,50,0.8); transform:scale(0.92); }
     @media (pointer: coarse) { .touch-controls { display:flex; } .controls-info .pc-only { display:none; } .controls-info .mobile-only { display:inline-block; } }
     @media (pointer: fine) { .controls-info .pc-only { display:inline-block; } .controls-info .mobile-only { display:none; } }
-    @media (max-width:560px) { canvas { width:90vw; height:90vw; max-width:500px; max-height:500px; } .game-container { padding:6px; } .crt-overlay { top:6px; left:6px; width:calc(100% - 12px); height:calc(100% - 12px); } .dpad { width:130px; height:130px; } .dpad-btn { width:40px; height:40px; font-size:22px; } .dpad-up    { top:0; left:45px; } .dpad-down  { bottom:0; left:45px; } .dpad-left  { top:45px; left:0; } .dpad-right { top:45px; right:0; } .action-btn { width:65px; height:65px; font-size:15px; } .info-bar { font-size:11px; flex-wrap:wrap; gap:5px; justify-content:center; } }
+    @media (max-width:560px) { canvas { width:90vw; height:90vw; max-width:500px; max-height:500px; } .game-container { padding:6px; } .crt-overlay { top:6px; left:6px; width:calc(100% - 12px); height:calc(100% - 12px); } .dpad { width:130px; height:130px; } .dpad-btn { width:40px; height:40px; font-size:22px; } .dpad-up    { top:0; left:45px; } .dpad-down  { bottom:0; left:45px; } .dpad-left  { top:45px; left:0; } .dpad-right { top:45px; right:0; } .action-btn { width:65px; height:65px; font-size:15px; } }
   </style>
 </head>
 <body>
@@ -44,6 +56,7 @@
     <div class="crt-overlay"></div>
   </div>
 
+  <!-- INFO-BAR OCULTA (el CSS la oculta, pero el JS aún puede actualizarla sin errores) -->
   <div class="info-bar">
     <span>⬆ <span id="upCounter" class="highlight">0</span></span>
     <span>⬇ <span id="downCounter" class="highlight">0</span></span>
@@ -175,18 +188,25 @@
     const keys = { up:false, down:false, left:false, right:false, action:false };
 
     // ==================== UI ELEMENTS ====================
+    // Obtenemos referencias a los elementos, pero si no existen, no falla
     const upCounterEl = document.getElementById('upCounter');
     const downCounterEl = document.getElementById('downCounter');
     const leftCounterEl = document.getElementById('leftCounter');
     const rightCounterEl = document.getElementById('rightCounter');
     const totalStepsEl = document.getElementById('totalSteps');
 
+    // ==================== UPDATE UI (con protección) ====================
     function updateUI() {
-      upCounterEl.textContent = counters.up;
-      downCounterEl.textContent = counters.down;
-      leftCounterEl.textContent = counters.left;
-      rightCounterEl.textContent = counters.right;
-      totalStepsEl.textContent = counters.total;
+      try {
+        if (upCounterEl) upCounterEl.textContent = counters.up;
+        if (downCounterEl) downCounterEl.textContent = counters.down;
+        if (leftCounterEl) leftCounterEl.textContent = counters.left;
+        if (rightCounterEl) rightCounterEl.textContent = counters.right;
+        if (totalStepsEl) totalStepsEl.textContent = counters.total;
+      } catch (e) {
+        // Si falla, no interrumpimos el juego
+        console.warn('Error al actualizar la UI (info-bar oculta):', e);
+      }
     }
 
     // ==================== CARGA DE SPRITE ====================
@@ -332,7 +352,7 @@
     addObject(3, 1, 31, 357, false, null);
     addObject(3, 1, 380, 357, false, null);
 
-    // ==================== COLISIONES ====================
+    // ==================== COLISIONES (con ajuste de 10px hacia arriba) ====================
     function rectCollide(r1, r2) {
       return r1.x < r2.x + r2.width &&
              r1.x + r1.width > r2.x &&
@@ -342,11 +362,12 @@
 
     function isCollidingWithWorld(rect) {
       const shrink = 0.25;
+      const Y_OFFSET = -10; // <--- Mueve todas las colisiones 10px hacia arriba
       for (let obj of worldObjects) {
         if (!obj.collision) continue;
         const objRect = {
           x: obj.x + (1 - shrink) * obj.width / 2,
-          y: obj.y + (1 - shrink) * obj.height / 2,
+          y: obj.y + (1 - shrink) * obj.height / 2 + Y_OFFSET, // Aplicamos offset
           width: obj.width * shrink,
           height: obj.height * shrink
         };
@@ -355,7 +376,7 @@
       if (clone.active) {
         const cloneRect = {
           x: clone.x + (1 - shrink) * clone.width / 2,
-          y: clone.y + (1 - shrink) * clone.height / 2,
+          y: clone.y + (1 - shrink) * clone.height / 2 + Y_OFFSET,
           width: clone.width * shrink,
           height: clone.height * shrink
         };
@@ -364,7 +385,7 @@
       if (babyKing.active) {
         const bkRect = {
           x: babyKing.x + (1 - shrink) * babyKing.width / 2,
-          y: babyKing.y + (1 - shrink) * babyKing.height / 2,
+          y: babyKing.y + (1 - shrink) * babyKing.height / 2 + Y_OFFSET,
           width: babyKing.width * shrink,
           height: babyKing.height * shrink
         };
@@ -401,38 +422,26 @@
       const seconds = sequenceTimer / frameRate;
 
       if (eventSequence === 'clone') {
-        // Step 0: pantalla negra, sonido shadow.mp3, esperar 2.5s y redirigir
         if (sequenceStep === 0) {
-          // Reproducir audio
           shadowAudio.play().catch(e => console.warn('Error al reproducir shadow.mp3', e));
           sequenceStep = 1;
           sequenceTimer = 0;
         } else if (sequenceStep === 1 && seconds >= 2.5) {
-          // Redirigir
           window.location.href = 'https://luxu-1.github.io/views/hat';
           return;
         }
       } else if (eventSequence === 'babyKing') {
-        // Step 0: jumpscare + sonido color.mp3
-        // Step 1: amarillo
-        // Step 2: azul
-        // Step 3: celeste
-        // Step 4: verde
-        // Step 5: redirigir
-        const colorDurations = [0.5, 0.8, 0.8, 0.8, 0.8]; // duración de cada step en segundos
+        const colorDurations = [0.5, 0.8, 0.8, 0.8, 0.8];
         if (sequenceStep === 0) {
-          // Mostrar jumpscare y sonido
           colorAudio.play().catch(e => console.warn('Error al reproducir color.mp3', e));
           sequenceStep = 1;
           sequenceTimer = 0;
         } else if (sequenceStep >= 1 && sequenceStep <= 4) {
-          // Cambiar color cada colorDurations[step-1] segundos
           if (seconds >= colorDurations[sequenceStep - 1]) {
             sequenceStep++;
             sequenceTimer = 0;
           }
         } else if (sequenceStep === 5) {
-          // Redirigir
           window.location.href = 'https://luxu-1.github.io/views/ARG/806392.html';
           return;
         }
@@ -441,10 +450,10 @@
 
     function getSequenceColor() {
       if (eventSequence === 'babyKing') {
-        if (sequenceStep === 1) return '#FFFF00'; // Amarillo
-        if (sequenceStep === 2) return '#0000FF'; // Azul
-        if (sequenceStep === 3) return '#00FFFF'; // Celeste
-        if (sequenceStep === 4) return '#00FF00'; // Verde
+        if (sequenceStep === 1) return '#FFFF00';
+        if (sequenceStep === 2) return '#0000FF';
+        if (sequenceStep === 3) return '#00FFFF';
+        if (sequenceStep === 4) return '#00FF00';
       }
       return null;
     }
@@ -457,7 +466,7 @@
       else if (dir === 'right') counters.right++;
       counters.total++;
       handleConsecutive(dir);
-      updateUI();
+      updateUI(); // <-- ahora protegido contra errores
     }
 
     // ==================== DESAPARECER PERSONAJES ====================
@@ -579,17 +588,14 @@
 
     // ==================== INTERACCIÓN (lateral) ====================
     function checkInteraction() {
-      // Si hay cooldown o secuencia activa, no hacer nada
       if (dialogCooldown > 0 || eventSequence) return false;
 
-      // Si el diálogo está activo y completo, lo cerramos y activamos cooldown
       if (dialog.active && dialog.complete) {
         const speaker = dialog.speaker;
         dialog.active = false;
         dialogCooldown = 12;
         console.log('💬 Diálogo cerrado');
 
-        // Iniciar secuencias según el speaker
         if (speaker === 'clone') {
           startCloneSequence();
         } else if (speaker === 'babyKing') {
@@ -598,16 +604,12 @@
         return true;
       }
 
-      // Si el diálogo está activo pero no completo, no hacemos nada
       if (dialog.active) return false;
-
-      // No hay diálogo y el jugador está quieto: buscar objeto cercano (lateral)
       if (player.moving) return false;
 
-      const interactX = 70; // rango horizontal
-      const interactY = 30; // rango vertical (más pequeño)
+      const interactX = 70;
+      const interactY = 30;
 
-      // 1. Objetos del mundo (Ángel, carteles)
       for (let obj of worldObjects) {
         if (obj.dialog === null) continue;
         const dx = (player.x + player.width/2) - (obj.x + obj.width/2);
@@ -618,7 +620,6 @@
         }
       }
 
-      // 2. Clon
       if (clone.active && !clone.talked) {
         const dx = (player.x + player.width/2) - (clone.x + clone.width/2);
         const dy = (player.y + player.height/2) - (clone.y + clone.height/2);
@@ -629,7 +630,6 @@
         }
       }
 
-      // 3. Baby King
       if (babyKing.active && !babyKing.talked) {
         const dx = (player.x + player.width/2) - (babyKing.x + babyKing.width/2);
         const dy = (player.y + player.height/2) - (babyKing.y + babyKing.height/2);
@@ -645,7 +645,6 @@
 
     // ==================== UPDATE ====================
     function update() {
-      // Si hay secuencia en curso, actualizarla y saltar el resto
       if (eventSequence) {
         updateSequence();
         return;
@@ -662,14 +661,12 @@
       const moving = (dx!==0 || dy!==0);
       player.moving = moving;
 
-      // Carrera: Z + moviendo + sin diálogo
       let speedMultiplier = 1;
       if (keys.action && !dialog.active && moving) {
         speedMultiplier = 2.0;
       }
       const currentSpeed = BASE_SPEED * speedMultiplier;
 
-      // Actualizar cooldowns
       updateCooldowns();
 
       if (moving && !dialog.active) {
@@ -743,20 +740,16 @@
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Si hay secuencia, dibujar efectos especiales
       if (eventSequence) {
         if (eventSequence === 'clone') {
-          // Pantalla negra
           ctx.fillStyle = 'black';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
         } else if (eventSequence === 'babyKing') {
-          // Dibujar jumpscare de King (gigante)
           const color = getSequenceColor();
           if (color) {
             ctx.fillStyle = color;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
           } else {
-            // Jumpscare: sprite de King escalado 6x
             const kingSprite = SPRITES.KING;
             const sx = kingSprite.col * SPRITE_W;
             const sy = kingSprite.row * SPRITE_H;
@@ -769,11 +762,9 @@
             ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, cx, cy, w, h);
           }
         }
-        // No dibujar nada más durante la secuencia
         return;
       }
 
-      // Fondo normal
       ctx.fillStyle = '#353535';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#454545';
@@ -848,10 +839,8 @@
       if (key === 'z'||key==='Z') {
         e.preventDefault();
         keys.action = true;
-
-        // Si el diálogo está completo, cerrarlo
         if (dialog.active && dialog.complete) {
-          checkInteraction(); // Esto cerrará y activará secuencias si corresponde
+          checkInteraction();
         }
       }
     }
@@ -869,8 +858,6 @@
       if (key === 'z'||key==='Z') {
         e.preventDefault();
         keys.action = false;
-
-        // Solo si no hay diálogo y el jugador está quieto, intentar interactuar
         if (!dialog.active && !player.moving && !eventSequence) {
           checkInteraction();
         }
@@ -988,7 +975,7 @@
     updateUI();
     setTimeout(ensurePlayerSpawn, 100);
 
-    console.log('🎮 Juego actualizado con interacción lateral y secuencias especiales.');
+    console.log('🎮 Juego actualizado: colisiones +10px arriba, info-bar oculta sin errores.');
     console.log('⬆ 5 pasos consecutivos → Clon → secuencia shadow');
     console.log('⬇ 7 pasos consecutivos → Baby King → jumpscare + colores');
   })();
