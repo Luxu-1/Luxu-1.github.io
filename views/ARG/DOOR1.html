@@ -2,9 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Zelda - Aventura CRT</title>
+  <title>Word has reached us...</title>
   <link rel="icon" type="image/png" href="/media/texture/icon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     /* (Mismo CSS que antes, sin cambios) */
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
@@ -247,50 +248,63 @@
         }
       }
     }
-
-    function drawDialog() {
-      if (!dialog.active) return;
-      const dw = canvas.width * 0.85, dh = 100;
-      const x = (canvas.width - dw) / 2, y = canvas.height - dh - 20;
-      ctx.fillStyle = 'black';
-      ctx.shadowColor = 'rgba(0,0,0,0.5)';
-      ctx.shadowBlur = 20;
-      ctx.fillRect(x, y, dw, dh);
-      ctx.shadowBlur = 0;
-      ctx.strokeStyle = 'white';
-      ctx.lineWidth = 4;
-      ctx.strokeRect(x, y, dw, dh);
-      ctx.fillStyle = 'white';
-      ctx.font = '18px "Courier New", monospace';
-      ctx.textBaseline = 'top';
-      const margin = 15;
-      const maxWidth = dw - margin * 2;
-      let lines = [], currentLine = '';
-      const words = dialog.displayText.split(' ');
-      for (let word of words) {
-        let testLine = currentLine + (currentLine ? ' ' : '') + word;
-        if (ctx.measureText(testLine).width > maxWidth) {
-          lines.push(currentLine);
-          currentLine = word;
-        } else {
-          currentLine = testLine;
-        }
-      }
-      if (currentLine) lines.push(currentLine);
-      const lineHeight = 26;
-      for (let i = 0; i < Math.min(lines.length, 3); i++) {
-        ctx.fillText(lines[i], x + margin, y + margin + i * lineHeight);
-      }
-      if (dialog.complete) {
-        const blink = Math.floor(Date.now() / 500) % 2 === 0;
-        if (blink) {
-          ctx.fillStyle = 'white';
-          ctx.font = '20px monospace';
-          ctx.fillText('▼', x + dw - 30, y + dh - 25);
-        }
-      }
+function drawDialog() {
+  if (!dialog.active) return;
+  
+  const dw = canvas.width * 0.85, dh = 100;
+  const x = (canvas.width - dw) / 2, y = canvas.height - dh - 20;
+  
+  // Fondo del diálogo
+  ctx.fillStyle = 'black';
+  ctx.shadowColor = 'rgba(0,0,0,0.5)';
+  ctx.shadowBlur = 20;
+  ctx.fillRect(x, y, dw, dh);
+  ctx.shadowBlur = 0;
+  
+  // Borde blanco
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(x, y, dw, dh);
+  
+  // ====== FUENTE PIXELADA ======
+  ctx.fillStyle = 'white';
+  // Usamos la fuente "Press Start 2P" de Google Fonts
+  ctx.font = 'bold 16px "Press Start 2P", "Courier New", monospace';
+  ctx.textBaseline = 'top';
+  // Desactivar suavizado para que se vea más pixelado
+  ctx.imageSmoothingEnabled = false;
+  
+  const margin = 15;
+  const maxWidth = dw - margin * 2;
+  let lines = [], currentLine = '';
+  const words = dialog.displayText.split(' ');
+  
+  for (let word of words) {
+    let testLine = currentLine + (currentLine ? ' ' : '') + word;
+    if (ctx.measureText(testLine).width > maxWidth) {
+      lines.push(currentLine);
+      currentLine = word;
+    } else {
+      currentLine = testLine;
     }
-
+  }
+  if (currentLine) lines.push(currentLine);
+  
+  const lineHeight = 28; // Ajustado para la fuente de 16px
+  for (let i = 0; i < Math.min(lines.length, 3); i++) {
+    ctx.fillText(lines[i], x + margin, y + margin + i * lineHeight);
+  }
+  
+  // Flecha parpadeante
+  if (dialog.complete) {
+    const blink = Math.floor(Date.now() / 500) % 2 === 0;
+    if (blink) {
+      ctx.fillStyle = 'white';
+      ctx.font = '18px "Press Start 2P", monospace';
+      ctx.fillText('▼', x + dw - 35, y + dh - 28);
+    }
+  }
+        }
     // ==================== MUNDO ====================
     const worldObjects = [];
 
@@ -314,10 +328,10 @@
     }
 
     // Ángel y carteles (con diálogo)
-    addObject(0, 1, 204, 20, true, "Emperor of dark, i saw you fight");
-    addObject(0, 2, 31, 210, true, "The King... The King...");
-    addObject(1, 2, 204, 357, true, "The different one");
-    addObject(2, 2, 380, 210, true, "You loomed too high");
+    addObject(0, 1, 204, 20, true, "Emperor, do you hear the news? A new king has been born.");
+    addObject(0, 2, 31, 210, true, "I told you, a King would be born, a different one, Tyahaha!");
+    addObject(1, 2, 204, 357, true, "The one who seeks to loom high.");
+    addObject(2, 2, 380, 210, true, "Small, naive, still innocent.");
     // Vegetación (sin diálogo)
     addObject(1, 1, 30, 20, true, null);
     addObject(1, 1, 380, 20, true, null);
@@ -397,13 +411,13 @@
       if (counters.lastDir === dir) {
         if (dir === 'up') {
           counters.consecutiveUp++;
-          if (counters.consecutiveUp >= 6 && !clone.active) {
+          if (counters.consecutiveUp >= 5 && !clone.active) {
             activateClone();
             counters.consecutiveUp = 0;
           }
         } else if (dir === 'down') {
           counters.consecutiveDown++;
-          if (counters.consecutiveDown >= 8 && !babyKing.active) {
+          if (counters.consecutiveDown >= 7 && !babyKing.active) {
             activateBabyKing();
             counters.consecutiveDown = 0;
           }
@@ -529,7 +543,7 @@
         const dx = (player.x + player.width/2) - (clone.x + clone.width/2);
         const dy = (player.y + player.height/2) - (clone.y + clone.height/2);
         if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
-          startDialog('You loomed too high', 'clone', 'slow');
+          startDialog('We loomed too high, did we?', 'clone', 'slow');
           clone.talked = true;
           return true;
         }
@@ -540,7 +554,7 @@
         const dx = (player.x + player.width/2) - (babyKing.x + babyKing.width/2);
         const dy = (player.y + player.height/2) - (babyKing.y + babyKing.height/2);
         if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
-          startDialog('I loomed too high', 'babyKing', 'slow');
+          startDialog('I loomed too high, did i?', 'babyKing', 'slow');
           babyKing.talked = true;
           return true;
         }
