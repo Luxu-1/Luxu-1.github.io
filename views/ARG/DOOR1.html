@@ -172,7 +172,7 @@
       complete: false,
     };
 
-    // ==================== COOLDOWN PARA EVITAR REAPERTURA ====================
+    // ==================== COOLDOWN ====================
     let dialogCooldown = 0;
 
     // ==================== CONTADORES ====================
@@ -187,15 +187,13 @@
     // ==================== TECLAS ====================
     const keys = { up:false, down:false, left:false, right:false, action:false };
 
-    // ==================== UI ELEMENTS ====================
-    // Obtenemos referencias a los elementos, pero si no existen, no falla
+    // ==================== UI (protegida) ====================
     const upCounterEl = document.getElementById('upCounter');
     const downCounterEl = document.getElementById('downCounter');
     const leftCounterEl = document.getElementById('leftCounter');
     const rightCounterEl = document.getElementById('rightCounter');
     const totalStepsEl = document.getElementById('totalSteps');
 
-    // ==================== UPDATE UI (con protección) ====================
     function updateUI() {
       try {
         if (upCounterEl) upCounterEl.textContent = counters.up;
@@ -203,10 +201,7 @@
         if (leftCounterEl) leftCounterEl.textContent = counters.left;
         if (rightCounterEl) rightCounterEl.textContent = counters.right;
         if (totalStepsEl) totalStepsEl.textContent = counters.total;
-      } catch (e) {
-        // Si falla, no interrumpimos el juego
-        console.warn('Error al actualizar la UI (info-bar oculta):', e);
-      }
+      } catch (e) {}
     }
 
     // ==================== CARGA DE SPRITE ====================
@@ -273,7 +268,7 @@
       }
     }
 
-    // ==================== DIBUJO DE DIÁLOGO (fuente pixelada) ====================
+    // ==================== DIBUJO DE DIÁLOGO (pixelado) ====================
     function drawDialog() {
       if (!dialog.active) return;
       const dw = canvas.width * 0.85, dh = 100;
@@ -340,19 +335,19 @@
       });
     }
 
-    // Ángel y carteles (con diálogo)
+    // Ángel y carteles
     addObject(0, 1, 204, 20, true, "Emperor, do you hear the news? A new king has been born.");
     addObject(0, 2, 31, 210, true, "I told you, a King would be born, a different one, Tyahaha!");
     addObject(1, 2, 204, 357, true, "The one who seeks to loom high.");
     addObject(2, 2, 380, 210, true, "Small, naive, still innocent.");
-    // Vegetación (sin diálogo)
+    // Vegetación
     addObject(1, 1, 30, 20, true, null);
     addObject(1, 1, 380, 20, true, null);
     addObject(2, 1, 150, 30, false, null);
     addObject(3, 1, 31, 357, false, null);
     addObject(3, 1, 380, 357, false, null);
 
-    // ==================== COLISIONES (con ajuste de 10px hacia arriba) ====================
+    // ==================== COLISIONES (con offset vertical aumentado) ====================
     function rectCollide(r1, r2) {
       return r1.x < r2.x + r2.width &&
              r1.x + r1.width > r2.x &&
@@ -362,12 +357,12 @@
 
     function isCollidingWithWorld(rect) {
       const shrink = 0.25;
-      const Y_OFFSET = -10; // <--- Mueve todas las colisiones 10px hacia arriba
+      const Y_OFFSET = -25; // <--- Sube la colisión 25px (antes -10)
       for (let obj of worldObjects) {
         if (!obj.collision) continue;
         const objRect = {
           x: obj.x + (1 - shrink) * obj.width / 2,
-          y: obj.y + (1 - shrink) * obj.height / 2 + Y_OFFSET, // Aplicamos offset
+          y: obj.y + (1 - shrink) * obj.height / 2 + Y_OFFSET,
           width: obj.width * shrink,
           height: obj.height * shrink
         };
@@ -394,11 +389,10 @@
       return false;
     }
 
-    // ==================== SECUENCIAS DE EVENTOS ====================
-    let eventSequence = null; // 'clone' o 'babyKing'
+    // ==================== SECUENCIAS ====================
+    let eventSequence = null;
     let sequenceTimer = 0;
     let sequenceStep = 0;
-    let sequenceCallback = null;
 
     function startCloneSequence() {
       eventSequence = 'clone';
@@ -416,14 +410,12 @@
 
     function updateSequence() {
       if (!eventSequence) return;
-
       sequenceTimer++;
-      const frameRate = 60; // 60 FPS
-      const seconds = sequenceTimer / frameRate;
+      const seconds = sequenceTimer / 60;
 
       if (eventSequence === 'clone') {
         if (sequenceStep === 0) {
-          shadowAudio.play().catch(e => console.warn('Error al reproducir shadow.mp3', e));
+          shadowAudio.play().catch(e => console.warn(e));
           sequenceStep = 1;
           sequenceTimer = 0;
         } else if (sequenceStep === 1 && seconds >= 2.5) {
@@ -433,7 +425,7 @@
       } else if (eventSequence === 'babyKing') {
         const colorDurations = [0.5, 0.8, 0.8, 0.8, 0.8];
         if (sequenceStep === 0) {
-          colorAudio.play().catch(e => console.warn('Error al reproducir color.mp3', e));
+          colorAudio.play().catch(e => console.warn(e));
           sequenceStep = 1;
           sequenceTimer = 0;
         } else if (sequenceStep >= 1 && sequenceStep <= 4) {
@@ -466,10 +458,9 @@
       else if (dir === 'right') counters.right++;
       counters.total++;
       handleConsecutive(dir);
-      updateUI(); // <-- ahora protegido contra errores
+      updateUI();
     }
 
-    // ==================== DESAPARECER PERSONAJES ====================
     function despawnCharacters() {
       if (clone.active) {
         clone.active = false;
@@ -484,7 +475,6 @@
       counters.stepsSinceSpawn = 0;
     }
 
-    // ==================== PASOS CONSECUTIVOS ====================
     function handleConsecutive(dir) {
       if (counters.lastDir === dir) {
         if (dir === 'up') {
@@ -507,7 +497,6 @@
       counters.lastDir = dir;
     }
 
-    // ==================== ACTIVAR CLON ====================
     function activateClone() {
       clone.active = true;
       clone.x = 250 - CHAR_W/2;
@@ -521,7 +510,6 @@
       console.log('👥 Clon activado');
     }
 
-    // ==================== ACTIVAR BABY KING ====================
     function activateBabyKing() {
       babyKing.active = true;
       babyKing.x = 250 - CHAR_W/2;
@@ -535,7 +523,6 @@
       console.log('👑 Baby King activado');
     }
 
-    // ==================== COOLDOWNS ====================
     function updateCooldowns() {
       if (clone.active && clone.cooldown > 0) {
         clone.cooldown--;
@@ -550,7 +537,6 @@
       }
     }
 
-    // ==================== CHECK BOUNDARY ====================
     function checkBoundaryAndRecord() {
       const margin = 5;
       let dir = null;
@@ -586,7 +572,7 @@
       }
     }
 
-    // ==================== INTERACCIÓN (lateral) ====================
+    // ==================== INTERACCIÓN (distancia circular) ====================
     function checkInteraction() {
       if (dialogCooldown > 0 || eventSequence) return false;
 
@@ -595,7 +581,6 @@
         dialog.active = false;
         dialogCooldown = 12;
         console.log('💬 Diálogo cerrado');
-
         if (speaker === 'clone') {
           startCloneSequence();
         } else if (speaker === 'babyKing') {
@@ -607,33 +592,35 @@
       if (dialog.active) return false;
       if (player.moving) return false;
 
-      const interactX = 70;
-      const interactY = 30;
+      const interactDist = 60; // <--- Radio circular (antes era rectangular)
 
+      // 1. Objetos del mundo
       for (let obj of worldObjects) {
         if (obj.dialog === null) continue;
         const dx = (player.x + player.width/2) - (obj.x + obj.width/2);
         const dy = (player.y + player.height/2) - (obj.y + obj.height/2);
-        if (Math.abs(dx) < interactX && Math.abs(dy) < interactY) {
+        if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
           startDialog(obj.dialog, obj, 'fast');
           return true;
         }
       }
 
+      // 2. Clon
       if (clone.active && !clone.talked) {
         const dx = (player.x + player.width/2) - (clone.x + clone.width/2);
         const dy = (player.y + player.height/2) - (clone.y + clone.height/2);
-        if (Math.abs(dx) < interactX && Math.abs(dy) < interactY) {
+        if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
           startDialog('We loomed too high, did we?', 'clone', 'slow');
           clone.talked = true;
           return true;
         }
       }
 
+      // 3. Baby King
       if (babyKing.active && !babyKing.talked) {
         const dx = (player.x + player.width/2) - (babyKing.x + babyKing.width/2);
         const dy = (player.y + player.height/2) - (babyKing.y + babyKing.height/2);
-        if (Math.abs(dx) < interactX && Math.abs(dy) < interactY) {
+        if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
           startDialog('I loomed too high, did i?', 'babyKing', 'slow');
           babyKing.talked = true;
           return true;
@@ -975,9 +962,9 @@
     updateUI();
     setTimeout(ensurePlayerSpawn, 100);
 
-    console.log('🎮 Juego actualizado: colisiones +10px arriba, info-bar oculta sin errores.');
-    console.log('⬆ 5 pasos consecutivos → Clon → secuencia shadow');
-    console.log('⬇ 7 pasos consecutivos → Baby King → jumpscare + colores');
+    console.log('🎮 Interacción circular (radio 60) y colisión offset -25.');
+    console.log('⬆ 5 pasos → Clon');
+    console.log('⬇ 7 pasos → Baby King');
   })();
 </script>
 </body>
