@@ -363,7 +363,8 @@
 
     // ==================== SONIDO ====================
     let audioCtx = null;
-    function playTickSound() {
+    // Ahora recibe un parámetro 'lowPitch' para sonido grave o agudo
+    function playTickSound(lowPitch = false) {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const osc = audioCtx.createOscillator();
@@ -371,8 +372,15 @@
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.type = 'square';
-        osc.frequency.value = 800 + Math.random() * 200;
-        gain.gain.value = 0.03;
+        // Si es grave (diálogo lento): frecuencia baja (150-350 Hz)
+        // Si es agudo (diálogo rápido): frecuencia alta (800-1000 Hz)
+        if (lowPitch) {
+          osc.frequency.value = 150 + Math.random() * 200; // 150-350 Hz
+          gain.gain.value = 0.05; // un poco más de volumen para que se note
+        } else {
+          osc.frequency.value = 800 + Math.random() * 200; // 800-1000 Hz
+          gain.gain.value = 0.03;
+        }
         osc.start();
         osc.stop(audioCtx.currentTime + 0.03);
       } catch (e) {}
@@ -389,8 +397,9 @@
       dialog.speed = speed;
       dialog.speaker = speaker;
       dialog.complete = false;
-      dialog.charDelay = (speed === 'slow') ? 12 : 1;
-      console.log(`💬 Inicio diálogo: "${text}" (retraso: ${dialog.charDelay} frames)`);
+      // Velocidad: 'slow' = 12 frames, 'fast' = 2 frames
+      dialog.charDelay = (speed === 'slow') ? 12 : 2;
+      console.log(`💬 Inicio diálogo: "${text}" (${speed}, retraso: ${dialog.charDelay} frames)`);
     }
 
     function updateDialog() {
@@ -401,7 +410,9 @@
         if (dialog.charIndex < dialog.text.length) {
           dialog.displayText += dialog.text[dialog.charIndex];
           dialog.charIndex++;
-          playTickSound();
+          // Determinar si el diálogo es lento (clon o babyKing) para sonido grave
+          const isSlow = (dialog.speaker === 'clone' || dialog.speaker === 'babyKing');
+          playTickSound(isSlow);
         } else {
           dialog.complete = true;
         }
@@ -494,7 +505,7 @@
     }
 
     function isCollidingWithWorld(rect) {
-      const shrink = 0.4; // Antes era 0.7, ahora 0.4 para colisiones mucho más pequeñas
+      const shrink = 0.4; // 40% del tamaño
       for (let obj of worldObjects) {
         if (!obj.collision) continue;
         const objRect = {
@@ -670,22 +681,22 @@
         return;
       }
 
-      const interactDist = 120; // Aumentado de 60 a 120
+      const interactDist = 120; // Rango ampliado
 
-      // Objetos del mundo (Ángel y carteles)
+      // Objetos del mundo (Ángel y carteles) → diálogo RÁPIDO
       for (let obj of worldObjects) {
         if (obj.dialog === null) continue;
         if (obj.talked) continue;
         const dx = (player.x + player.width/2) - (obj.x + obj.width/2);
         const dy = (player.y + player.height/2) - (obj.y + obj.height/2);
         if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
-          startDialog(obj.dialog || '...', obj, 'slow');
+          startDialog(obj.dialog || '...', obj, 'fast'); // <--- RÁPIDO
           obj.talked = true;
           return;
         }
       }
 
-      // Clon
+      // Clon → diálogo LENTO
       if (clone.active && !clone.talked) {
         const dx = (player.x + player.width/2) - (clone.x + clone.width/2);
         const dy = (player.y + player.height/2) - (clone.y + clone.height/2);
@@ -696,7 +707,7 @@
         }
       }
 
-      // Baby King
+      // Baby King → diálogo LENTO
       if (babyKing.active && !babyKing.talked) {
         const dx = (player.x + player.width/2) - (babyKing.x + babyKing.width/2);
         const dy = (player.y + player.height/2) - (babyKing.y + babyKing.height/2);
@@ -978,10 +989,10 @@
     updateUI();
     setTimeout(ensurePlayerSpawn, 100);
 
-    console.log('🎮 Juego iniciado con colisiones reducidas (40%) y rango de interacción ampliado (120px).');
-    console.log('⬆ 6 pasos consecutivos → Clon (cooldown 5s)');
-    console.log('⬇ 8 pasos consecutivos → Baby King (cooldown 5s)');
-    console.log('💬 Diálogos lentos: 12 frames por letra.');
+    console.log('🎮 Juego iniciado con diálogos rápidos para objetos y lentos para clon/babyKing.');
+    console.log('⬆ 6 pasos consecutivos → Clon (cooldown 5s, diálogo lento, sonido grave)');
+    console.log('⬇ 8 pasos consecutivos → Baby King (cooldown 5s, diálogo lento, sonido grave)');
+    console.log('💬 Objetos del mundo (Ángel, carteles) → diálogo rápido, sonido agudo.');
   })();
 </script>
 </body>
