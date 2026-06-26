@@ -518,6 +518,7 @@
       else if (dir === 'right') counters.right++;
       
       counters.total++;
+      console.log(`📍 Step recorded: ${dir} - Total: ${counters.total}`);
       handleConsecutive(dir);
       updateUI();
     }
@@ -660,49 +661,35 @@
           player.x = newX;
           player.y = newY;
           
-          // Check for teleport and record step
-          let teleported = false;
-          const margin = 20;
-          let moveDir = null;
-
-          if (player.y + player.height < -margin) {
-            player.y = canvas.height + margin;
-            moveDir = 'up';
-            teleported = true;
-          } else if (player.y > canvas.height + margin) {
-            player.y = -player.height - margin;
-            moveDir = 'down';
-            teleported = true;
-          } else if (player.x + player.width < -margin) {
-            player.x = canvas.width + margin;
-            moveDir = 'left';
-            teleported = true;
-          } else if (player.x > canvas.width + margin) {
-            player.x = -player.width - margin;
-            moveDir = 'right';
-            teleported = true;
-          }
-
-          if (teleported) {
-            recordStep(moveDir);
+          // Check for teleport/wrapping and record step
+          // Use canvas boundaries directly (0 and 500)
+          if (player.y + player.height < 0) {
+            player.y = canvas.height;
+            recordStep('up');
             if (clone.active || babyKing.active) {
               counters.stepsSinceSpawn++;
-              if (counters.stepsSinceSpawn >= 1) {
-                despawnCharacters();
-              }
+              if (counters.stepsSinceSpawn >= 1) despawnCharacters();
             }
-          } else {
-            // Only wrap at boundaries if no teleport occurred
-            if (player.x + player.width < 0) {
-              player.x = canvas.width;
-            } else if (player.x > canvas.width) {
-              player.x = -player.width;
+          } else if (player.y > canvas.height) {
+            player.y = -player.height;
+            recordStep('down');
+            if (clone.active || babyKing.active) {
+              counters.stepsSinceSpawn++;
+              if (counters.stepsSinceSpawn >= 1) despawnCharacters();
             }
-            
-            if (player.y + player.height < 0) {
-              player.y = canvas.height;
-            } else if (player.y > canvas.height) {
-              player.y = -player.height;
+          } else if (player.x + player.width < 0) {
+            player.x = canvas.width;
+            recordStep('left');
+            if (clone.active || babyKing.active) {
+              counters.stepsSinceSpawn++;
+              if (counters.stepsSinceSpawn >= 1) despawnCharacters();
+            }
+          } else if (player.x > canvas.width) {
+            player.x = -player.width;
+            recordStep('right');
+            if (clone.active || babyKing.active) {
+              counters.stepsSinceSpawn++;
+              if (counters.stepsSinceSpawn >= 1) despawnCharacters();
             }
           }
         } else {
@@ -712,34 +699,19 @@
             if (!isCollidingWithWorld(testX)) {
               player.x = newX;
               
-              // Check for teleport and record step
-              let teleported = false;
-              const margin = 20;
-              let moveDir = null;
-
-              if (player.x + player.width < -margin) {
-                player.x = canvas.width + margin;
-                moveDir = 'left';
-                teleported = true;
-              } else if (player.x > canvas.width + margin) {
-                player.x = -player.width - margin;
-                moveDir = 'right';
-                teleported = true;
-              }
-
-              if (teleported) {
-                recordStep(moveDir);
+              if (player.x + player.width < 0) {
+                player.x = canvas.width;
+                recordStep('left');
                 if (clone.active || babyKing.active) {
                   counters.stepsSinceSpawn++;
-                  if (counters.stepsSinceSpawn >= 1) {
-                    despawnCharacters();
-                  }
+                  if (counters.stepsSinceSpawn >= 1) despawnCharacters();
                 }
-              } else {
-                if (player.x + player.width < 0) {
-                  player.x = canvas.width;
-                } else if (player.x > canvas.width) {
-                  player.x = -player.width;
+              } else if (player.x > canvas.width) {
+                player.x = -player.width;
+                recordStep('right');
+                if (clone.active || babyKing.active) {
+                  counters.stepsSinceSpawn++;
+                  if (counters.stepsSinceSpawn >= 1) despawnCharacters();
                 }
               }
             }
@@ -749,34 +721,19 @@
             if (!isCollidingWithWorld(testY)) {
               player.y = newY;
               
-              // Check for teleport and record step
-              let teleported = false;
-              const margin = 20;
-              let moveDir = null;
-
-              if (player.y + player.height < -margin) {
-                player.y = canvas.height + margin;
-                moveDir = 'up';
-                teleported = true;
-              } else if (player.y > canvas.height + margin) {
-                player.y = -player.height - margin;
-                moveDir = 'down';
-                teleported = true;
-              }
-
-              if (teleported) {
-                recordStep(moveDir);
+              if (player.y + player.height < 0) {
+                player.y = canvas.height;
+                recordStep('up');
                 if (clone.active || babyKing.active) {
                   counters.stepsSinceSpawn++;
-                  if (counters.stepsSinceSpawn >= 1) {
-                    despawnCharacters();
-                  }
+                  if (counters.stepsSinceSpawn >= 1) despawnCharacters();
                 }
-              } else {
-                if (player.y + player.height < 0) {
-                  player.y = canvas.height;
-                } else if (player.y > canvas.height) {
-                  player.y = -player.height;
+              } else if (player.y > canvas.height) {
+                player.y = -player.height;
+                recordStep('down');
+                if (clone.active || babyKing.active) {
+                  counters.stepsSinceSpawn++;
+                  if (counters.stepsSinceSpawn >= 1) despawnCharacters();
                 }
               }
             }
@@ -1023,7 +980,7 @@
     console.log('🎮 Juego iniciado con colisiones y objetos reubicados.');
     console.log('⬆ 6 pasos consecutivos → Clon');
     console.log('⬇ 8 pasos consecutivos → Baby King');
-    console.log('✅ Fondo monocromático y movimiento mejorado.');
+    console.log('✅ Canvas boundaries: 0 a 500');
   })();
 </script>
 </body>
