@@ -6,7 +6,7 @@
   <link rel="icon" type="image/png" href="/media/texture/icon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
-    /* (Mismo CSS que antes) */
+    /* ========== ESTILOS ========== */
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
     body {
       background:#1a1a1a;
@@ -223,7 +223,7 @@
   </div>
 
   <div class="controls-info">
-    <span class="pc-only">WASD / Flechas · Z = acción / hablar</span>
+    <span class="pc-only">WASD / Flechas · Z = correr (mantener) / hablar (quieto)</span>
     <span class="mobile-only">Botones táctiles</span>
   </div>
 
@@ -270,12 +270,13 @@
     };
 
     // ==================== JUGADOR ====================
+    const BASE_SPEED = 1.5;
     const player = {
       x: 250 - CHAR_W/2,
       y: 250 - CHAR_H/2,
       width: CHAR_W,
       height: CHAR_H,
-      speed: 1.5,
+      speed: BASE_SPEED,
       dir: 'down',
       moving: false,
       frame: 0,
@@ -286,7 +287,7 @@
       flipX: false,
     };
 
-    // ==================== CLON (con cooldown) ====================
+    // ==================== CLON ====================
     const clone = {
       active: false,
       x: 250 - CHAR_W/2,
@@ -300,7 +301,7 @@
       cooldown: 0,
     };
 
-    // ==================== BABY KING (con cooldown) ====================
+    // ==================== BABY KING ====================
     const babyKing = {
       active: false,
       x: 250 - CHAR_W/2,
@@ -363,7 +364,6 @@
 
     // ==================== SONIDO ====================
     let audioCtx = null;
-    // Ahora recibe un parámetro 'lowPitch' para sonido grave o agudo
     function playTickSound(lowPitch = false) {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -372,11 +372,9 @@
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.type = 'square';
-        // Si es grave (diálogo lento): frecuencia baja (150-350 Hz)
-        // Si es agudo (diálogo rápido): frecuencia alta (800-1000 Hz)
         if (lowPitch) {
           osc.frequency.value = 150 + Math.random() * 200; // 150-350 Hz
-          gain.gain.value = 0.05; // un poco más de volumen para que se note
+          gain.gain.value = 0.05;
         } else {
           osc.frequency.value = 800 + Math.random() * 200; // 800-1000 Hz
           gain.gain.value = 0.03;
@@ -397,7 +395,6 @@
       dialog.speed = speed;
       dialog.speaker = speaker;
       dialog.complete = false;
-      // Velocidad: 'slow' = 12 frames, 'fast' = 2 frames
       dialog.charDelay = (speed === 'slow') ? 12 : 2;
       console.log(`💬 Inicio diálogo: "${text}" (${speed}, retraso: ${dialog.charDelay} frames)`);
     }
@@ -410,7 +407,6 @@
         if (dialog.charIndex < dialog.text.length) {
           dialog.displayText += dialog.text[dialog.charIndex];
           dialog.charIndex++;
-          // Determinar si el diálogo es lento (clon o babyKing) para sonido grave
           const isSlow = (dialog.speaker === 'clone' || dialog.speaker === 'babyKing');
           playTickSound(isSlow);
         } else {
@@ -481,20 +477,23 @@
         spriteRow: row,
         collision: collision,
         dialog: dialogText,
-        talked: false,
+        // 👇 ELIMINADO: already talked, ahora se puede releer siempre
       });
     }
 
-    // --- Posiciones ajustadas ---
-    addObject(0, 1, 30, 30, true, "Emperor of dark, i saw you fight");          // Ángel
-    addObject(0, 2, 400, 50, true, "The King... The King...");          // Cartel1
-    addObject(1, 2, 400, 150, true, "The different one");         // Cartel2
-    addObject(2, 2, 400, 250, true, "You loomed too high");         // Cartel3
-    addObject(1, 1, 30, 150, true, null);          // Árbol izquierdo
-    addObject(2, 1, 150, 30, false, null);         // Pasto (sin colisión)
-    addObject(3, 1, 30, 300, false, null);         // Flor (sin colisión)
-    addObject(1, 1, 450, 400, true, null);         // Árbol abajo derecha
-    addObject(2, 1, 300, 450, false, null);        // Pasto abajo (sin colisión)
+    // ===== MODIFICA LAS COORDENADAS AQUÍ (X, Y) =====
+    // Ángel
+    addObject(0, 1, 30, 30, true, "Emperor of dark, i saw you fight");
+    // Carteles
+    addObject(0, 2, 400, 50, true, "The King... The King...");
+    addObject(1, 2, 400, 150, true, "The different one");
+    addObject(2, 2, 400, 250, true, "You loomed too high");
+    // Vegetación (sin diálogo)
+    addObject(1, 1, 30, 150, true, null);   // árbol
+    addObject(2, 1, 150, 30, false, null);  // pasto (sin colisión)
+    addObject(3, 1, 30, 300, false, null);  // flor (sin colisión)
+    addObject(1, 1, 450, 400, true, null);  // árbol
+    addObject(2, 1, 300, 450, false, null); // pasto
 
     // ==================== COLISIONES ====================
     function rectCollide(r1, r2) {
@@ -505,7 +504,7 @@
     }
 
     function isCollidingWithWorld(rect) {
-      const shrink = 0.4; // 40% del tamaño
+      const shrink = 0.4;
       for (let obj of worldObjects) {
         if (!obj.collision) continue;
         const objRect = {
@@ -681,22 +680,21 @@
         return;
       }
 
-      const interactDist = 120; // Rango ampliado
+      const interactDist = 120;
 
-      // Objetos del mundo (Ángel y carteles) → diálogo RÁPIDO
+      // Objetos del mundo (Ángel y carteles) → diálogo RÁPIDO y RELEIBLE
       for (let obj of worldObjects) {
         if (obj.dialog === null) continue;
-        if (obj.talked) continue;
+        // 🔁 Ya no comprobamos obj.talked, así que se puede releer siempre
         const dx = (player.x + player.width/2) - (obj.x + obj.width/2);
         const dy = (player.y + player.height/2) - (obj.y + obj.height/2);
         if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
-          startDialog(obj.dialog || '...', obj, 'fast'); // <--- RÁPIDO
-          obj.talked = true;
-          return;
+          startDialog(obj.dialog, obj, 'fast');
+          return; // Solo un diálogo a la vez
         }
       }
 
-      // Clon → diálogo LENTO
+      // Clon → diálogo LENTO (una sola vez)
       if (clone.active && !clone.talked) {
         const dx = (player.x + player.width/2) - (clone.x + clone.width/2);
         const dy = (player.y + player.height/2) - (clone.y + clone.height/2);
@@ -707,7 +705,7 @@
         }
       }
 
-      // Baby King → diálogo LENTO
+      // Baby King → diálogo LENTO (una sola vez)
       if (babyKing.active && !babyKing.talked) {
         const dx = (player.x + player.width/2) - (babyKing.x + babyKing.width/2);
         const dy = (player.y + player.height/2) - (babyKing.y + babyKing.height/2);
@@ -732,12 +730,19 @@
       const moving = (dx!==0 || dy!==0);
       player.moving = moving;
 
-      // Actualizar cooldowns de personajes
+      // ====== CARRERA: Z presionado + moviéndose + sin diálogo ======
+      let speedMultiplier = 1;
+      if (keys.action && !dialog.active && moving) {
+        speedMultiplier = 2.0;
+      }
+      const currentSpeed = BASE_SPEED * speedMultiplier;
+
+      // Actualizar cooldowns
       updateCooldowns();
 
       if (moving && !dialog.active) {
-        let newX = player.x + dx * player.speed;
-        let newY = player.y + dy * player.speed;
+        let newX = player.x + dx * currentSpeed;
+        let newY = player.y + dy * currentSpeed;
         const testRect = { x: newX, y: newY, width: player.width, height: player.height };
 
         if (!isCollidingWithWorld(testRect)) {
@@ -801,9 +806,15 @@
 
       updateDialog();
 
+      // ====== ACCIÓN: Si está quieto, intenta interactuar; si se mueve, solo corre ======
       if (keys.action) {
-        checkInteraction();
-        keys.action = false;
+        if (!moving) {
+          checkInteraction();
+        }
+        // No reseteamos keys.action aquí porque se usa para correr (se resetea al soltar la tecla)
+        // Pero para evitar que se dispare múltiples veces al mantenerla, usamos un flag.
+        // La mejor forma es no resetearla, y que el keyup la ponga a false.
+        // Así que eliminamos keys.action = false; de aquí.
       }
     }
 
@@ -883,11 +894,13 @@
       if (key === 'z'||key==='Z') {
         keys.action = true;
         e.preventDefault();
+        // Si hay diálogo completo, cerrarlo al presionar Z
         if (dialog.active && dialog.complete) {
           dialog.active = false;
         }
       }
     }
+
     function handleKeyUp(e) {
       const key = e.key;
       if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(key)) e.preventDefault();
@@ -895,8 +908,12 @@
       if (key === 's'||key==='S'||key==='ArrowDown') keys.down = false;
       if (key === 'a'||key==='A'||key==='ArrowLeft') keys.left = false;
       if (key === 'd'||key==='D'||key==='ArrowRight') keys.right = false;
-      if (key === 'z'||key==='Z') keys.action = false;
+      if (key === 'z'||key==='Z') {
+        keys.action = false;
+        e.preventDefault();
+      }
     }
+
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
 
@@ -941,26 +958,45 @@
         else if (dir === 'right') assignTouchEvents(btn, 'right', 'left');
       });
 
-      actionBtn.addEventListener('click', () => {
-        if (dialog.active && dialog.complete) {
-          dialog.active = false;
-        } else {
-          keys.action = true;
-          checkInteraction();
-          keys.action = false;
-        }
-      });
-
-      actionBtn.addEventListener('touchstart', (e) => {
+      // Botón de acción táctil
+      const actionBtnEl = document.getElementById('actionBtn');
+      actionBtnEl.addEventListener('touchstart', (e) => {
         e.preventDefault();
+        keys.action = true;
         if (dialog.active && dialog.complete) {
           dialog.active = false;
-        } else {
-          keys.action = true;
-          checkInteraction();
-          keys.action = false;
         }
       }, { passive: false });
+
+      actionBtnEl.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys.action = false;
+        // Si no se movió y estaba quieto, intentar interactuar (como clic)
+        if (!player.moving) {
+          checkInteraction();
+        }
+      }, { passive: false });
+
+      actionBtnEl.addEventListener('touchcancel', (e) => {
+        e.preventDefault();
+        keys.action = false;
+      }, { passive: false });
+
+      // También para mouse (para depuración)
+      actionBtnEl.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        keys.action = true;
+      });
+      actionBtnEl.addEventListener('mouseup', (e) => {
+        e.preventDefault();
+        keys.action = false;
+        if (!player.moving) {
+          checkInteraction();
+        }
+      });
+      actionBtnEl.addEventListener('mouseleave', (e) => {
+        keys.action = false;
+      });
     }
     setupTouchControls();
 
@@ -989,10 +1025,11 @@
     updateUI();
     setTimeout(ensurePlayerSpawn, 100);
 
-    console.log('🎮 Juego iniciado con diálogos rápidos para objetos y lentos para clon/babyKing.');
-    console.log('⬆ 6 pasos consecutivos → Clon (cooldown 5s, diálogo lento, sonido grave)');
-    console.log('⬇ 8 pasos consecutivos → Baby King (cooldown 5s, diálogo lento, sonido grave)');
-    console.log('💬 Objetos del mundo (Ángel, carteles) → diálogo rápido, sonido agudo.');
+    console.log('🎮 Juego iniciado con carrera (Z), diálogos releíbles y todas las mejoras.');
+    console.log('⬆ 6 pasos consecutivos → Clon (cooldown 5s, diálogo lento)');
+    console.log('⬇ 8 pasos consecutivos → Baby King (cooldown 5s, diálogo lento)');
+    console.log('💬 Objetos del mundo (Ángel, carteles) → diálogo rápido, releíble siempre.');
+    console.log('🏃 Mantén Z mientras te mueves para correr.');
   })();
 </script>
 </body>
