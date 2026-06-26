@@ -6,7 +6,7 @@
   <link rel="icon" type="image/png" href="/media/texture/icon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
-    /* ========== ESTILOS (igual que antes) ========== */
+    /* (Estilos idénticos a los que tienes) */
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
     body {
       background:#1a1a1a;
@@ -38,7 +38,7 @@
       height:500px;
       image-rendering:pixelated;
       image-rendering:crisp-edges;
-      background:#3a3a3a;
+      background:#353535;
       cursor:none;
       touch-action: none;
     }
@@ -387,7 +387,9 @@
       dialog.speed = speed;
       dialog.speaker = speaker;
       dialog.complete = false;
-      dialog.charDelay = (speed === 'slow') ? 5 : 1;
+      // Aumento de 5 a 12 para que sea más lento
+      dialog.charDelay = (speed === 'slow') ? 12 : 1;
+      console.log(`💬 Inicio diálogo: "${text}" (retraso: ${dialog.charDelay} frames)`);
     }
 
     function updateDialog() {
@@ -471,20 +473,16 @@
       });
     }
 
-    // --- Posiciones ajustadas para evitar colisión inicial con el jugador ---
-    // Ángel (esquina superior izquierda)
-    addObject(0, 1, 30, 30, true, null);
-    // Carteles (lado derecho)
-    addObject(0, 2, 400, 50, true, null);
-    addObject(1, 2, 400, 150, true, null);
-    addObject(2, 2, 400, 250, true, null);
-    // Vegetación (alejada del centro) - COLLISION DISABLED FOR GRASS AND FLOWERS
-    addObject(1, 1, 30, 150, true, null);   // árbol izquierdo
-    addObject(2, 1, 150, 30, false, null);   // pasto arriba - NO COLLISION
-    addObject(3, 1, 30, 300, false, null);   // flor abajo izquierda - NO COLLISION
-    addObject(1, 1, 450, 400, true, null);  // árbol abajo derecha
-    // También añadir algún objeto más para rellenar
-    addObject(2, 1, 300, 450, false, null);  // pasto abajo - NO COLLISION
+    // --- Posiciones ajustadas (sin colisión inicial) ---
+    addObject(0, 1, 30, 30, true, null);          // Ángel
+    addObject(0, 2, 400, 50, true, null);          // Cartel1
+    addObject(1, 2, 400, 150, true, null);         // Cartel2
+    addObject(2, 2, 400, 250, true, null);         // Cartel3
+    addObject(1, 1, 30, 150, true, null);          // Árbol izquierdo
+    addObject(2, 1, 150, 30, false, null);         // Pasto (sin colisión)
+    addObject(3, 1, 30, 300, false, null);         // Flor (sin colisión)
+    addObject(1, 1, 450, 400, true, null);         // Árbol abajo derecha
+    addObject(2, 1, 300, 450, false, null);        // Pasto abajo (sin colisión)
 
     // ==================== COLISIONES ====================
     function rectCollide(r1, r2) {
@@ -495,17 +493,37 @@
     }
 
     function isCollidingWithWorld(rect) {
+      const shrink = 0.7; // 70% del tamaño para colisiones más pequeñas
       for (let obj of worldObjects) {
         if (!obj.collision) continue;
-        if (rectCollide(rect, obj)) {
+        // Reducir el rectángulo de colisión del objeto
+        const objRect = {
+          x: obj.x + (1 - shrink) * obj.width / 2,
+          y: obj.y + (1 - shrink) * obj.height / 2,
+          width: obj.width * shrink,
+          height: obj.height * shrink
+        };
+        if (rectCollide(rect, objRect)) {
           return true;
         }
       }
       if (clone.active) {
-        if (rectCollide(rect, clone)) return true;
+        const cloneRect = {
+          x: clone.x + (1 - shrink) * clone.width / 2,
+          y: clone.y + (1 - shrink) * clone.height / 2,
+          width: clone.width * shrink,
+          height: clone.height * shrink
+        };
+        if (rectCollide(rect, cloneRect)) return true;
       }
       if (babyKing.active) {
-        if (rectCollide(rect, babyKing)) return true;
+        const bkRect = {
+          x: babyKing.x + (1 - shrink) * babyKing.width / 2,
+          y: babyKing.y + (1 - shrink) * babyKing.height / 2,
+          width: babyKing.width * shrink,
+          height: babyKing.height * shrink
+        };
+        if (rectCollide(rect, bkRect)) return true;
       }
       return false;
     }
@@ -516,9 +534,8 @@
       else if (dir === 'down') counters.down++;
       else if (dir === 'left') counters.left++;
       else if (dir === 'right') counters.right++;
-      
       counters.total++;
-      console.log(`📍 Step recorded: ${dir} - Total: ${counters.total}`);
+      console.log(`📍 Paso registrado: ${dir} - Total: ${counters.total}`);
       handleConsecutive(dir);
       updateUI();
     }
@@ -543,20 +560,21 @@
       if (counters.lastDir === dir) {
         if (dir === 'up') {
           counters.consecutiveUp++;
-          console.log(`⬆ Consecutive UP: ${counters.consecutiveUp}/6`);
+          console.log(`⬆ Pasos consecutivos UP: ${counters.consecutiveUp}/6`);
           if (counters.consecutiveUp >= 6 && !clone.active) {
             activateClone();
             counters.consecutiveUp = 0;
           }
         } else if (dir === 'down') {
           counters.consecutiveDown++;
-          console.log(`⬇ Consecutive DOWN: ${counters.consecutiveDown}/8`);
+          console.log(`⬇ Pasos consecutivos DOWN: ${counters.consecutiveDown}/8`);
           if (counters.consecutiveDown >= 8 && !babyKing.active) {
             activateBabyKing();
             counters.consecutiveDown = 0;
           }
         }
       } else {
+        console.log(`🔄 Cambio de dirección (${counters.lastDir} → ${dir}), reseteando contadores`);
         counters.consecutiveUp = 0;
         counters.consecutiveDown = 0;
       }
@@ -651,96 +669,38 @@
       player.moving = moving;
 
       if (moving && !dialog.active) {
-        // Calculate new position
+        // Calcular nueva posición
         let newX = player.x + dx * player.speed;
         let newY = player.y + dy * player.speed;
 
         const testRect = { x: newX, y: newY, width: player.width, height: player.height };
 
         if (!isCollidingWithWorld(testRect)) {
+          // Movimiento libre
           player.x = newX;
           player.y = newY;
-          
-          // Check for teleport/wrapping and record step
-          // Use canvas boundaries directly (0 and 500)
-          if (player.y + player.height < 0) {
-            player.y = canvas.height;
-            recordStep('up');
-            if (clone.active || babyKing.active) {
-              counters.stepsSinceSpawn++;
-              if (counters.stepsSinceSpawn >= 1) despawnCharacters();
-            }
-          } else if (player.y > canvas.height) {
-            player.y = -player.height;
-            recordStep('down');
-            if (clone.active || babyKing.active) {
-              counters.stepsSinceSpawn++;
-              if (counters.stepsSinceSpawn >= 1) despawnCharacters();
-            }
-          } else if (player.x + player.width < 0) {
-            player.x = canvas.width;
-            recordStep('left');
-            if (clone.active || babyKing.active) {
-              counters.stepsSinceSpawn++;
-              if (counters.stepsSinceSpawn >= 1) despawnCharacters();
-            }
-          } else if (player.x > canvas.width) {
-            player.x = -player.width;
-            recordStep('right');
-            if (clone.active || babyKing.active) {
-              counters.stepsSinceSpawn++;
-              if (counters.stepsSinceSpawn >= 1) despawnCharacters();
-            }
-          }
+          checkBoundaryAndRecord();
         } else {
-          // Try moving on single axis
+          // Intentar mover en un solo eje
+          let moved = false;
           if (dx !== 0) {
             const testX = { x: newX, y: player.y, width: player.width, height: player.height };
             if (!isCollidingWithWorld(testX)) {
               player.x = newX;
-              
-              if (player.x + player.width < 0) {
-                player.x = canvas.width;
-                recordStep('left');
-                if (clone.active || babyKing.active) {
-                  counters.stepsSinceSpawn++;
-                  if (counters.stepsSinceSpawn >= 1) despawnCharacters();
-                }
-              } else if (player.x > canvas.width) {
-                player.x = -player.width;
-                recordStep('right');
-                if (clone.active || babyKing.active) {
-                  counters.stepsSinceSpawn++;
-                  if (counters.stepsSinceSpawn >= 1) despawnCharacters();
-                }
-              }
+              checkBoundaryAndRecord();
+              moved = true;
             }
           }
-          if (dy !== 0) {
+          if (dy !== 0 && !moved) {
             const testY = { x: player.x, y: newY, width: player.width, height: player.height };
             if (!isCollidingWithWorld(testY)) {
               player.y = newY;
-              
-              if (player.y + player.height < 0) {
-                player.y = canvas.height;
-                recordStep('up');
-                if (clone.active || babyKing.active) {
-                  counters.stepsSinceSpawn++;
-                  if (counters.stepsSinceSpawn >= 1) despawnCharacters();
-                }
-              } else if (player.y > canvas.height) {
-                player.y = -player.height;
-                recordStep('down');
-                if (clone.active || babyKing.active) {
-                  counters.stepsSinceSpawn++;
-                  if (counters.stepsSinceSpawn >= 1) despawnCharacters();
-                }
-              }
+              checkBoundaryAndRecord();
             }
           }
         }
 
-        // Animation
+        // Animación
         if (dx > 0) player.dir = 'right';
         else if (dx < 0) player.dir = 'left';
         else if (dy < 0) player.dir = 'up';
@@ -763,7 +723,7 @@
           player.flipX = (dir === 'left');
         }
       } else if (!dialog.active) {
-        // Idle
+        // Quieto
         const dir = player.dir;
         if (dir === 'up' || dir === 'down') {
           player.spriteCol = SPRITES.IDLE.col;
@@ -786,15 +746,46 @@
       }
     }
 
+    // Función auxiliar para verificar límites y registrar pasos
+    function checkBoundaryAndRecord() {
+      const margin = 5;
+      let dir = null;
+      if (player.y + player.height < -margin) {
+        player.y = canvas.height + margin;
+        dir = 'up';
+      } else if (player.y > canvas.height + margin) {
+        player.y = -player.height - margin;
+        dir = 'down';
+      } else if (player.x + player.width < -margin) {
+        player.x = canvas.width + margin;
+        dir = 'left';
+      } else if (player.x > canvas.width + margin) {
+        player.x = -player.width - margin;
+        dir = 'right';
+      }
+
+      if (dir) {
+        recordStep(dir);
+        // Si hay personajes activos, incrementar contador de pasos desde spawn
+        if (clone.active || babyKing.active) {
+          counters.stepsSinceSpawn++;
+          console.log(`👣 Pasos desde spawn: ${counters.stepsSinceSpawn}`);
+          if (counters.stepsSinceSpawn >= 1) {
+            despawnCharacters();
+          }
+        }
+      }
+    }
+
     // ==================== DRAW ====================
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // MONOCHROMATIC BACKGROUND (grayscale)
+      // Fondo monocromático (escala de grises)
       ctx.fillStyle = '#353535';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Subtle grid pattern in grayscale
+      // Patrón de cuadrícula sutil en grises
       ctx.fillStyle = '#454545';
       for (let i=0; i<canvas.width; i+=60) {
         for (let j=0; j<canvas.height; j+=60) {
@@ -804,14 +795,14 @@
       }
 
       if (sheetLoaded) {
-        // Draw world objects
+        // Dibujar objetos del mundo
         for (let obj of worldObjects) {
           const sx = obj.spriteCol * SPRITE_W;
           const sy = obj.spriteRow * SPRITE_H;
           ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, obj.x, obj.y, obj.width, obj.height);
         }
 
-        // Clone
+        // Clon
         if (clone.active) {
           const sx = clone.spriteCol * SPRITE_W;
           const sy = clone.spriteRow * SPRITE_H;
@@ -827,7 +818,7 @@
           ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, babyKing.x, babyKing.y, babyKing.width, babyKing.height);
         }
 
-        // Player
+        // Jugador
         const sx = player.spriteCol * SPRITE_W;
         const sy = player.spriteRow * SPRITE_H;
         if (player.flipX) {
@@ -950,11 +941,9 @@
     setupTouchControls();
 
     // ==================== INICIO ====================
-    // Verify initial collision and relocate if necessary
     function ensurePlayerSpawn() {
       const testRect = { x: player.x, y: player.y, width: player.width, height: player.height };
       if (isCollidingWithWorld(testRect)) {
-        // Search for free position (brute force)
         for (let y = 20; y < canvas.height - player.height - 20; y += 10) {
           for (let x = 20; x < canvas.width - player.width - 20; x += 10) {
             const test = { x, y, width: player.width, height: player.height };
@@ -974,13 +963,12 @@
     }
     gameLoop();
     updateUI();
-    // Relocate if necessary (runs after sprite loads)
     setTimeout(ensurePlayerSpawn, 100);
 
-    console.log('🎮 Juego iniciado con colisiones y objetos reubicados.');
+    console.log('🎮 Juego iniciado con colisiones reducidas y diálogos más lentos.');
     console.log('⬆ 6 pasos consecutivos → Clon');
     console.log('⬇ 8 pasos consecutivos → Baby King');
-    console.log('✅ Canvas boundaries: 0 a 500');
+    console.log('💬 Diálogos lentos: 12 frames por letra.');
   })();
 </script>
 </body>
