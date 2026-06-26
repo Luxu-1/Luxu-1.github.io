@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>His Game</title>
+  <title>Zelda - Aventura CRT</title>
   <link rel="icon" type="image/png" href="/media/texture/icon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
@@ -297,7 +297,7 @@
       spriteRow: SPRITES.IDLE.row,
       flipX: false,
       talked: false,
-      cooldown: 0, // frames restantes antes de que los pasos cuenten
+      cooldown: 0,
     };
 
     // ==================== BABY KING (con cooldown) ====================
@@ -494,7 +494,7 @@
     }
 
     function isCollidingWithWorld(rect) {
-      const shrink = 0.7;
+      const shrink = 0.4; // Antes era 0.7, ahora 0.4 para colisiones mucho más pequeñas
       for (let obj of worldObjects) {
         if (!obj.collision) continue;
         const objRect = {
@@ -590,7 +590,7 @@
       clone.spriteRow = SPRITES.IDLE.row;
       clone.flipX = false;
       clone.talked = false;
-      clone.cooldown = 300; // 5 segundos
+      clone.cooldown = 300;
       counters.stepsSinceSpawn = 0;
       console.log('👥 ¡Clon apareció! (cooldown 5s)');
     }
@@ -641,7 +641,6 @@
 
       if (dir) {
         recordStep(dir);
-        // Solo procesar desaparición si el cooldown ha terminado
         let shouldDespawn = false;
         if (clone.active && clone.cooldown === 0) {
           shouldDespawn = true;
@@ -671,8 +670,9 @@
         return;
       }
 
-      const interactDist = 60;
+      const interactDist = 120; // Aumentado de 60 a 120
 
+      // Objetos del mundo (Ángel y carteles)
       for (let obj of worldObjects) {
         if (obj.dialog === null) continue;
         if (obj.talked) continue;
@@ -685,6 +685,7 @@
         }
       }
 
+      // Clon
       if (clone.active && !clone.talked) {
         const dx = (player.x + player.width/2) - (clone.x + clone.width/2);
         const dy = (player.y + player.height/2) - (clone.y + clone.height/2);
@@ -695,6 +696,7 @@
         }
       }
 
+      // Baby King
       if (babyKing.active && !babyKing.talked) {
         const dx = (player.x + player.width/2) - (babyKing.x + babyKing.width/2);
         const dy = (player.y + player.height/2) - (babyKing.y + babyKing.height/2);
@@ -976,7 +978,7 @@
     updateUI();
     setTimeout(ensurePlayerSpawn, 100);
 
-    console.log('🎮 Juego iniciado con cooldown de 5s para personajes.');
+    console.log('🎮 Juego iniciado con colisiones reducidas (40%) y rango de interacción ampliado (120px).');
     console.log('⬆ 6 pasos consecutivos → Clon (cooldown 5s)');
     console.log('⬇ 8 pasos consecutivos → Baby King (cooldown 5s)');
     console.log('💬 Diálogos lentos: 12 frames por letra.');
