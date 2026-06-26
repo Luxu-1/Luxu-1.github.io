@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>You Found The First</title>
+  <title>You found the first</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     * {
@@ -24,7 +24,7 @@
       display: block;
       width: 100vw;
       height: 100vh;
-      image-rendering: pixelated; /* para que la textura se vea nítida */
+      image-rendering: pixelated;
       background: black;
     }
   </style>
@@ -36,7 +36,7 @@
       const canvas = document.getElementById('canvas');
       const ctx = canvas.getContext('2d');
 
-      // Ajustar tamaño al viewport
+      // ==================== AJUSTAR TAMAÑO ====================
       function resize() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -53,15 +53,15 @@
         console.log('✅ Textura bellowtext.png cargada');
       };
       textureImg.onerror = () => {
-        console.warn('⚠️ No se pudo cargar bellowtext.png, se usará patrón por defecto');
-        // Crear un patrón de cuadrícula como fallback
+        console.warn('⚠️ No se pudo cargar bellowtext.png, usando patrón de fallback');
+        // Patrón de fallback: cuadrícula pixelada
         const fallbackCanvas = document.createElement('canvas');
         fallbackCanvas.width = 64;
         fallbackCanvas.height = 64;
         const fctx = fallbackCanvas.getContext('2d');
         fctx.fillStyle = '#444';
         fctx.fillRect(0, 0, 64, 64);
-        fctx.fillStyle = '#666';
+        fctx.fillStyle = '#888';
         for (let i = 0; i < 64; i += 8) {
           fctx.fillRect(i, 0, 2, 64);
           fctx.fillRect(0, i, 64, 2);
@@ -70,22 +70,17 @@
         textureLoaded = true;
       };
 
-      // ==================== PARÁMETROS DE LA K ====================
+      // ==================== PARÁMETROS ====================
       const LETTER = 'K';
-      const FONT_SIZE = Math.min(window.innerWidth, window.innerHeight) * 0.7; // 70% del lado más pequeño
-      const GLOW_LAYERS = 6; // número de capas de brillo
-      const GLOW_MAX_BLUR = 25; // desenfoque máximo en píxeles
-      const GLOW_MAX_SCALE = 1.4; // escala máxima del glow
-      const SPEED = 0.3; // velocidad de desplazamiento de la textura (píxeles por frame)
-
-      // Offset de la textura (se mueve en diagonal)
-      let offsetX = 0;
-      let offsetY = 0;
+      const FONT_SIZE = Math.min(window.innerWidth, window.innerHeight) * 0.7;
+      const GLOW_BLUR = 20;        // desenfoque del brillo (píxeles)
+      const GLOW_SCALE = 1.15;      // escala del brillo (1.15 = 15% más grande)
+      const MOVE_AMPLITUDE = 80;    // amplitud de movimiento en píxeles
+      const SPEED = 0.02;           // velocidad de oscilación
 
       // ==================== DIBUJAR ====================
-      function draw() {
+      function draw(time) {
         if (!textureLoaded) {
-          // Mostrar un mensaje de carga
           ctx.fillStyle = 'white';
           ctx.font = '20px monospace';
           ctx.textAlign = 'center';
@@ -95,46 +90,39 @@
           return;
         }
 
-        // Limpiar canvas (fondo negro)
+        // Calcular offset oscilante en diagonal
+        // Usamos Math.sin(time * SPEED) para que vaya y vuelva suavemente
+        const phase = Math.sin(time * SPEED);
+        // Desplazamiento en X e Y: se mueven en diagonal (misma fase pero con diferente amplitud para que no sea recta perfecta)
+        const offsetX = phase * MOVE_AMPLITUDE;
+        const offsetY = phase * MOVE_AMPLITUDE * 0.6; // para dar un efecto diagonal más orgánico
+
+        // Crear patrón con la textura
+        const pattern = ctx.createPattern(textureImg, 'repeat');
+        // Aplicar desplazamiento al patrón
+        pattern.setTransform(new DOMMatrix([1, 0, 0, 1, offsetX, offsetY]));
+
+        // Limpiar canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Crear patrón con la textura
-        const pattern = ctx.createPattern(textureImg, 'repeat');
-        // Desplazar el patrón en diagonal
-        pattern.setTransform(new DOMMatrix([1, 0, 0, 1, offsetX, offsetY]));
-
-        // Configurar la fuente
+        // Configurar fuente
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.font = `bold ${FONT_SIZE}px "Press Start 2P", "Courier New", monospace`;
 
-        // Guardar estado
+        // ========== BRILLO (una capa con textura y desenfoque) ==========
         ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.scale(GLOW_SCALE, GLOW_SCALE);
+        ctx.filter = `blur(${GLOW_BLUR}px)`;
+        ctx.globalAlpha = 0.5; // opacidad del brillo
+        ctx.fillStyle = pattern;
+        ctx.fillText(LETTER, 0, 0);
+        ctx.restore();
 
-        // ========== DIBUJAR EL BRILLO (GLOW) CON TEXTURA ==========
-        // Dibujamos varias capas con escala creciente, opacidad decreciente y desenfoque
-        for (let i = GLOW_LAYERS; i >= 0; i--) {
-          const t = i / GLOW_LAYERS; // 0 a 1
-          const scale = 1 + t * (GLOW_MAX_SCALE - 1);
-          const opacity = 0.3 * (1 - t * 0.7); // de 0.3 a 0.09
-          const blur = t * GLOW_MAX_BLUR;
-
-          ctx.save();
-          ctx.translate(canvas.width / 2, canvas.height / 2);
-          ctx.scale(scale, scale);
-          ctx.filter = `blur(${blur}px)`;
-          ctx.globalAlpha = opacity;
-
-          // Rellenar la letra con el patrón (que tiene la textura)
-          ctx.fillStyle = pattern;
-          ctx.fillText(LETTER, 0, 0);
-
-          ctx.restore();
-        }
-
-        // ========== DIBUJAR LA K NÍTIDA (ENCIMA) ==========
+        // ========== K NÍTIDA (encima) ==========
         ctx.save();
         ctx.translate(canvas.width / 2, canvas.height / 2);
         ctx.filter = 'none';
@@ -143,39 +131,17 @@
         ctx.fillText(LETTER, 0, 0);
         ctx.restore();
 
-        ctx.restore();
-
-        // ========== ACTUALIZAR OFFSET DE LA TEXTURA (movimiento diagonal) ==========
-        offsetX += SPEED;
-        offsetY += SPEED * 0.7; // movimiento diagonal no uniforme para más dinamismo
-
-        // Si el offset es muy grande, resetear para evitar que el patrón se desplace demasiado
-        if (offsetX > textureImg.width) offsetX -= textureImg.width;
-        if (offsetY > textureImg.height) offsetY -= textureImg.height;
-
+        // Continuar animación
         requestAnimationFrame(draw);
       }
 
-      // Iniciar animación cuando la textura esté cargada
-      if (textureImg.complete && textureImg.naturalWidth !== 0) {
-        textureLoaded = true;
+      // Iniciar animación con el tiempo
+      let startTime = performance.now();
+      function animate(time) {
+        const elapsed = (time - startTime) / 1000; // segundos
+        draw(elapsed);
       }
-      // Si ya está cargada, comenzar; si no, la carga la iniciará el evento onload
-      if (textureLoaded) {
-        draw();
-      } else {
-        textureImg.onload = () => {
-          textureLoaded = true;
-          draw();
-        };
-      }
-
-      // Redimensionar también cambia el tamaño de la fuente
-      window.addEventListener('resize', () => {
-        resize();
-        // Actualizar el tamaño de la fuente (se recalcula en cada frame)
-        // No es necesario hacer nada más porque draw() usa FONT_SIZE calculado con el tamaño actual
-      });
+      requestAnimationFrame(animate);
 
     })();
   </script>
