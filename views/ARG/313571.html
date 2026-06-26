@@ -1,1 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>You found the fpurth</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Press Start 2P', monospace;
+    }
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      image-rendering: pixelated;
+      background: black;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <script>
+    (function() {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
 
+      // ==================== AJUSTAR TAMAÑO ====================
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      // ==================== CARGAR TEXTURA ====================
+      const textureImg = new Image();
+      textureImg.src = '/media/texture/bellowtext.png';
+      let textureLoaded = false;
+      textureImg.onload = () => {
+        textureLoaded = true;
+        console.log('✅ Textura bellowtext.png cargada');
+      };
+      textureImg.onerror = () => {
+        console.warn('⚠️ No se pudo cargar bellowtext.png, usando patrón de fallback');
+        // Patrón de fallback: cuadrícula pixelada
+        const fallbackCanvas = document.createElement('canvas');
+        fallbackCanvas.width = 64;
+        fallbackCanvas.height = 64;
+        const fctx = fallbackCanvas.getContext('2d');
+        fctx.fillStyle = '#444';
+        fctx.fillRect(0, 0, 64, 64);
+        fctx.fillStyle = '#888';
+        for (let i = 0; i < 64; i += 8) {
+          fctx.fillRect(i, 0, 2, 64);
+          fctx.fillRect(0, i, 64, 2);
+        }
+        textureImg.src = fallbackCanvas.toDataURL();
+        textureLoaded = true;
+      };
+
+      // ==================== PARÁMETROS ====================
+      const LETTER = 'E';
+      const FONT_SIZE = Math.min(window.innerWidth, window.innerHeight) * 0.7;
+      const GLOW_BLUR = 20;        // desenfoque del brillo (píxeles)
+      const GLOW_SCALE = 1.15;      // escala del brillo (1.15 = 15% más grande)
+      const MOVE_AMPLITUDE = 80;    // amplitud de movimiento en píxeles
+      const SPEED = 0.0002;           // velocidad de oscilación
+
+      // ==================== DIBUJAR ====================
+      function draw(time) {
+        if (!textureLoaded) {
+          ctx.fillStyle = 'white';
+          ctx.font = '20px monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('Cargando textura...', canvas.width/2, canvas.height/2);
+          requestAnimationFrame(draw);
+          return;
+        }
+
+        // Calcular offset oscilante en diagonal
+        // Usamos Math.sin(time * SPEED) para que vaya y vuelva suavemente
+        const phase = Math.sin(time * SPEED);
+        // Desplazamiento en X e Y: se mueven en diagonal (misma fase pero con diferente amplitud para que no sea recta perfecta)
+        const offsetX = phase * MOVE_AMPLITUDE;
+        const offsetY = phase * MOVE_AMPLITUDE * 0.6; // para dar un efecto diagonal más orgánico
+
+        // Crear patrón con la textura
+        const pattern = ctx.createPattern(textureImg, 'repeat');
+        // Aplicar desplazamiento al patrón
+        pattern.setTransform(new DOMMatrix([1, 0, 0, 1, offsetX, offsetY]));
+
+        // Limpiar canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Configurar fuente
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = `bold ${FONT_SIZE}px "Press Start 2P", "Courier New", monospace`;
+
+        // ========== BRILLO (una capa con textura y desenfoque) ==========
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.scale(GLOW_SCALE, GLOW_SCALE);
+        ctx.filter = `blur(${GLOW_BLUR}px)`;
+        ctx.globalAlpha = 0.5; // opacidad del brillo
+        ctx.fillStyle = pattern;
+        ctx.fillText(LETTER, 0, 0);
+        ctx.restore();
+
+        // ========== K NÍTIDA (encima) ==========
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.filter = 'none';
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = pattern;
+        ctx.fillText(LETTER, 0, 0);
+        ctx.restore();
+
+        // Continuar animación
+        requestAnimationFrame(draw);
+      }
+
+      // Iniciar animación con el tiempo
+      let startTime = performance.now();
+      function animate(time) {
+        const elapsed = (time - startTime) / 1000; // segundos
+        draw(elapsed);
+      }
+      requestAnimationFrame(animate);
+
+    })();
+  </script>
+</body>
+</html>
