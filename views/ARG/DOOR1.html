@@ -6,7 +6,7 @@
   <link rel="icon" type="image/png" href="/media/texture/icon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
-    /* ========== ESTILOS ========== */
+    /* (Mismo CSS que antes, no lo repito por brevedad pero está incluido) */
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
     body {
       background:#1a1a1a;
@@ -373,10 +373,10 @@
         gain.connect(audioCtx.destination);
         osc.type = 'square';
         if (lowPitch) {
-          osc.frequency.value = 150 + Math.random() * 200; // 150-350 Hz
+          osc.frequency.value = 150 + Math.random() * 200;
           gain.gain.value = 0.05;
         } else {
-          osc.frequency.value = 800 + Math.random() * 200; // 800-1000 Hz
+          osc.frequency.value = 800 + Math.random() * 200;
           gain.gain.value = 0.03;
         }
         osc.start();
@@ -396,7 +396,7 @@
       dialog.speaker = speaker;
       dialog.complete = false;
       dialog.charDelay = (speed === 'slow') ? 12 : 2;
-      console.log(`💬 Inicio diálogo: "${text}" (${speed}, retraso: ${dialog.charDelay} frames)`);
+      console.log(`💬 Inicio diálogo: "${text}" (${speed})`);
     }
 
     function updateDialog() {
@@ -458,7 +458,7 @@
       }
     }
 
-    // ==================== MUNDO (objetos estáticos) ====================
+    // ==================== MUNDO ====================
     const worldObjects = [];
 
     function addObject(col, row, x, y, collision = true, dialogText = null) {
@@ -477,23 +477,20 @@
         spriteRow: row,
         collision: collision,
         dialog: dialogText,
-        // 👇 ELIMINADO: already talked, ahora se puede releer siempre
       });
     }
 
-    // ===== MODIFICA LAS COORDENADAS AQUÍ (X, Y) =====
-    // Ángel
+    // Ángel y carteles (con diálogo)
     addObject(0, 1, 30, 30, true, "Emperor of dark, i saw you fight");
-    // Carteles
     addObject(0, 2, 400, 50, true, "The King... The King...");
     addObject(1, 2, 400, 150, true, "The different one");
     addObject(2, 2, 400, 250, true, "You loomed too high");
     // Vegetación (sin diálogo)
-    addObject(1, 1, 30, 150, true, null);   // árbol
-    addObject(2, 1, 150, 30, false, null);  // pasto (sin colisión)
-    addObject(3, 1, 30, 300, false, null);  // flor (sin colisión)
-    addObject(1, 1, 450, 400, true, null);  // árbol
-    addObject(2, 1, 300, 450, false, null); // pasto
+    addObject(1, 1, 30, 150, true, null);
+    addObject(2, 1, 150, 30, false, null);
+    addObject(3, 1, 30, 300, false, null);
+    addObject(1, 1, 450, 400, true, null);
+    addObject(2, 1, 300, 450, false, null);
 
     // ==================== COLISIONES ====================
     function rectCollide(r1, r2) {
@@ -543,7 +540,6 @@
       else if (dir === 'left') counters.left++;
       else if (dir === 'right') counters.right++;
       counters.total++;
-      console.log(`📍 Paso registrado: ${dir} - Total: ${counters.total}`);
       handleConsecutive(dir);
       updateUI();
     }
@@ -554,13 +550,11 @@
         clone.active = false;
         clone.talked = false;
         clone.cooldown = 0;
-        console.log('👥 Clon desapareció');
       }
       if (babyKing.active) {
         babyKing.active = false;
         babyKing.talked = false;
         babyKing.cooldown = 0;
-        console.log('👑 Baby King desapareció');
       }
       counters.stepsSinceSpawn = 0;
     }
@@ -570,21 +564,18 @@
       if (counters.lastDir === dir) {
         if (dir === 'up') {
           counters.consecutiveUp++;
-          console.log(`⬆ Pasos consecutivos UP: ${counters.consecutiveUp}/6`);
           if (counters.consecutiveUp >= 6 && !clone.active) {
             activateClone();
             counters.consecutiveUp = 0;
           }
         } else if (dir === 'down') {
           counters.consecutiveDown++;
-          console.log(`⬇ Pasos consecutivos DOWN: ${counters.consecutiveDown}/8`);
           if (counters.consecutiveDown >= 8 && !babyKing.active) {
             activateBabyKing();
             counters.consecutiveDown = 0;
           }
         }
       } else {
-        console.log(`🔄 Cambio de dirección (${counters.lastDir} → ${dir}), reseteando contadores`);
         counters.consecutiveUp = 0;
         counters.consecutiveDown = 0;
       }
@@ -602,7 +593,6 @@
       clone.talked = false;
       clone.cooldown = 300;
       counters.stepsSinceSpawn = 0;
-      console.log('👥 ¡Clon apareció! (cooldown 5s)');
     }
 
     // ==================== ACTIVAR BABY KING ====================
@@ -616,10 +606,9 @@
       babyKing.talked = false;
       babyKing.cooldown = 300;
       counters.stepsSinceSpawn = 0;
-      console.log('👑 ¡Baby King apareció! (cooldown 5s)');
     }
 
-    // ==================== ACTUALIZAR COOLDOWNS ====================
+    // ==================== COOLDOWNS ====================
     function updateCooldowns() {
       if (clone.active && clone.cooldown > 0) {
         clone.cooldown--;
@@ -631,7 +620,7 @@
       }
     }
 
-    // ==================== CHECK BOUNDARY (con cooldown) ====================
+    // ==================== CHECK BOUNDARY ====================
     function checkBoundaryAndRecord() {
       const margin = 5;
       let dir = null;
@@ -660,61 +649,64 @@
         }
         if (shouldDespawn) {
           counters.stepsSinceSpawn++;
-          console.log(`👣 Pasos desde spawn (cooldown terminado): ${counters.stepsSinceSpawn}`);
           if (counters.stepsSinceSpawn >= 1) {
             despawnCharacters();
           }
-        } else {
-          console.log(`⏳ Paso ignorado (cooldown activo) - Clon: ${clone.cooldown}, BabyKing: ${babyKing.cooldown}`);
         }
       }
     }
 
-    // ==================== INTERACCIÓN ====================
+    // ==================== INTERACCIÓN (nueva versión mejorada) ====================
     function checkInteraction() {
-      if (dialog.active) {
-        if (dialog.complete) {
-          dialog.active = false;
-          console.log('💬 Diálogo cerrado');
-        }
-        return;
+      // Si el diálogo está activo y completo, lo cerramos (esto se llama desde los eventos)
+      if (dialog.active && dialog.complete) {
+        dialog.active = false;
+        console.log('💬 Diálogo cerrado con Z');
+        return true; // Indica que se cerró
       }
 
+      // Si el diálogo está activo pero no completo, no hacemos nada
+      if (dialog.active) {
+        return false;
+      }
+
+      // No hay diálogo: buscar objeto cercano para iniciar uno
       const interactDist = 120;
 
-      // Objetos del mundo (Ángel y carteles) → diálogo RÁPIDO y RELEIBLE
+      // 1. Objetos del mundo (Ángel y carteles) - siempre releíbles
       for (let obj of worldObjects) {
         if (obj.dialog === null) continue;
-        // 🔁 Ya no comprobamos obj.talked, así que se puede releer siempre
         const dx = (player.x + player.width/2) - (obj.x + obj.width/2);
         const dy = (player.y + player.height/2) - (obj.y + obj.height/2);
         if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
           startDialog(obj.dialog, obj, 'fast');
-          return; // Solo un diálogo a la vez
+          return true;
         }
       }
 
-      // Clon → diálogo LENTO (una sola vez)
+      // 2. Clon (solo si no ha hablado aún)
       if (clone.active && !clone.talked) {
         const dx = (player.x + player.width/2) - (clone.x + clone.width/2);
         const dy = (player.y + player.height/2) - (clone.y + clone.height/2);
         if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
           startDialog('You loomed too high', 'clone', 'slow');
           clone.talked = true;
-          return;
+          return true;
         }
       }
 
-      // Baby King → diálogo LENTO (una sola vez)
+      // 3. Baby King (solo si no ha hablado aún)
       if (babyKing.active && !babyKing.talked) {
         const dx = (player.x + player.width/2) - (babyKing.x + babyKing.width/2);
         const dy = (player.y + player.height/2) - (babyKing.y + babyKing.height/2);
         if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
           startDialog('I loomed too high', 'babyKing', 'slow');
           babyKing.talked = true;
-          return;
+          return true;
         }
       }
+
+      return false;
     }
 
     // ==================== UPDATE ====================
@@ -730,14 +722,13 @@
       const moving = (dx!==0 || dy!==0);
       player.moving = moving;
 
-      // ====== CARRERA: Z presionado + moviéndose + sin diálogo ======
+      // Carrera: Z + moviendo + sin diálogo
       let speedMultiplier = 1;
       if (keys.action && !dialog.active && moving) {
         speedMultiplier = 2.0;
       }
       const currentSpeed = BASE_SPEED * speedMultiplier;
 
-      // Actualizar cooldowns
       updateCooldowns();
 
       if (moving && !dialog.active) {
@@ -806,25 +797,15 @@
 
       updateDialog();
 
-      // ====== ACCIÓN: Si está quieto, intenta interactuar; si se mueve, solo corre ======
-      if (keys.action) {
-        if (!moving) {
-          checkInteraction();
-        }
-        // No reseteamos keys.action aquí porque se usa para correr (se resetea al soltar la tecla)
-        // Pero para evitar que se dispare múltiples veces al mantenerla, usamos un flag.
-        // La mejor forma es no resetearla, y que el keyup la ponga a false.
-        // Así que eliminamos keys.action = false; de aquí.
-      }
+      // NOTA: Ya no llamamos a checkInteraction() desde aquí.
+      // Se maneja exclusivamente desde los eventos de teclado/táctiles.
     }
 
     // ==================== DRAW ====================
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
       ctx.fillStyle = '#353535';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
       ctx.fillStyle = '#454545';
       for (let i=0; i<canvas.width; i+=60) {
         for (let j=0; j<canvas.height; j+=60) {
@@ -883,34 +864,55 @@
       requestAnimationFrame(gameLoop);
     }
 
-    // ==================== EVENTOS ====================
+    // ==================== EVENTOS DE TECLADO ====================
     function handleKeyDown(e) {
       const key = e.key;
-      if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(key)) e.preventDefault();
+      if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(key)) {
+        e.preventDefault();
+      }
       if (key === 'w'||key==='W'||key==='ArrowUp') keys.up = true;
       if (key === 's'||key==='S'||key==='ArrowDown') keys.down = true;
       if (key === 'a'||key==='A'||key==='ArrowLeft') keys.left = true;
       if (key === 'd'||key==='D'||key==='ArrowRight') keys.right = true;
+
       if (key === 'z'||key==='Z') {
-        keys.action = true;
         e.preventDefault();
-        // Si hay diálogo completo, cerrarlo al presionar Z
+        keys.action = true;
+
+        // Manejar el diálogo con Z (cerrar si está completo, o iniciar si no hay)
         if (dialog.active && dialog.complete) {
+          // Cerrar diálogo
           dialog.active = false;
+          console.log('💬 Diálogo cerrado con Z (keydown)');
+        } else if (!dialog.active) {
+          // Solo si no hay diálogo, intentar interactuar (pero esperamos a que suelte la tecla para evitar doble llamada)
+          // No llamamos aquí, lo hacemos en keyup para evitar repetición.
         }
       }
     }
 
     function handleKeyUp(e) {
       const key = e.key;
-      if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(key)) e.preventDefault();
+      if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(key)) {
+        e.preventDefault();
+      }
       if (key === 'w'||key==='W'||key==='ArrowUp') keys.up = false;
       if (key === 's'||key==='S'||key==='ArrowDown') keys.down = false;
       if (key === 'a'||key==='A'||key==='ArrowLeft') keys.left = false;
       if (key === 'd'||key==='D'||key==='ArrowRight') keys.right = false;
+
       if (key === 'z'||key==='Z') {
-        keys.action = false;
         e.preventDefault();
+        keys.action = false;
+
+        // Al soltar Z, si no hay diálogo y el jugador está quieto, intentar interactuar
+        if (!dialog.active) {
+          // Solo si el jugador no se está moviendo
+          if (!player.moving) {
+            checkInteraction();
+          }
+        }
+        // Si el diálogo está activo y completo, ya se cerró en keydown, así que no hacemos nada
       }
     }
 
@@ -959,42 +961,50 @@
       });
 
       // Botón de acción táctil
-      const actionBtnEl = document.getElementById('actionBtn');
-      actionBtnEl.addEventListener('touchstart', (e) => {
+      actionBtn.addEventListener('touchstart', (e) => {
         e.preventDefault();
         keys.action = true;
+
+        // Cerrar diálogo si está completo
         if (dialog.active && dialog.complete) {
           dialog.active = false;
+          console.log('💬 Diálogo cerrado con botón táctil (touchstart)');
         }
       }, { passive: false });
 
-      actionBtnEl.addEventListener('touchend', (e) => {
+      actionBtn.addEventListener('touchend', (e) => {
         e.preventDefault();
         keys.action = false;
-        // Si no se movió y estaba quieto, intentar interactuar (como clic)
-        if (!player.moving) {
+
+        // Si no hay diálogo y el jugador está quieto, interactuar
+        if (!dialog.active && !player.moving) {
           checkInteraction();
         }
       }, { passive: false });
 
-      actionBtnEl.addEventListener('touchcancel', (e) => {
+      actionBtn.addEventListener('touchcancel', (e) => {
         e.preventDefault();
         keys.action = false;
       }, { passive: false });
 
       // También para mouse (para depuración)
-      actionBtnEl.addEventListener('mousedown', (e) => {
+      actionBtn.addEventListener('mousedown', (e) => {
         e.preventDefault();
         keys.action = true;
+        if (dialog.active && dialog.complete) {
+          dialog.active = false;
+          console.log('💬 Diálogo cerrado con botón (mousedown)');
+        }
       });
-      actionBtnEl.addEventListener('mouseup', (e) => {
+
+      actionBtn.addEventListener('mouseup', (e) => {
         e.preventDefault();
         keys.action = false;
-        if (!player.moving) {
+        if (!dialog.active && !player.moving) {
           checkInteraction();
         }
       });
-      actionBtnEl.addEventListener('mouseleave', (e) => {
+      actionBtn.addEventListener('mouseleave', (e) => {
         keys.action = false;
       });
     }
@@ -1025,11 +1035,7 @@
     updateUI();
     setTimeout(ensurePlayerSpawn, 100);
 
-    console.log('🎮 Juego iniciado con carrera (Z), diálogos releíbles y todas las mejoras.');
-    console.log('⬆ 6 pasos consecutivos → Clon (cooldown 5s, diálogo lento)');
-    console.log('⬇ 8 pasos consecutivos → Baby King (cooldown 5s, diálogo lento)');
-    console.log('💬 Objetos del mundo (Ángel, carteles) → diálogo rápido, releíble siempre.');
-    console.log('🏃 Mantén Z mientras te mueves para correr.');
+    console.log('🎮 Juego iniciado con corrección de diálogos (Z cierra cuando está completo).');
   })();
 </script>
 </body>
