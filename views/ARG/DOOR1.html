@@ -478,13 +478,13 @@
     addObject(0, 2, 400, 50, true, null);
     addObject(1, 2, 400, 150, true, null);
     addObject(2, 2, 400, 250, true, null);
-    // Vegetación (alejada del centro)
+    // Vegetación (alejada del centro) - COLLISION DISABLED FOR GRASS AND FLOWERS
     addObject(1, 1, 30, 150, true, null);   // árbol izquierdo
-    addObject(2, 1, 150, 30, true, null);   // pasto arriba
-    addObject(3, 1, 30, 300, true, null);   // flor abajo izquierda
+    addObject(2, 1, 150, 30, false, null);   // pasto arriba - NO COLLISION
+    addObject(3, 1, 30, 300, false, null);   // flor abajo izquierda - NO COLLISION
     addObject(1, 1, 450, 400, true, null);  // árbol abajo derecha
     // También añadir algún objeto más para rellenar
-    addObject(2, 1, 300, 450, true, null);  // pasto abajo
+    addObject(2, 1, 300, 450, false, null);  // pasto abajo - NO COLLISION
 
     // ==================== COLISIONES ====================
     function rectCollide(r1, r2) {
@@ -555,6 +555,8 @@
           despawnCharacters();
         }
       }
+      
+      return stepCompleted;
     }
 
     // ==================== DESAPARECER PERSONAJES ====================
@@ -695,20 +697,22 @@
           player.x = newX;
           player.y = newY;
           
-          // Check for teleport BEFORE wrapping
-          teleportPlayer();
+          // Check for teleport and don't wrap if teleported
+          const teleported = teleportPlayer();
           
-          // NOW apply boundary wrapping
-          if (player.x + player.width < 0) {
-            player.x = canvas.width;
-          } else if (player.x > canvas.width) {
-            player.x = -player.width;
-          }
-          
-          if (player.y + player.height < 0) {
-            player.y = canvas.height;
-          } else if (player.y > canvas.height) {
-            player.y = -player.height;
+          // Only apply boundary wrapping if NO teleport occurred
+          if (!teleported) {
+            if (player.x + player.width < 0) {
+              player.x = canvas.width;
+            } else if (player.x > canvas.width) {
+              player.x = -player.width;
+            }
+            
+            if (player.y + player.height < 0) {
+              player.y = canvas.height;
+            } else if (player.y > canvas.height) {
+              player.y = -player.height;
+            }
           }
         } else {
           // Try moving on single axis
@@ -717,14 +721,16 @@
             if (!isCollidingWithWorld(testX)) {
               player.x = newX;
               
-              // Check for teleport BEFORE wrapping
-              teleportPlayer();
+              // Check for teleport and don't wrap if teleported
+              const teleported = teleportPlayer();
               
-              // NOW apply boundary wrapping
-              if (player.x + player.width < 0) {
-                player.x = canvas.width;
-              } else if (player.x > canvas.width) {
-                player.x = -player.width;
+              // Only apply boundary wrapping if NO teleport occurred
+              if (!teleported) {
+                if (player.x + player.width < 0) {
+                  player.x = canvas.width;
+                } else if (player.x > canvas.width) {
+                  player.x = -player.width;
+                }
               }
             }
           }
@@ -733,14 +739,16 @@
             if (!isCollidingWithWorld(testY)) {
               player.y = newY;
               
-              // Check for teleport BEFORE wrapping
-              teleportPlayer();
+              // Check for teleport and don't wrap if teleported
+              const teleported = teleportPlayer();
               
-              // NOW apply boundary wrapping
-              if (player.y + player.height < 0) {
-                player.y = canvas.height;
-              } else if (player.y > canvas.height) {
-                player.y = -player.height;
+              // Only apply boundary wrapping if NO teleport occurred
+              if (!teleported) {
+                if (player.y + player.height < 0) {
+                  player.y = canvas.height;
+                } else if (player.y > canvas.height) {
+                  player.y = -player.height;
+                }
               }
             }
           }
