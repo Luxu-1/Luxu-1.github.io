@@ -2,11 +2,11 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Zelda - Aventura CRT</title>
+  <title>His Game</title>
   <link rel="icon" type="image/png" href="/media/texture/icon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
-    /* (Estilos idénticos a los que tienes) */
+    /* (Mismo CSS que antes) */
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
     body {
       background:#1a1a1a;
@@ -286,7 +286,7 @@
       flipX: false,
     };
 
-    // ==================== CLON ====================
+    // ==================== CLON (con cooldown) ====================
     const clone = {
       active: false,
       x: 250 - CHAR_W/2,
@@ -297,9 +297,10 @@
       spriteRow: SPRITES.IDLE.row,
       flipX: false,
       talked: false,
+      cooldown: 0, // frames restantes antes de que los pasos cuenten
     };
 
-    // ==================== BABY KING ====================
+    // ==================== BABY KING (con cooldown) ====================
     const babyKing = {
       active: false,
       x: 250 - CHAR_W/2,
@@ -310,6 +311,7 @@
       spriteRow: SPRITES.BABY_KING.row,
       flipX: false,
       talked: false,
+      cooldown: 0,
     };
 
     // ==================== DIÁLOGO ====================
@@ -387,7 +389,6 @@
       dialog.speed = speed;
       dialog.speaker = speaker;
       dialog.complete = false;
-      // Aumento de 5 a 12 para que sea más lento
       dialog.charDelay = (speed === 'slow') ? 12 : 1;
       console.log(`💬 Inicio diálogo: "${text}" (retraso: ${dialog.charDelay} frames)`);
     }
@@ -473,7 +474,7 @@
       });
     }
 
-    // --- Posiciones ajustadas (sin colisión inicial) ---
+    // --- Posiciones ajustadas ---
     addObject(0, 1, 30, 30, true, null);          // Ángel
     addObject(0, 2, 400, 50, true, null);          // Cartel1
     addObject(1, 2, 400, 150, true, null);         // Cartel2
@@ -493,19 +494,16 @@
     }
 
     function isCollidingWithWorld(rect) {
-      const shrink = 0.7; // 70% del tamaño para colisiones más pequeñas
+      const shrink = 0.7;
       for (let obj of worldObjects) {
         if (!obj.collision) continue;
-        // Reducir el rectángulo de colisión del objeto
         const objRect = {
           x: obj.x + (1 - shrink) * obj.width / 2,
           y: obj.y + (1 - shrink) * obj.height / 2,
           width: obj.width * shrink,
           height: obj.height * shrink
         };
-        if (rectCollide(rect, objRect)) {
-          return true;
-        }
+        if (rectCollide(rect, objRect)) return true;
       }
       if (clone.active) {
         const cloneRect = {
@@ -545,11 +543,13 @@
       if (clone.active) {
         clone.active = false;
         clone.talked = false;
+        clone.cooldown = 0;
         console.log('👥 Clon desapareció');
       }
       if (babyKing.active) {
         babyKing.active = false;
         babyKing.talked = false;
+        babyKing.cooldown = 0;
         console.log('👑 Baby King desapareció');
       }
       counters.stepsSinceSpawn = 0;
@@ -590,8 +590,9 @@
       clone.spriteRow = SPRITES.IDLE.row;
       clone.flipX = false;
       clone.talked = false;
+      clone.cooldown = 300; // 5 segundos
       counters.stepsSinceSpawn = 0;
-      console.log('👥 ¡Clon apareció!');
+      console.log('👥 ¡Clon apareció! (cooldown 5s)');
     }
 
     // ==================== ACTIVAR BABY KING ====================
@@ -603,8 +604,61 @@
       babyKing.spriteRow = SPRITES.BABY_KING.row;
       babyKing.flipX = false;
       babyKing.talked = false;
+      babyKing.cooldown = 300;
       counters.stepsSinceSpawn = 0;
-      console.log('👑 ¡Baby King apareció!');
+      console.log('👑 ¡Baby King apareció! (cooldown 5s)');
+    }
+
+    // ==================== ACTUALIZAR COOLDOWNS ====================
+    function updateCooldowns() {
+      if (clone.active && clone.cooldown > 0) {
+        clone.cooldown--;
+        if (clone.cooldown === 0) console.log('⏳ Cooldown del Clon terminado');
+      }
+      if (babyKing.active && babyKing.cooldown > 0) {
+        babyKing.cooldown--;
+        if (babyKing.cooldown === 0) console.log('⏳ Cooldown de Baby King terminado');
+      }
+    }
+
+    // ==================== CHECK BOUNDARY (con cooldown) ====================
+    function checkBoundaryAndRecord() {
+      const margin = 5;
+      let dir = null;
+      if (player.y + player.height < -margin) {
+        player.y = canvas.height + margin;
+        dir = 'up';
+      } else if (player.y > canvas.height + margin) {
+        player.y = -player.height - margin;
+        dir = 'down';
+      } else if (player.x + player.width < -margin) {
+        player.x = canvas.width + margin;
+        dir = 'left';
+      } else if (player.x > canvas.width + margin) {
+        player.x = -player.width - margin;
+        dir = 'right';
+      }
+
+      if (dir) {
+        recordStep(dir);
+        // Solo procesar desaparición si el cooldown ha terminado
+        let shouldDespawn = false;
+        if (clone.active && clone.cooldown === 0) {
+          shouldDespawn = true;
+        }
+        if (babyKing.active && babyKing.cooldown === 0) {
+          shouldDespawn = true;
+        }
+        if (shouldDespawn) {
+          counters.stepsSinceSpawn++;
+          console.log(`👣 Pasos desde spawn (cooldown terminado): ${counters.stepsSinceSpawn}`);
+          if (counters.stepsSinceSpawn >= 1) {
+            despawnCharacters();
+          }
+        } else {
+          console.log(`⏳ Paso ignorado (cooldown activo) - Clon: ${clone.cooldown}, BabyKing: ${babyKing.cooldown}`);
+        }
+      }
     }
 
     // ==================== INTERACCIÓN ====================
@@ -619,7 +673,6 @@
 
       const interactDist = 60;
 
-      // Objetos del mundo
       for (let obj of worldObjects) {
         if (obj.dialog === null) continue;
         if (obj.talked) continue;
@@ -632,7 +685,6 @@
         }
       }
 
-      // Clon
       if (clone.active && !clone.talked) {
         const dx = (player.x + player.width/2) - (clone.x + clone.width/2);
         const dy = (player.y + player.height/2) - (clone.y + clone.height/2);
@@ -643,7 +695,6 @@
         }
       }
 
-      // Baby King
       if (babyKing.active && !babyKing.talked) {
         const dx = (player.x + player.width/2) - (babyKing.x + babyKing.width/2);
         const dy = (player.y + player.height/2) - (babyKing.y + babyKing.height/2);
@@ -668,20 +719,19 @@
       const moving = (dx!==0 || dy!==0);
       player.moving = moving;
 
+      // Actualizar cooldowns de personajes
+      updateCooldowns();
+
       if (moving && !dialog.active) {
-        // Calcular nueva posición
         let newX = player.x + dx * player.speed;
         let newY = player.y + dy * player.speed;
-
         const testRect = { x: newX, y: newY, width: player.width, height: player.height };
 
         if (!isCollidingWithWorld(testRect)) {
-          // Movimiento libre
           player.x = newX;
           player.y = newY;
           checkBoundaryAndRecord();
         } else {
-          // Intentar mover en un solo eje
           let moved = false;
           if (dx !== 0) {
             const testX = { x: newX, y: player.y, width: player.width, height: player.height };
@@ -700,7 +750,6 @@
           }
         }
 
-        // Animación
         if (dx > 0) player.dir = 'right';
         else if (dx < 0) player.dir = 'left';
         else if (dy < 0) player.dir = 'up';
@@ -723,7 +772,6 @@
           player.flipX = (dir === 'left');
         }
       } else if (!dialog.active) {
-        // Quieto
         const dir = player.dir;
         if (dir === 'up' || dir === 'down') {
           player.spriteCol = SPRITES.IDLE.col;
@@ -746,46 +794,13 @@
       }
     }
 
-    // Función auxiliar para verificar límites y registrar pasos
-    function checkBoundaryAndRecord() {
-      const margin = 5;
-      let dir = null;
-      if (player.y + player.height < -margin) {
-        player.y = canvas.height + margin;
-        dir = 'up';
-      } else if (player.y > canvas.height + margin) {
-        player.y = -player.height - margin;
-        dir = 'down';
-      } else if (player.x + player.width < -margin) {
-        player.x = canvas.width + margin;
-        dir = 'left';
-      } else if (player.x > canvas.width + margin) {
-        player.x = -player.width - margin;
-        dir = 'right';
-      }
-
-      if (dir) {
-        recordStep(dir);
-        // Si hay personajes activos, incrementar contador de pasos desde spawn
-        if (clone.active || babyKing.active) {
-          counters.stepsSinceSpawn++;
-          console.log(`👣 Pasos desde spawn: ${counters.stepsSinceSpawn}`);
-          if (counters.stepsSinceSpawn >= 1) {
-            despawnCharacters();
-          }
-        }
-      }
-    }
-
     // ==================== DRAW ====================
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Fondo monocromático (escala de grises)
       ctx.fillStyle = '#353535';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Patrón de cuadrícula sutil en grises
       ctx.fillStyle = '#454545';
       for (let i=0; i<canvas.width; i+=60) {
         for (let j=0; j<canvas.height; j+=60) {
@@ -795,14 +810,12 @@
       }
 
       if (sheetLoaded) {
-        // Dibujar objetos del mundo
         for (let obj of worldObjects) {
           const sx = obj.spriteCol * SPRITE_W;
           const sy = obj.spriteRow * SPRITE_H;
           ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, obj.x, obj.y, obj.width, obj.height);
         }
 
-        // Clon
         if (clone.active) {
           const sx = clone.spriteCol * SPRITE_W;
           const sy = clone.spriteRow * SPRITE_H;
@@ -811,14 +824,12 @@
           ctx.globalAlpha = 1.0;
         }
 
-        // Baby King
         if (babyKing.active) {
           const sx = babyKing.spriteCol * SPRITE_W;
           const sy = babyKing.spriteRow * SPRITE_H;
           ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, babyKing.x, babyKing.y, babyKing.width, babyKing.height);
         }
 
-        // Jugador
         const sx = player.spriteCol * SPRITE_W;
         const sy = player.spriteRow * SPRITE_H;
         if (player.flipX) {
@@ -965,9 +976,9 @@
     updateUI();
     setTimeout(ensurePlayerSpawn, 100);
 
-    console.log('🎮 Juego iniciado con colisiones reducidas y diálogos más lentos.');
-    console.log('⬆ 6 pasos consecutivos → Clon');
-    console.log('⬇ 8 pasos consecutivos → Baby King');
+    console.log('🎮 Juego iniciado con cooldown de 5s para personajes.');
+    console.log('⬆ 6 pasos consecutivos → Clon (cooldown 5s)');
+    console.log('⬇ 8 pasos consecutivos → Baby King (cooldown 5s)');
     console.log('💬 Diálogos lentos: 12 frames por letra.');
   })();
 </script>
