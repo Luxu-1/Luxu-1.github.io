@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
-    /* (Mismo CSS que antes, sin cambios) */
+    /* (Mismo CSS que antes) */
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
     body { background:#1a1a1a; display:flex; justify-content:center; align-items:center; min-height:100vh; overflow:hidden; font-family:'Courier New',monospace; touch-action: none; }
     .game-wrapper { display:flex; flex-direction:column; align-items:center; gap:12px; padding:10px; }
@@ -196,7 +196,11 @@
     spriteSheet.onload = () => { sheetLoaded = true; console.log('✅ Sprite sheet cargado'); };
     spriteSheet.onerror = () => { console.error('❌ Error al cargar el sprite sheet.'); };
 
-    // ==================== SONIDO ====================
+    // ==================== AUDIOS ====================
+    const shadowAudio = new Audio('/media/sound/shadow.mp3');
+    const colorAudio = new Audio('/media/sound/color.mp3');
+
+    // ==================== SONIDO TICK ====================
     let audioCtx = null;
     function playTickSound(lowPitch = false) {
       try {
@@ -248,63 +252,52 @@
         }
       }
     }
-function drawDialog() {
-  if (!dialog.active) return;
-  
-  const dw = canvas.width * 0.85, dh = 100;
-  const x = (canvas.width - dw) / 2, y = canvas.height - dh - 20;
-  
-  // Fondo del diálogo
-  ctx.fillStyle = 'black';
-  ctx.shadowColor = 'rgba(0,0,0,0.5)';
-  ctx.shadowBlur = 20;
-  ctx.fillRect(x, y, dw, dh);
-  ctx.shadowBlur = 0;
-  
-  // Borde blanco
-  ctx.strokeStyle = 'white';
-  ctx.lineWidth = 4;
-  ctx.strokeRect(x, y, dw, dh);
-  
-  // ====== FUENTE PIXELADA ======
-  ctx.fillStyle = 'white';
-  // Usamos la fuente "Press Start 2P" de Google Fonts
-  ctx.font = 'bold 16px "Press Start 2P", "Courier New", monospace';
-  ctx.textBaseline = 'top';
-  // Desactivar suavizado para que se vea más pixelado
-  ctx.imageSmoothingEnabled = false;
-  
-  const margin = 15;
-  const maxWidth = dw - margin * 2;
-  let lines = [], currentLine = '';
-  const words = dialog.displayText.split(' ');
-  
-  for (let word of words) {
-    let testLine = currentLine + (currentLine ? ' ' : '') + word;
-    if (ctx.measureText(testLine).width > maxWidth) {
-      lines.push(currentLine);
-      currentLine = word;
-    } else {
-      currentLine = testLine;
-    }
-  }
-  if (currentLine) lines.push(currentLine);
-  
-  const lineHeight = 28; // Ajustado para la fuente de 16px
-  for (let i = 0; i < Math.min(lines.length, 3); i++) {
-    ctx.fillText(lines[i], x + margin, y + margin + i * lineHeight);
-  }
-  
-  // Flecha parpadeante
-  if (dialog.complete) {
-    const blink = Math.floor(Date.now() / 500) % 2 === 0;
-    if (blink) {
+
+    // ==================== DIBUJO DE DIÁLOGO (fuente pixelada) ====================
+    function drawDialog() {
+      if (!dialog.active) return;
+      const dw = canvas.width * 0.85, dh = 100;
+      const x = (canvas.width - dw) / 2, y = canvas.height - dh - 20;
+      ctx.fillStyle = 'black';
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 20;
+      ctx.fillRect(x, y, dw, dh);
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(x, y, dw, dh);
       ctx.fillStyle = 'white';
-      ctx.font = '18px "Press Start 2P", monospace';
-      ctx.fillText('▼', x + dw - 35, y + dh - 28);
-    }
-  }
+      ctx.font = 'bold 16px "Press Start 2P", "Courier New", monospace';
+      ctx.textBaseline = 'top';
+      ctx.imageSmoothingEnabled = false;
+      const margin = 15;
+      const maxWidth = dw - margin * 2;
+      let lines = [], currentLine = '';
+      const words = dialog.displayText.split(' ');
+      for (let word of words) {
+        let testLine = currentLine + (currentLine ? ' ' : '') + word;
+        if (ctx.measureText(testLine).width > maxWidth) {
+          lines.push(currentLine);
+          currentLine = word;
+        } else {
+          currentLine = testLine;
         }
+      }
+      if (currentLine) lines.push(currentLine);
+      const lineHeight = 28;
+      for (let i = 0; i < Math.min(lines.length, 3); i++) {
+        ctx.fillText(lines[i], x + margin, y + margin + i * lineHeight);
+      }
+      if (dialog.complete) {
+        const blink = Math.floor(Date.now() / 500) % 2 === 0;
+        if (blink) {
+          ctx.fillStyle = 'white';
+          ctx.font = '18px "Press Start 2P", monospace';
+          ctx.fillText('▼', x + dw - 35, y + dh - 28);
+        }
+      }
+    }
+
     // ==================== MUNDO ====================
     const worldObjects = [];
 
@@ -339,7 +332,7 @@ function drawDialog() {
     addObject(3, 1, 31, 357, false, null);
     addObject(3, 1, 380, 357, false, null);
 
-    // ==================== COLISIONES (más pequeñas) ====================
+    // ==================== COLISIONES ====================
     function rectCollide(r1, r2) {
       return r1.x < r2.x + r2.width &&
              r1.x + r1.width > r2.x &&
@@ -348,7 +341,7 @@ function drawDialog() {
     }
 
     function isCollidingWithWorld(rect) {
-      const shrink = 0.25; // <--- CAMBIADO: de 0.4 a 0.25 (25% del tamaño)
+      const shrink = 0.25;
       for (let obj of worldObjects) {
         if (!obj.collision) continue;
         const objRect = {
@@ -378,6 +371,82 @@ function drawDialog() {
         if (rectCollide(rect, bkRect)) return true;
       }
       return false;
+    }
+
+    // ==================== SECUENCIAS DE EVENTOS ====================
+    let eventSequence = null; // 'clone' o 'babyKing'
+    let sequenceTimer = 0;
+    let sequenceStep = 0;
+    let sequenceCallback = null;
+
+    function startCloneSequence() {
+      eventSequence = 'clone';
+      sequenceStep = 0;
+      sequenceTimer = 0;
+      console.log('🔮 Iniciando secuencia del Clon');
+    }
+
+    function startBabyKingSequence() {
+      eventSequence = 'babyKing';
+      sequenceStep = 0;
+      sequenceTimer = 0;
+      console.log('👑 Iniciando secuencia de Baby King');
+    }
+
+    function updateSequence() {
+      if (!eventSequence) return;
+
+      sequenceTimer++;
+      const frameRate = 60; // 60 FPS
+      const seconds = sequenceTimer / frameRate;
+
+      if (eventSequence === 'clone') {
+        // Step 0: pantalla negra, sonido shadow.mp3, esperar 2.5s y redirigir
+        if (sequenceStep === 0) {
+          // Reproducir audio
+          shadowAudio.play().catch(e => console.warn('Error al reproducir shadow.mp3', e));
+          sequenceStep = 1;
+          sequenceTimer = 0;
+        } else if (sequenceStep === 1 && seconds >= 2.5) {
+          // Redirigir
+          window.location.href = 'https://luxu-1.github.io/views/hat';
+          return;
+        }
+      } else if (eventSequence === 'babyKing') {
+        // Step 0: jumpscare + sonido color.mp3
+        // Step 1: amarillo
+        // Step 2: azul
+        // Step 3: celeste
+        // Step 4: verde
+        // Step 5: redirigir
+        const colorDurations = [0.5, 0.8, 0.8, 0.8, 0.8]; // duración de cada step en segundos
+        if (sequenceStep === 0) {
+          // Mostrar jumpscare y sonido
+          colorAudio.play().catch(e => console.warn('Error al reproducir color.mp3', e));
+          sequenceStep = 1;
+          sequenceTimer = 0;
+        } else if (sequenceStep >= 1 && sequenceStep <= 4) {
+          // Cambiar color cada colorDurations[step-1] segundos
+          if (seconds >= colorDurations[sequenceStep - 1]) {
+            sequenceStep++;
+            sequenceTimer = 0;
+          }
+        } else if (sequenceStep === 5) {
+          // Redirigir
+          window.location.href = 'https://luxu-1.github.io/views/ARG/806392.html';
+          return;
+        }
+      }
+    }
+
+    function getSequenceColor() {
+      if (eventSequence === 'babyKing') {
+        if (sequenceStep === 1) return '#FFFF00'; // Amarillo
+        if (sequenceStep === 2) return '#0000FF'; // Azul
+        if (sequenceStep === 3) return '#00FFFF'; // Celeste
+        if (sequenceStep === 4) return '#00FF00'; // Verde
+      }
+      return null;
     }
 
     // ==================== CONTADOR DE PASOS ====================
@@ -440,6 +509,7 @@ function drawDialog() {
       clone.talked = false;
       clone.cooldown = 300;
       counters.stepsSinceSpawn = 0;
+      console.log('👥 Clon activado');
     }
 
     // ==================== ACTIVAR BABY KING ====================
@@ -453,6 +523,7 @@ function drawDialog() {
       babyKing.talked = false;
       babyKing.cooldown = 300;
       counters.stepsSinceSpawn = 0;
+      console.log('👑 Baby King activado');
     }
 
     // ==================== COOLDOWNS ====================
@@ -506,33 +577,42 @@ function drawDialog() {
       }
     }
 
-    // ==================== INTERACCIÓN (rango más pequeño) ====================
+    // ==================== INTERACCIÓN (lateral) ====================
     function checkInteraction() {
-      // Si hay cooldown, no hacer nada
-      if (dialogCooldown > 0) return false;
+      // Si hay cooldown o secuencia activa, no hacer nada
+      if (dialogCooldown > 0 || eventSequence) return false;
 
       // Si el diálogo está activo y completo, lo cerramos y activamos cooldown
       if (dialog.active && dialog.complete) {
+        const speaker = dialog.speaker;
         dialog.active = false;
-        dialogCooldown = 12; // ~200ms
+        dialogCooldown = 12;
         console.log('💬 Diálogo cerrado');
+
+        // Iniciar secuencias según el speaker
+        if (speaker === 'clone') {
+          startCloneSequence();
+        } else if (speaker === 'babyKing') {
+          startBabyKingSequence();
+        }
         return true;
       }
 
       // Si el diálogo está activo pero no completo, no hacemos nada
       if (dialog.active) return false;
 
-      // No hay diálogo y el jugador está quieto: buscar objeto cercano
+      // No hay diálogo y el jugador está quieto: buscar objeto cercano (lateral)
       if (player.moving) return false;
 
-      const interactDist = 70; // <--- CAMBIADO: de 120 a 70 (más preciso)
+      const interactX = 70; // rango horizontal
+      const interactY = 30; // rango vertical (más pequeño)
 
       // 1. Objetos del mundo (Ángel, carteles)
       for (let obj of worldObjects) {
         if (obj.dialog === null) continue;
         const dx = (player.x + player.width/2) - (obj.x + obj.width/2);
         const dy = (player.y + player.height/2) - (obj.y + obj.height/2);
-        if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
+        if (Math.abs(dx) < interactX && Math.abs(dy) < interactY) {
           startDialog(obj.dialog, obj, 'fast');
           return true;
         }
@@ -542,7 +622,7 @@ function drawDialog() {
       if (clone.active && !clone.talked) {
         const dx = (player.x + player.width/2) - (clone.x + clone.width/2);
         const dy = (player.y + player.height/2) - (clone.y + clone.height/2);
-        if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
+        if (Math.abs(dx) < interactX && Math.abs(dy) < interactY) {
           startDialog('We loomed too high, did we?', 'clone', 'slow');
           clone.talked = true;
           return true;
@@ -553,7 +633,7 @@ function drawDialog() {
       if (babyKing.active && !babyKing.talked) {
         const dx = (player.x + player.width/2) - (babyKing.x + babyKing.width/2);
         const dy = (player.y + player.height/2) - (babyKing.y + babyKing.height/2);
-        if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
+        if (Math.abs(dx) < interactX && Math.abs(dy) < interactY) {
           startDialog('I loomed too high, did i?', 'babyKing', 'slow');
           babyKing.talked = true;
           return true;
@@ -565,6 +645,12 @@ function drawDialog() {
 
     // ==================== UPDATE ====================
     function update() {
+      // Si hay secuencia en curso, actualizarla y saltar el resto
+      if (eventSequence) {
+        updateSequence();
+        return;
+      }
+
       let dx=0, dy=0;
       if (keys.up) dy = -1;
       if (keys.down) dy = 1;
@@ -583,7 +669,7 @@ function drawDialog() {
       }
       const currentSpeed = BASE_SPEED * speedMultiplier;
 
-      // Actualizar cooldowns (incluyendo el de diálogo)
+      // Actualizar cooldowns
       updateCooldowns();
 
       if (moving && !dialog.active) {
@@ -651,13 +737,43 @@ function drawDialog() {
       }
 
       updateDialog();
-
-      // NOTA: La interacción se maneja desde los eventos de teclado/táctiles, no desde aquí.
     }
 
     // ==================== DRAW ====================
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Si hay secuencia, dibujar efectos especiales
+      if (eventSequence) {
+        if (eventSequence === 'clone') {
+          // Pantalla negra
+          ctx.fillStyle = 'black';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        } else if (eventSequence === 'babyKing') {
+          // Dibujar jumpscare de King (gigante)
+          const color = getSequenceColor();
+          if (color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          } else {
+            // Jumpscare: sprite de King escalado 6x
+            const kingSprite = SPRITES.KING;
+            const sx = kingSprite.col * SPRITE_W;
+            const sy = kingSprite.row * SPRITE_H;
+            const scale = 6;
+            const w = SPRITE_W * scale;
+            const h = SPRITE_H * scale;
+            const cx = (canvas.width - w) / 2;
+            const cy = (canvas.height - h) / 2;
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, cx, cy, w, h);
+          }
+        }
+        // No dibujar nada más durante la secuencia
+        return;
+      }
+
+      // Fondo normal
       ctx.fillStyle = '#353535';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#454545';
@@ -735,7 +851,7 @@ function drawDialog() {
 
         // Si el diálogo está completo, cerrarlo
         if (dialog.active && dialog.complete) {
-          checkInteraction(); // Esto cerrará y pondrá cooldown
+          checkInteraction(); // Esto cerrará y activará secuencias si corresponde
         }
       }
     }
@@ -755,7 +871,7 @@ function drawDialog() {
         keys.action = false;
 
         // Solo si no hay diálogo y el jugador está quieto, intentar interactuar
-        if (!dialog.active && !player.moving) {
+        if (!dialog.active && !player.moving && !eventSequence) {
           checkInteraction();
         }
       }
@@ -805,19 +921,18 @@ function drawDialog() {
         else if (dir === 'right') assignTouchEvents(btn, 'right', 'left');
       });
 
-      // Botón de acción táctil
       actionBtn.addEventListener('touchstart', (e) => {
         e.preventDefault();
         keys.action = true;
         if (dialog.active && dialog.complete) {
-          checkInteraction(); // cerrar y cooldown
+          checkInteraction();
         }
       }, { passive: false });
 
       actionBtn.addEventListener('touchend', (e) => {
         e.preventDefault();
         keys.action = false;
-        if (!dialog.active && !player.moving) {
+        if (!dialog.active && !player.moving && !eventSequence) {
           checkInteraction();
         }
       }, { passive: false });
@@ -827,7 +942,6 @@ function drawDialog() {
         keys.action = false;
       }, { passive: false });
 
-      // También para mouse
       actionBtn.addEventListener('mousedown', (e) => {
         e.preventDefault();
         keys.action = true;
@@ -839,7 +953,7 @@ function drawDialog() {
       actionBtn.addEventListener('mouseup', (e) => {
         e.preventDefault();
         keys.action = false;
-        if (!dialog.active && !player.moving) {
+        if (!dialog.active && !player.moving && !eventSequence) {
           checkInteraction();
         }
       });
@@ -874,9 +988,9 @@ function drawDialog() {
     updateUI();
     setTimeout(ensurePlayerSpawn, 100);
 
-    console.log('🎮 Juego iniciado con colisión al 25% y rango de interacción de 70px.');
-    console.log('⬆ 6 pasos consecutivos → Clon');
-    console.log('⬇ 8 pasos consecutivos → Baby King');
+    console.log('🎮 Juego actualizado con interacción lateral y secuencias especiales.');
+    console.log('⬆ 5 pasos consecutivos → Clon → secuencia shadow');
+    console.log('⬇ 7 pasos consecutivos → Baby King → jumpscare + colores');
   })();
 </script>
 </body>
