@@ -361,8 +361,8 @@
       for (let obj of worldObjects) {
         if (!obj.collision) continue;
         const objRect = {
-          x: obj.x + (1 - shrink) * obj.width / 2,
-          y: obj.y + (1 - shrink) * obj.height / 2 + Y_OFFSET,
+          x: obj.x + (1 - shrink) * obj.width / 3,
+          y: obj.y + (1 - shrink) * obj.height / 3 + Y_OFFSET,
           width: obj.width * shrink,
           height: obj.height * shrink
         };
@@ -370,8 +370,8 @@
       }
       if (clone.active) {
         const cloneRect = {
-          x: clone.x + (1 - shrink) * clone.width / 2,
-          y: clone.y + (1 - shrink) * clone.height / 2 + Y_OFFSET,
+          x: clone.x + (1 - shrink) * clone.width / 3,
+          y: clone.y + (1 - shrink) * clone.height / 3 + Y_OFFSET,
           width: clone.width * shrink,
           height: clone.height * shrink
         };
@@ -379,8 +379,8 @@
       }
       if (babyKing.active) {
         const bkRect = {
-          x: babyKing.x + (1 - shrink) * babyKing.width / 2,
-          y: babyKing.y + (1 - shrink) * babyKing.height / 2 + Y_OFFSET,
+          x: babyKing.x + (1 - shrink) * babyKing.width / 3,
+          y: babyKing.y + (1 - shrink) * babyKing.height / 3 + Y_OFFSET,
           width: babyKing.width * shrink,
           height: babyKing.height * shrink
         };
