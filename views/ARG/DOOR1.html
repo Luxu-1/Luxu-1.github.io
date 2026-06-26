@@ -510,53 +510,16 @@
       return false;
     }
 
-    // ==================== TELEPORT PAC-MAN ====================
-    function teleportPlayer() {
-      const margin = 20;
-      let stepCompleted = false;
-
-      if (player.y + player.height < -margin) {
-        player.y = canvas.height + margin;
-        counters.up++;
-        counters.total++;
-        stepCompleted = true;
-        handleConsecutive('up');
-        updateUI();
-        console.log('📍 Teleport UP - Total:', counters.total);
-      } else if (player.y > canvas.height + margin) {
-        player.y = -player.height - margin;
-        counters.down++;
-        counters.total++;
-        stepCompleted = true;
-        handleConsecutive('down');
-        updateUI();
-        console.log('📍 Teleport DOWN - Total:', counters.total);
-      } else if (player.x + player.width < -margin) {
-        player.x = canvas.width + margin;
-        counters.left++;
-        counters.total++;
-        stepCompleted = true;
-        handleConsecutive('left');
-        updateUI();
-        console.log('📍 Teleport LEFT - Total:', counters.total);
-      } else if (player.x > canvas.width + margin) {
-        player.x = -player.width - margin;
-        counters.right++;
-        counters.total++;
-        stepCompleted = true;
-        handleConsecutive('right');
-        updateUI();
-        console.log('📍 Teleport RIGHT - Total:', counters.total);
-      }
-
-      if (stepCompleted && (clone.active || babyKing.active)) {
-        counters.stepsSinceSpawn++;
-        if (counters.stepsSinceSpawn >= 1) {
-          despawnCharacters();
-        }
-      }
+    // ==================== CONTADOR DE PASOS ====================
+    function recordStep(dir) {
+      if (dir === 'up') counters.up++;
+      else if (dir === 'down') counters.down++;
+      else if (dir === 'left') counters.left++;
+      else if (dir === 'right') counters.right++;
       
-      return stepCompleted;
+      counters.total++;
+      handleConsecutive(dir);
+      updateUI();
     }
 
     // ==================== DESAPARECER PERSONAJES ====================
@@ -697,11 +660,39 @@
           player.x = newX;
           player.y = newY;
           
-          // Check for teleport and don't wrap if teleported
-          const teleported = teleportPlayer();
-          
-          // Only apply boundary wrapping if NO teleport occurred
-          if (!teleported) {
+          // Check for teleport and record step
+          let teleported = false;
+          const margin = 20;
+          let moveDir = null;
+
+          if (player.y + player.height < -margin) {
+            player.y = canvas.height + margin;
+            moveDir = 'up';
+            teleported = true;
+          } else if (player.y > canvas.height + margin) {
+            player.y = -player.height - margin;
+            moveDir = 'down';
+            teleported = true;
+          } else if (player.x + player.width < -margin) {
+            player.x = canvas.width + margin;
+            moveDir = 'left';
+            teleported = true;
+          } else if (player.x > canvas.width + margin) {
+            player.x = -player.width - margin;
+            moveDir = 'right';
+            teleported = true;
+          }
+
+          if (teleported) {
+            recordStep(moveDir);
+            if (clone.active || babyKing.active) {
+              counters.stepsSinceSpawn++;
+              if (counters.stepsSinceSpawn >= 1) {
+                despawnCharacters();
+              }
+            }
+          } else {
+            // Only wrap at boundaries if no teleport occurred
             if (player.x + player.width < 0) {
               player.x = canvas.width;
             } else if (player.x > canvas.width) {
@@ -721,11 +712,30 @@
             if (!isCollidingWithWorld(testX)) {
               player.x = newX;
               
-              // Check for teleport and don't wrap if teleported
-              const teleported = teleportPlayer();
-              
-              // Only apply boundary wrapping if NO teleport occurred
-              if (!teleported) {
+              // Check for teleport and record step
+              let teleported = false;
+              const margin = 20;
+              let moveDir = null;
+
+              if (player.x + player.width < -margin) {
+                player.x = canvas.width + margin;
+                moveDir = 'left';
+                teleported = true;
+              } else if (player.x > canvas.width + margin) {
+                player.x = -player.width - margin;
+                moveDir = 'right';
+                teleported = true;
+              }
+
+              if (teleported) {
+                recordStep(moveDir);
+                if (clone.active || babyKing.active) {
+                  counters.stepsSinceSpawn++;
+                  if (counters.stepsSinceSpawn >= 1) {
+                    despawnCharacters();
+                  }
+                }
+              } else {
                 if (player.x + player.width < 0) {
                   player.x = canvas.width;
                 } else if (player.x > canvas.width) {
@@ -739,11 +749,30 @@
             if (!isCollidingWithWorld(testY)) {
               player.y = newY;
               
-              // Check for teleport and don't wrap if teleported
-              const teleported = teleportPlayer();
-              
-              // Only apply boundary wrapping if NO teleport occurred
-              if (!teleported) {
+              // Check for teleport and record step
+              let teleported = false;
+              const margin = 20;
+              let moveDir = null;
+
+              if (player.y + player.height < -margin) {
+                player.y = canvas.height + margin;
+                moveDir = 'up';
+                teleported = true;
+              } else if (player.y > canvas.height + margin) {
+                player.y = -player.height - margin;
+                moveDir = 'down';
+                teleported = true;
+              }
+
+              if (teleported) {
+                recordStep(moveDir);
+                if (clone.active || babyKing.active) {
+                  counters.stepsSinceSpawn++;
+                  if (counters.stepsSinceSpawn >= 1) {
+                    despawnCharacters();
+                  }
+                }
+              } else {
                 if (player.y + player.height < 0) {
                   player.y = canvas.height;
                 } else if (player.y > canvas.height) {
