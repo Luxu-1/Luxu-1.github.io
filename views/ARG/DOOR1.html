@@ -6,7 +6,7 @@
   <link rel="icon" type="image/png" href="/media/texture/icon.ico">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
-    /* (Mismo CSS que antes, omitido por brevedad) */
+    /* (Mismo CSS que antes, sin cambios) */
     * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
     body { background:#1a1a1a; display:flex; justify-content:center; align-items:center; min-height:100vh; overflow:hidden; font-family:'Courier New',monospace; touch-action: none; }
     .game-wrapper { display:flex; flex-direction:column; align-items:center; gap:12px; padding:10px; }
@@ -115,7 +115,8 @@
       spriteRow: SPRITES.IDLE.row,
       flipX: false,
     };
-window.player = player;
+    window.player = player;
+
     // ==================== CLON ====================
     const clone = {
       active: false,
@@ -324,7 +325,7 @@ window.player = player;
     addObject(3, 1, 31, 357, false, null);
     addObject(3, 1, 380, 357, false, null);
 
-    // ==================== COLISIONES ====================
+    // ==================== COLISIONES (más pequeñas) ====================
     function rectCollide(r1, r2) {
       return r1.x < r2.x + r2.width &&
              r1.x + r1.width > r2.x &&
@@ -333,7 +334,7 @@ window.player = player;
     }
 
     function isCollidingWithWorld(rect) {
-      const shrink = 0.4;
+      const shrink = 0.25; // <--- CAMBIADO: de 0.4 a 0.25 (25% del tamaño)
       for (let obj of worldObjects) {
         if (!obj.collision) continue;
         const objRect = {
@@ -491,7 +492,7 @@ window.player = player;
       }
     }
 
-    // ==================== INTERACCIÓN (con cooldown y sin movimiento) ====================
+    // ==================== INTERACCIÓN (rango más pequeño) ====================
     function checkInteraction() {
       // Si hay cooldown, no hacer nada
       if (dialogCooldown > 0) return false;
@@ -510,7 +511,7 @@ window.player = player;
       // No hay diálogo y el jugador está quieto: buscar objeto cercano
       if (player.moving) return false;
 
-      const interactDist = 120;
+      const interactDist = 70; // <--- CAMBIADO: de 120 a 70 (más preciso)
 
       // 1. Objetos del mundo (Ángel, carteles)
       for (let obj of worldObjects) {
@@ -718,8 +719,7 @@ window.player = player;
         e.preventDefault();
         keys.action = true;
 
-        // Si el diálogo está completo, cerrarlo (esto se maneja en checkInteraction)
-        // Pero llamamos a checkInteraction para que cierre y active cooldown
+        // Si el diálogo está completo, cerrarlo
         if (dialog.active && dialog.complete) {
           checkInteraction(); // Esto cerrará y pondrá cooldown
         }
@@ -860,7 +860,9 @@ window.player = player;
     updateUI();
     setTimeout(ensurePlayerSpawn, 100);
 
-    console.log('🎮 Juego iniciado con cooldown de diálogo para evitar bucles.');
+    console.log('🎮 Juego iniciado con colisión al 25% y rango de interacción de 70px.');
+    console.log('⬆ 6 pasos consecutivos → Clon');
+    console.log('⬇ 8 pasos consecutivos → Baby King');
   })();
 </script>
 </body>
