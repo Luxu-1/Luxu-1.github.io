@@ -18,21 +18,12 @@
     .crt-overlay::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%); pointer-events: none; z-index: 12; }
     @keyframes flicker { 0% { opacity: 0.97; } 50% { opacity: 1; } 100% { opacity: 0.97; } }
     .crt-overlay { animation: flicker 0.15s infinite alternate; }
-    
+
     /* ===== INFO-BAR OCULTA (pero sin romper el layout) ===== */
     .info-bar {
       display: none; /* Oculta completamente la barra */
     }
-    /* Si prefieres que ocupe espacio pero sea invisible, usa esto en lugar de display:none */
-    /*
-    .info-bar {
-      opacity: 0;
-      pointer-events: none;
-      height: 0;
-      overflow: hidden;
-    }
-    */
-    
+
     .controls-info { color:rgba(255,255,255,0.2); text-align:center; font-size:14px; padding:4px 0; letter-spacing:1px; }
     .touch-controls { display: none; width:100%; max-width:500px; justify-content:space-between; align-items:center; gap:20px; touch-action: none; padding:0 10px; }
     .dpad { position:relative; width:160px; height:160px; touch-action:none; }
@@ -64,7 +55,7 @@
     <span>➡ <span id="rightCounter" class="highlight">0</span></span>
     <span>🚶 <span id="totalSteps" class="highlight">0</span></span>
   </div>
-  
+
   <div class="controls-info">
     <span class="pc-only">WASD / Flechas · Z = correr (mantener) / hablar (quieto)</span>
     <span class="mobile-only">Botones táctiles</span>
@@ -87,13 +78,24 @@
     const ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
+    // ==================== RUTAS / CONFIG CENTRALIZADA ====================
+    const ROUTES = {
+      clone: 'https://luxu-1.github.io/views/hat',
+      babyKing: 'https://luxu-1.github.io/views/ARG/806392.html'
+    };
+
     // ==================== SPRITE SHEET ====================
     const SPRITE_SHEET_URL = '/media/texture/sprite_sheet.png';
     const SPRITE_W = 22;
     const SPRITE_H = 28;
-    const SCALE = 4.18;
+    const SCALE = 3.0; // Antes 4.18 — personaje más proporcionado al mapa
     const CHAR_W = Math.round(SPRITE_W * SCALE);
     const CHAR_H = Math.round(SPRITE_H * SCALE);
+
+    // Colisión: caja más pequeña y centrada en el sprite
+    const COLLISION_SHRINK = 0.16;   // Antes 0.25 — caja de colisión más chica
+    const COLLISION_Y_OFFSET = -18;  // Reajustado tras centrar (antes -25 con caja descentrada)
+    const INTERACT_DIST = 60;        // Radio circular de interacción
 
     const SPRITES = {
       IDLE:      { col:0, row:0 },
@@ -111,6 +113,13 @@
       BABY_KING: { col:0, row:3 },
       KING:      { col:1, row:3 },
     };
+
+    // Mapa inverso "col,row" -> nombre, para no recorrer SPRITES cada vez (antes O(n) por llamada)
+    const SPRITE_LOOKUP = {};
+    for (const name in SPRITES) {
+      const s = SPRITES[name];
+      SPRITE_LOOKUP[`${s.col},${s.row}`] = name;
+    }
 
     // ==================== JUGADOR ====================
     const BASE_SPEED = 1.5;
@@ -215,6 +224,15 @@
     const shadowAudio = new Audio('/media/sound/shadow.mp3');
     const colorAudio = new Audio('/media/sound/color.mp3');
 
+    // Reproduce desde el inicio, evitando solapamientos si se dispara dos veces
+    function playOnce(audio) {
+      try {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.play().catch(e => console.warn(e));
+      } catch (e) { console.warn(e); }
+    }
+
     // ==================== SONIDO TICK ====================
     let audioCtx = null;
     function playTickSound(lowPitch = false) {
@@ -317,8 +335,8 @@
     const worldObjects = [];
 
     function addObject(col, row, x, y, collision = true, dialogText = null) {
-      const sprite = SPRITES[Object.keys(SPRITES).find(k => SPRITES[k].col === col && SPRITES[k].row === row)];
-      if (!sprite) {
+      const spriteName = SPRITE_LOOKUP[`${col},${row}`];
+      if (!spriteName) {
         console.warn(`Sprite no encontrado para col:${col} row:${row}`);
         return;
       }
@@ -347,7 +365,7 @@
     addObject(3, 1, 31, 357, false, null);
     addObject(3, 1, 380, 357, false, null);
 
-    // ==================== COLISIONES (con offset vertical aumentado) ====================
+    // ==================== COLISIONES (caja pequeña y centrada) ====================
     function rectCollide(r1, r2) {
       return r1.x < r2.x + r2.width &&
              r1.x + r1.width > r2.x &&
@@ -355,37 +373,24 @@
              r1.y + r1.height > r2.y;
     }
 
+    // Devuelve la caja de colisión reducida y centrada de cualquier entidad con x/y/width/height
+    function getCollisionBox(entity) {
+      const shrink = COLLISION_SHRINK;
+      return {
+        x: entity.x + (1 - shrink) * entity.width / 2,
+        y: entity.y + (1 - shrink) * entity.height / 2 + COLLISION_Y_OFFSET,
+        width: entity.width * shrink,
+        height: entity.height * shrink
+      };
+    }
+
     function isCollidingWithWorld(rect) {
-      const shrink = 0.25;
-      const Y_OFFSET = -25; // <--- Sube la colisión 25px (antes -10)
       for (let obj of worldObjects) {
         if (!obj.collision) continue;
-        const objRect = {
-          x: obj.x + (1 - shrink) * obj.width / 3,
-          y: obj.y + (1 - shrink) * obj.height / 3 + Y_OFFSET,
-          width: obj.width * shrink,
-          height: obj.height * shrink
-        };
-        if (rectCollide(rect, objRect)) return true;
+        if (rectCollide(rect, getCollisionBox(obj))) return true;
       }
-      if (clone.active) {
-        const cloneRect = {
-          x: clone.x + (1 - shrink) * clone.width / 3,
-          y: clone.y + (1 - shrink) * clone.height / 3 + Y_OFFSET,
-          width: clone.width * shrink,
-          height: clone.height * shrink
-        };
-        if (rectCollide(rect, cloneRect)) return true;
-      }
-      if (babyKing.active) {
-        const bkRect = {
-          x: babyKing.x + (1 - shrink) * babyKing.width / 3,
-          y: babyKing.y + (1 - shrink) * babyKing.height / 3 + Y_OFFSET,
-          width: babyKing.width * shrink,
-          height: babyKing.height * shrink
-        };
-        if (rectCollide(rect, bkRect)) return true;
-      }
+      if (clone.active && rectCollide(rect, getCollisionBox(clone))) return true;
+      if (babyKing.active && rectCollide(rect, getCollisionBox(babyKing))) return true;
       return false;
     }
 
@@ -415,17 +420,17 @@
 
       if (eventSequence === 'clone') {
         if (sequenceStep === 0) {
-          shadowAudio.play().catch(e => console.warn(e));
+          playOnce(shadowAudio);
           sequenceStep = 1;
           sequenceTimer = 0;
         } else if (sequenceStep === 1 && seconds >= 2.5) {
-          window.location.href = 'https://luxu-1.github.io/views/hat';
+          window.location.href = ROUTES.clone;
           return;
         }
       } else if (eventSequence === 'babyKing') {
         const colorDurations = [0.5, 0.8, 0.8, 0.8, 0.8];
         if (sequenceStep === 0) {
-          colorAudio.play().catch(e => console.warn(e));
+          playOnce(colorAudio);
           sequenceStep = 1;
           sequenceTimer = 0;
         } else if (sequenceStep >= 1 && sequenceStep <= 4) {
@@ -434,7 +439,7 @@
             sequenceTimer = 0;
           }
         } else if (sequenceStep === 5) {
-          window.location.href = 'https://luxu-1.github.io/views/ARG/806392.html';
+          window.location.href = ROUTES.babyKing;
           return;
         }
       }
@@ -539,30 +544,31 @@
 
     function checkBoundaryAndRecord() {
       const margin = 5;
-      let dir = null;
+      const dirsTriggered = [];
+
+      // Antes solo se detectaba un borde por frame (else if); ahora se revisan todos
+      // para no perder un cruce simultáneo en movimiento diagonal por esquina.
       if (player.y + player.height < -margin) {
         player.y = canvas.height + margin;
-        dir = 'up';
+        dirsTriggered.push('up');
       } else if (player.y > canvas.height + margin) {
         player.y = -player.height - margin;
-        dir = 'down';
-      } else if (player.x + player.width < -margin) {
-        player.x = canvas.width + margin;
-        dir = 'left';
-      } else if (player.x > canvas.width + margin) {
-        player.x = -player.width - margin;
-        dir = 'right';
+        dirsTriggered.push('down');
       }
 
-      if (dir) {
+      if (player.x + player.width < -margin) {
+        player.x = canvas.width + margin;
+        dirsTriggered.push('left');
+      } else if (player.x > canvas.width + margin) {
+        player.x = -player.width - margin;
+        dirsTriggered.push('right');
+      }
+
+      for (const dir of dirsTriggered) {
         recordStep(dir);
         let shouldDespawn = false;
-        if (clone.active && clone.cooldown === 0) {
-          shouldDespawn = true;
-        }
-        if (babyKing.active && babyKing.cooldown === 0) {
-          shouldDespawn = true;
-        }
+        if (clone.active && clone.cooldown === 0) shouldDespawn = true;
+        if (babyKing.active && babyKing.cooldown === 0) shouldDespawn = true;
         if (shouldDespawn) {
           counters.stepsSinceSpawn++;
           if (counters.stepsSinceSpawn >= 1) {
@@ -592,7 +598,7 @@
       if (dialog.active) return false;
       if (player.moving) return false;
 
-      const interactDist = 60; // <--- Radio circular (antes era rectangular)
+      const interactDist = INTERACT_DIST;
 
       // 1. Objetos del mundo
       for (let obj of worldObjects) {
@@ -806,11 +812,24 @@
     }
 
     // ==================== GAMELOOP ====================
+    let rafId = null;
     function gameLoop() {
       update();
       draw();
-      requestAnimationFrame(gameLoop);
+      rafId = requestAnimationFrame(gameLoop);
     }
+
+    // Pausa el loop y los audios cuando la pestaña pierde el foco,
+    // evitando que se "salten" pasos o que el audio siga sonando de fondo.
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (rafId) cancelAnimationFrame(rafId);
+        shadowAudio.pause();
+        colorAudio.pause();
+      } else {
+        gameLoop();
+      }
+    });
 
     // ==================== EVENTOS DE TECLADO ====================
     function handleKeyDown(e) {
@@ -962,7 +981,7 @@
     updateUI();
     setTimeout(ensurePlayerSpawn, 100);
 
-    console.log('🎮 Interacción circular (radio 60) y colisión offset -25.');
+    console.log('🎮 Colisión centrada y reducida, personaje reescalado.');
     console.log('⬆ 5 pasos → Clon');
     console.log('⬇ 7 pasos → Baby King');
   })();
