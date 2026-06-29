@@ -100,8 +100,9 @@
     const COLLISION_Y_OFFSET = 0;    // Sin offset: con offset distinto de 0, la caja queda
                                       // descentrada verticalmente y bloquea el acercamiento
                                       // desde uno de los lados (por eso fallaba "desde arriba").
-    const INTERACT_DIST = 70;        // Radio circular de interacción (independiente de la colisión,
-                                      // ligeramente mayor para compensar el sprite más grande)
+    const INTERACT_DIST = 100;       // Radio circular de interacción (independiente de la colisión;
+                                      // aumentado para poder hablar con objetos desde lejos sin
+                                      // tocar para nada la caja de colisión física)
 
     const SPRITES = {
       IDLE:      { col:0, row:0 },
@@ -185,6 +186,8 @@
       speed: 'slow',
       speaker: null,
       complete: false,
+      lines: null,      // Si el diálogo tiene varias líneas, se guardan aquí
+      lineIndex: 0,      // Índice de la línea actual dentro de `lines`
     };
 
     // ==================== COOLDOWN ====================
@@ -235,6 +238,7 @@
     const bgMusic = new Audio('/media/sound/listenthenews.mp3');
     bgMusic.loop = true;
     bgMusic.volume = 0.6;
+    let bgMusicStoppedForever = false; // Una vez true, nunca vuelve a sonar (hasta recargar la página)
 
     function tryPlayBgMusic() {
       bgMusic.play().catch(() => {
@@ -252,6 +256,10 @@
 
     // Revisa cada frame si la música debe sonar o estar en pausa
     function syncBackgroundMusic() {
+      if (bgMusicStoppedForever) {
+        if (!bgMusic.paused) bgMusic.pause();
+        return;
+      }
       const shouldPause = dialog.active && (dialog.speaker === 'clone' || dialog.speaker === 'babyKing');
       if (shouldPause) {
         if (!bgMusic.paused) bgMusic.pause();
@@ -292,18 +300,33 @@
     }
 
     // ==================== DIÁLOGO ====================
-    function startDialog(text, speaker, speed = 'slow') {
+    function startDialog(textOrLines, speaker, speed = 'slow') {
       if (dialog.active || dialogCooldown > 0) return;
+      const isMultiLine = Array.isArray(textOrLines);
       dialog.active = true;
-      dialog.text = text;
+      dialog.lines = isMultiLine ? textOrLines : null;
+      dialog.lineIndex = 0;
+      dialog.text = isMultiLine ? textOrLines[0] : textOrLines;
       dialog.displayText = '';
       dialog.charIndex = 0;
       dialog.charTimer = 0;
       dialog.speed = speed;
       dialog.speaker = speaker;
       dialog.complete = false;
-      dialog.charDelay = (speed === 'slow') ? 12 : 2;
-      console.log(`💬 Inicio diálogo: "${text}" (${speed})`);
+      dialog.charDelay = (speed === 'slow') ? 12 : 2.4; // 'fast' antes en 2, +20% para que el ritmo
+                                                          // de tecleo coincida con las letras mostradas
+      console.log(`💬 Inicio diálogo: "${dialog.text}" (${speed})`);
+    }
+
+    // Pasa a la siguiente línea del diálogo actual (sin cerrarlo ni activar cooldown)
+    function advanceDialogLine() {
+      dialog.lineIndex++;
+      dialog.text = dialog.lines[dialog.lineIndex];
+      dialog.displayText = '';
+      dialog.charIndex = 0;
+      dialog.charTimer = 0;
+      dialog.complete = false;
+      console.log(`💬 Siguiente línea: "${dialog.text}"`);
     }
 
     function updateDialog() {
@@ -390,7 +413,12 @@
     }
 
     // Ángel y carteles
-    addObject(0, 1, 204, 20, true, "Emperor, do you hear the news? A new king has been born.");
+    // El ángel ahora tiene 2 líneas: al presionar Z con la primera completa, avanza
+    // a la segunda en vez de cerrar; al presionar Z con la segunda completa, cierra el diálogo.
+    addObject(0, 1, 204, 20, true, [
+      "Emperor, do you hear the news? A new king has been born.",
+      "They say he was prophesied to be different from the others."
+    ]);
     addObject(0, 2, 31, 210, true, "I told you, a King would be born, a different one, Tyahaha!");
     addObject(1, 2, 204, 357, true, "The one who seeks to loom high.");
     addObject(2, 2, 380, 210, true, "Small, naive, still innocent.");
@@ -619,13 +647,23 @@
       if (dialogCooldown > 0 || eventSequence) return false;
 
       if (dialog.active && dialog.complete) {
+        // Si el diálogo tiene más líneas pendientes, avanza en vez de cerrar
+        if (dialog.lines && dialog.lineIndex < dialog.lines.length - 1) {
+          advanceDialogLine();
+          return true;
+        }
+
         const speaker = dialog.speaker;
         dialog.active = false;
         dialogCooldown = 12;
         console.log('💬 Diálogo cerrado');
         if (speaker === 'clone') {
+          bgMusicStoppedForever = true;
+          bgMusic.pause();
           startCloneSequence();
         } else if (speaker === 'babyKing') {
+          bgMusicStoppedForever = true;
+          bgMusic.pause();
           startBabyKingSequence();
         }
         return true;
