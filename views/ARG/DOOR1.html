@@ -277,28 +277,30 @@
       } catch (e) { console.warn(e); }
     }
 
-    // ==================== SONIDO TICK ====================
-    let audioCtx = null;
-    function playTickSound(lowPitch = false) {
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.type = 'square';
-        if (lowPitch) {
-          osc.frequency.value = 50 + Math.random() * 200;
-          gain.gain.value = 0.09;
-        } else {
-          osc.frequency.value = 800 + Math.random() * 200;
-          gain.gain.value = 0.03;
-        }
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.03);
-      } catch (e) {}
+// ==================== SONIDO TICK ====================
+let audioCtx = null;
+function playTickSound(lowPitch = false, char = '') {
+  // Si el carácter es un espacio, no reproducir sonido
+  if (char === ' ') return;
+  
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'square';
+    if (lowPitch) {
+      osc.frequency.value = 50 + Math.random() * 200;
+      gain.gain.value = 0.09;
+    } else {
+      osc.frequency.value = 800 + Math.random() * 200;
+      gain.gain.value = 0.03;
     }
-
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.03);
+  } catch (e) {}
+}
     // ==================== DIÁLOGO ====================
     function startDialog(textOrLines, speaker, speed = 'slow') {
       if (dialog.active || dialogCooldown > 0) return;
@@ -329,21 +331,22 @@
       console.log(`💬 Siguiente línea: "${dialog.text}"`);
     }
 
-    function updateDialog() {
-      if (!dialog.active || dialog.complete) return;
-      dialog.charTimer++;
-      if (dialog.charTimer >= dialog.charDelay) {
-        dialog.charTimer = 0;
-        if (dialog.charIndex < dialog.text.length) {
-          dialog.displayText += dialog.text[dialog.charIndex];
-          dialog.charIndex++;
-          const isSlow = (dialog.speaker === 'clone' || dialog.speaker === 'babyKing');
-          playTickSound(isSlow);
-        } else {
-          dialog.complete = true;
-        }
-      }
+function updateDialog() {
+  if (!dialog.active || dialog.complete) return;
+  dialog.charTimer++;
+  if (dialog.charTimer >= dialog.charDelay) {
+    dialog.charTimer = 0;
+    if (dialog.charIndex < dialog.text.length) {
+      const currentChar = dialog.text[dialog.charIndex]; // Guardamos el carácter
+      dialog.displayText += currentChar;
+      dialog.charIndex++;
+      const isSlow = (dialog.speaker === 'clone' || dialog.speaker === 'babyKing');
+      playTickSound(isSlow, currentChar); // Pasamos el carácter
+    } else {
+      dialog.complete = true;
     }
+  }
+}
 
     // ==================== DIBUJO DE DIÁLOGO (pixelado) ====================
     function drawDialog() {
