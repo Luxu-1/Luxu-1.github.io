@@ -313,7 +313,7 @@
       dialog.speed = speed;
       dialog.speaker = speaker;
       dialog.complete = false;
-      dialog.charDelay = (speed === 'slow') ? 12 : 2.4; // 'fast' antes en 2, +20% para que el ritmo
+      dialog.charDelay = (speed === 'slow') ? 9.6 : 2.4; // 'fast' antes en 2, +20% para que el ritmo
                                                           // de tecleo coincida con las letras mostradas
       console.log(`💬 Inicio diálogo: "${dialog.text}" (${speed})`);
     }
@@ -416,20 +416,20 @@
     // El ángel ahora tiene 2 líneas: al presionar Z con la primera completa, avanza
     // a la segunda en vez de cerrar; al presionar Z con la segunda completa, cierra el diálogo.
     addObject(0, 1, 204, 20, true, [
-      "Emperor, do you hear the news? A new king has been born.",
-      "They say he was prophesied, different from others.",
-      "Time makes everything change."
+      "* Emperor, do you hear the news? A new king has been born.",
+      "* They say he was prophesied, different from others.",
+      "* Time makes everything change."
     ]);
     addObject(0, 2, 31, 210, true, [
-      "I told you, a King would be born, a different one, Tyahaha!",
+      "* I told you, a King would be born, a different one, Tyahaha!",
       "-P"
       ]);
     addObject(1, 2, 204, 357, true, [
-      "The one who seeks to loom high.",
+      "* The one who seeks to loom high.",
       "-P"
       ]);
     addObject(2, 2, 380, 210, true, [
-      "Small, naive, still innocent.",
+      "* Small, naive, still innocent.",
       "-P"
       ]);
     // Vegetación
@@ -700,7 +700,7 @@
         const dx = (player.x + player.width/2) - (clone.x + clone.width/2);
         const dy = (player.y + player.height/2) - (clone.y + clone.height/2);
         if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
-          startDialog('We loomed too high, did we?', 'clone', 'slow');
+          startDialog('* We loomed too high, did we?', 'clone', 'slow');
           clone.talked = true;
           return true;
         }
@@ -711,7 +711,7 @@
         const dx = (player.x + player.width/2) - (babyKing.x + babyKing.width/2);
         const dy = (player.y + player.height/2) - (babyKing.y + babyKing.height/2);
         if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
-          startDialog('I loomed too high, did i?', 'babyKing', 'slow');
+          startDialog('* I loomed too high, did i?', 'babyKing', 'slow');
           babyKing.talked = true;
           return true;
         }
