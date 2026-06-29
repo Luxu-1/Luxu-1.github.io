@@ -313,7 +313,7 @@
       dialog.speed = speed;
       dialog.speaker = speaker;
       dialog.complete = false;
-      dialog.charDelay = (speed === 'slow') ? 9.6 : 2.4; // 'fast' antes en 2, +20% para que el ritmo
+      dialog.charDelay = (speed === 'slow') ? 6 : 1; // 'fast' antes en 2, +20% para que el ritmo
                                                           // de tecleo coincida con las letras mostradas
       console.log(`💬 Inicio diálogo: "${dialog.text}" (${speed})`);
     }
