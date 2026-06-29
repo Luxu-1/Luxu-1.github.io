@@ -288,8 +288,8 @@
         gain.connect(audioCtx.destination);
         osc.type = 'square';
         if (lowPitch) {
-          osc.frequency.value = 150 + Math.random() * 200;
-          gain.gain.value = 0.05;
+          osc.frequency.value = 50 + Math.random() * 200;
+          gain.gain.value = 0.09;
         } else {
           osc.frequency.value = 800 + Math.random() * 200;
           gain.gain.value = 0.03;
@@ -313,7 +313,7 @@
       dialog.speed = speed;
       dialog.speaker = speaker;
       dialog.complete = false;
-      dialog.charDelay = (speed === 'slow') ? 64 : 2.4; // 'fast' antes en 2, +20% para que el ritmo
+      dialog.charDelay = (speed === 'slow') ? 16 : 2.4; // 'fast' antes en 2, +20% para que el ritmo
                                                           // de tecleo coincida con las letras mostradas
       console.log(`💬 Inicio diálogo: "${dialog.text}" (${speed})`);
     }
