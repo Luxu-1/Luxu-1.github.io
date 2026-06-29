@@ -16,14 +16,12 @@
             width: 100vw;
             height: 100vh;
         }
-
         #kaleidoscope {
             display: block;
             width: 100vw;
             height: 100vh;
             background: #1a1a2e;
         }
-
         #cat-container {
             position: fixed;
             width: 32px;
@@ -40,13 +38,11 @@
             opacity: 0.7;
             filter: blur(0px) drop-shadow(0 0 8px rgba(255, 255, 0, 0.8));
         }
-
         #cat-container svg {
             display: block;
             width: 100%;
             height: 100%;
         }
-
         .cat-pop {
             animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
@@ -54,7 +50,6 @@
             0% { transform: scale(0) rotate(360deg); opacity: 0; }
             100% { transform: scale(1) rotate(0deg); opacity: 0.3; }
         }
-
         .cat-hide {
             animation: fadeOut 0.6s ease-in forwards;
         }
@@ -65,15 +60,10 @@
     </style>
 </head>
 <body>
-
     <canvas id="kaleidoscope"></canvas>
-
-    <!-- Gato amarillo puro, solo silueta (cabeza + orejas) -->
     <div id="cat-container">
         <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-            <!-- Cabeza redonda -->
             <circle cx="24" cy="24" r="18" fill="rgb(255, 255, 0)" />
-            <!-- Orejas izquierda y derecha -->
             <polygon points="6,14 16,6 12,22" fill="rgb(255, 255, 0)" />
             <polygon points="42,14 32,6 36,22" fill="rgb(255, 255, 0)" />
         </svg>
@@ -81,135 +71,178 @@
 
     <script>
         // =============================================
-        // 1. CALEIDOSCOPIO MEJORADO (más loco, sin negro)
+        // 1. CALEIDOSCOPIO MÚLTIPLE Y CAÓTICO
         // =============================================
         const canvas = document.getElementById('kaleidoscope');
         const ctx = canvas.getContext('2d');
-        let W, H, cx, cy, radius;
+        let W, H;
 
         function resizeCanvas() {
             W = window.innerWidth;
             H = window.innerHeight;
             canvas.width = W;
             canvas.height = H;
-            cx = W / 2;
-            cy = H / 2;
-            radius = Math.min(W, H) * 0.92;
         }
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // Paleta de colores vivos, sin negro, con mucho amarillo/naranja/rosa/azul/verde
+        // Paleta de colores vivos, sin negro
         const palette = [
             '#FF0055', '#FF8800', '#FFCC00', '#00FF66', '#00CCFF', '#FF00AA',
             '#FF5500', '#AAFF00', '#00FFCC', '#FF0066', '#6600FF', '#FFAA00',
-            '#00FF99', '#FF3399', '#33FFCC', '#FF9933', '#33CCFF', '#FF66CC'
+            '#00FF99', '#FF3399', '#33FFCC', '#FF9933', '#33CCFF', '#FF66CC',
+            '#FF3366', '#66FF33', '#FF33CC', '#33FF66', '#CC33FF', '#FFCC33'
         ];
 
-        // Generar muchas formas (más loco)
-        const NUM_SHAPES = 220;
-        const shapes = [];
-        for (let i = 0; i < NUM_SHAPES; i++) {
-            shapes.push({
-                baseX: (Math.random() - 0.5) * radius * 1.8,
-                baseY: (Math.random() - 0.5) * radius * 1.8,
-                size: Math.random() * 28 + 4,
-                color: palette[Math.floor(Math.random() * palette.length)],
-                type: Math.floor(Math.random() * 4), // 0,1,2,3 (añadimos estrella)
-                rotOffset: Math.random() * Math.PI * 2,
-                speed: 0.002 + Math.random() * 0.008,
-                orbit: Math.random() * 0.02,
-            });
+        // Definir múltiples centros de caleidoscopio (6 centros)
+        const centers = [];
+        const NUM_CENTERS = 6;
+        const baseRadius = Math.min(W, H) * 0.35; // radio de cada caleidoscopio
+
+        // Posiciones distribuidas en la pantalla (fijas pero se pueden reubicar en resize)
+        function initCenters() {
+            centers.length = 0;
+            // Distribución: 2 filas x 3 columnas
+            const cols = 3;
+            const rows = 2;
+            const spacingX = W / (cols + 1);
+            const spacingY = H / (rows + 1);
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const cx = spacingX * (c + 1);
+                    const cy = spacingY * (r + 1);
+                    const radius = Math.min(W, H) * 0.28; // un poco menos para que no se solapen demasiado
+                    // Cada centro tendrá su propio conjunto de formas y ángulo
+                    const shapes = [];
+                    const NUM_SHAPES_PER_CENTER = 30; // total 180 formas (menos que antes, pero más centros)
+                    for (let i = 0; i < NUM_SHAPES_PER_CENTER; i++) {
+                        shapes.push({
+                            baseX: (Math.random() - 0.5) * radius * 1.6,
+                            baseY: (Math.random() - 0.5) * radius * 1.6,
+                            size: Math.random() * 22 + 6,
+                            color: palette[Math.floor(Math.random() * palette.length)],
+                            type: Math.floor(Math.random() * 4),
+                            rotOffset: Math.random() * Math.PI * 2,
+                            speed: 0.015 + Math.random() * 0.025, // más rápido
+                            phaseX: Math.random() * 100,
+                            phaseY: Math.random() * 100,
+                            ampX: 30 + Math.random() * 40, // mayor amplitud
+                            ampY: 30 + Math.random() * 40,
+                            sizeSpeed: 0.02 + Math.random() * 0.04,
+                        });
+                    }
+                    centers.push({
+                        cx, cy,
+                        radius: radius * 0.9,
+                        angle: Math.random() * Math.PI * 2,
+                        speed: 0.006 + Math.random() * 0.01, // velocidad de rotación del ventilador (ligeramente variable)
+                        shapes: shapes,
+                        slices: 8 + Math.floor(Math.random() * 4) // entre 8 y 11 sectores
+                    });
+                }
+            }
         }
 
-        let angle = 0;
-        const slices = 10; // más sectores para más locura
+        initCenters();
+
+        // Reajustar centros al cambiar tamaño
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initCenters();
+        });
 
         function drawKaleidoscope() {
-            // Fondo con degradado oscuro pero sin negro (azul profundo)
-            const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+            // Fondo con degradado oscuro sin negro
+            const grad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H)*0.7);
             grad.addColorStop(0, '#2a1a4a');
             grad.addColorStop(1, '#0d0d2b');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, W, H);
 
-            ctx.save();
-            ctx.translate(cx, cy);
-            ctx.rotate(angle);
+            // Dibujar cada centro
+            centers.forEach(center => {
+                const { cx, cy, radius, angle, speed, shapes, slices } = center;
+                const sliceAngle = (Math.PI * 2) / slices;
 
-            const sliceAngle = (Math.PI * 2) / slices;
-
-            for (let i = 0; i < slices; i++) {
                 ctx.save();
-                ctx.rotate(i * sliceAngle + sliceAngle / 2);
+                ctx.translate(cx, cy);
+                ctx.rotate(angle);
 
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.arc(0, 0, radius, -sliceAngle / 2, sliceAngle / 2);
-                ctx.closePath();
-                ctx.clip();
-
-                // Espejo alternado
-                if (i % 2 === 1) ctx.scale(-1, 1);
-
-                shapes.forEach(s => {
-                    // Movimiento caótico: oscilación, rotación, desplazamiento
-                    const t = angle * s.speed * 2 + s.rotOffset;
-                    const offsetX = Math.sin(t * 1.7 + s.baseY * 0.03) * 25;
-                    const offsetY = Math.cos(t * 1.3 + s.baseX * 0.03) * 25;
-                    const x = s.baseX + offsetX;
-                    const y = s.baseY + offsetY;
-
+                for (let i = 0; i < slices; i++) {
                     ctx.save();
-                    ctx.translate(x, y);
-                    ctx.rotate(t * 0.5);
-
-                    ctx.fillStyle = s.color;
-                    ctx.shadowColor = s.color;
-                    ctx.shadowBlur = 8;
-
-                    const sz = s.size * (0.8 + 0.4 * Math.sin(t * 0.6 + s.rotOffset));
+                    ctx.rotate(i * sliceAngle + sliceAngle / 2);
 
                     ctx.beginPath();
-                    if (s.type === 0) { // círculo
-                        ctx.arc(0, 0, sz, 0, Math.PI * 2);
-                        ctx.fill();
-                    } else if (s.type === 1) { // cuadrado
-                        ctx.fillRect(-sz / 2, -sz / 2, sz, sz);
-                    } else if (s.type === 2) { // triángulo
-                        ctx.moveTo(0, -sz);
-                        ctx.lineTo(sz, sz);
-                        ctx.lineTo(-sz, sz);
-                        ctx.closePath();
-                        ctx.fill();
-                    } else { // estrella (4 puntas)
-                        for (let j = 0; j < 8; j++) {
-                            const r = j % 2 === 0 ? sz : sz * 0.4;
-                            const a = (j / 8) * Math.PI * 2 - Math.PI / 2;
-                            if (j === 0) ctx.moveTo(r * Math.cos(a), r * Math.sin(a));
-                            else ctx.lineTo(r * Math.cos(a), r * Math.sin(a));
-                        }
-                        ctx.closePath();
-                        ctx.fill();
-                    }
+                    ctx.moveTo(0, 0);
+                    ctx.arc(0, 0, radius, -sliceAngle / 2, sliceAngle / 2);
+                    ctx.closePath();
+                    ctx.clip();
 
-                    ctx.shadowBlur = 0;
+                    if (i % 2 === 1) ctx.scale(-1, 1);
+
+                    shapes.forEach(s => {
+                        // Movimiento caótico rápido: múltiples ondas
+                        const t = angle * s.speed * 3 + s.rotOffset;
+                        const offsetX = Math.sin(t * 2.1 + s.phaseX) * s.ampX +
+                                        Math.cos(t * 1.3 + s.phaseY) * s.ampX * 0.4;
+                        const offsetY = Math.cos(t * 1.7 + s.phaseY) * s.ampY +
+                                        Math.sin(t * 1.1 + s.phaseX) * s.ampY * 0.4;
+                        const x = s.baseX + offsetX;
+                        const y = s.baseY + offsetY;
+
+                        ctx.save();
+                        ctx.translate(x, y);
+                        ctx.rotate(t * 1.2);
+
+                        ctx.fillStyle = s.color;
+                        ctx.shadowColor = s.color;
+                        ctx.shadowBlur = 10;
+
+                        const sz = s.size * (0.7 + 0.6 * Math.sin(t * s.sizeSpeed + s.rotOffset));
+
+                        ctx.beginPath();
+                        if (s.type === 0) { // círculo
+                            ctx.arc(0, 0, sz, 0, Math.PI * 2);
+                            ctx.fill();
+                        } else if (s.type === 1) { // cuadrado
+                            ctx.fillRect(-sz / 2, -sz / 2, sz, sz);
+                        } else if (s.type === 2) { // triángulo
+                            ctx.moveTo(0, -sz);
+                            ctx.lineTo(sz, sz);
+                            ctx.lineTo(-sz, sz);
+                            ctx.closePath();
+                            ctx.fill();
+                        } else { // estrella 4 puntas
+                            for (let j = 0; j < 8; j++) {
+                                const r = j % 2 === 0 ? sz : sz * 0.4;
+                                const a = (j / 8) * Math.PI * 2 - Math.PI / 2;
+                                if (j === 0) ctx.moveTo(r * Math.cos(a), r * Math.sin(a));
+                                else ctx.lineTo(r * Math.cos(a), r * Math.sin(a));
+                            }
+                            ctx.closePath();
+                            ctx.fill();
+                        }
+
+                        ctx.shadowBlur = 0;
+                        ctx.restore();
+                    });
+
                     ctx.restore();
-                });
+                }
 
                 ctx.restore();
-            }
 
-            ctx.restore();
+                // Actualizar ángulo de este centro (velocidad de ventilador)
+                center.angle += speed;
+            });
 
-            angle += 0.008; // movimiento más rápido
             requestAnimationFrame(drawKaleidoscope);
         }
 
         drawKaleidoscope();
 
         // =============================================
-        // 2. LÓGICA DEL GATO (más pequeño, más camuflado)
+        // 2. LÓGICA DEL GATO (sin cambios)
         // =============================================
         const catContainer = document.getElementById('cat-container');
         let catTimeout = null;
@@ -252,7 +285,7 @@
 
         function scheduleCat() {
             clearTimeout(catTimeout);
-            const delay = Math.random() * 7000 + 2000; // más variable
+            const delay = Math.random() * 7000 + 2000;
 
             catTimeout = setTimeout(() => {
                 attempts++;
@@ -280,7 +313,7 @@
             }
         });
 
-        console.log('🐱 DOOR2: gato amarillo camuflado, ¡encuéntralo!');
+        console.log('🐱 DOOR2: gato amarillo camuflado en un caos de colores, ¡encuéntralo!');
     </script>
 </body>
 </html>
