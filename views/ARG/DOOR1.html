@@ -88,14 +88,20 @@
     const SPRITE_SHEET_URL = '/media/texture/sprite_sheet.png';
     const SPRITE_W = 22;
     const SPRITE_H = 28;
-    const SCALE = 3.0; // Antes 4.18 — personaje más proporcionado al mapa
+    const SCALE = 4.3; // Tamaño de sprite solicitado
     const CHAR_W = Math.round(SPRITE_W * SCALE);
     const CHAR_H = Math.round(SPRITE_H * SCALE);
 
-    // Colisión: caja más pequeña y centrada en el sprite
-    const COLLISION_SHRINK = 0.16;   // Antes 0.25 — caja de colisión más chica
-    const COLLISION_Y_OFFSET = -18;  // Reajustado tras centrar (antes -25 con caja descentrada)
-    const INTERACT_DIST = 60;        // Radio circular de interacción
+    // Tamaño aparte para el sprite del KING en la secuencia final (antes fijo en 10)
+    const KING_SCALE = 14;
+
+    // Colisión: caja pequeña y centrada en el sprite (no se usa para interacción)
+    const COLLISION_SHRINK = 0.16;
+    const COLLISION_Y_OFFSET = 0;    // Sin offset: con offset distinto de 0, la caja queda
+                                      // descentrada verticalmente y bloquea el acercamiento
+                                      // desde uno de los lados (por eso fallaba "desde arriba").
+    const INTERACT_DIST = 70;        // Radio circular de interacción (independiente de la colisión,
+                                      // ligeramente mayor para compensar el sprite más grande)
 
     const SPRITES = {
       IDLE:      { col:0, row:0 },
@@ -223,6 +229,36 @@
     // ==================== AUDIOS ====================
     const shadowAudio = new Audio('/media/sound/shadow.mp3');
     const colorAudio = new Audio('/media/sound/color.mp3');
+
+    // Música de fondo: suena siempre, se pausa solo durante el diálogo
+    // del clon o del baby king, y se reanuda al cerrar ese diálogo.
+    const bgMusic = new Audio('/media/sound/listenthenews.mp3');
+    bgMusic.loop = true;
+    bgMusic.volume = 0.6;
+
+    function tryPlayBgMusic() {
+      bgMusic.play().catch(() => {
+        // Autoplay bloqueado por el navegador: reintenta tras la primera
+        // interacción del usuario (requisito de Chrome/Safari).
+        const resume = () => {
+          bgMusic.play().catch(() => {});
+          window.removeEventListener('keydown', resume);
+          window.removeEventListener('pointerdown', resume);
+        };
+        window.addEventListener('keydown', resume, { once: true });
+        window.addEventListener('pointerdown', resume, { once: true });
+      });
+    }
+
+    // Revisa cada frame si la música debe sonar o estar en pausa
+    function syncBackgroundMusic() {
+      const shouldPause = dialog.active && (dialog.speaker === 'clone' || dialog.speaker === 'babyKing');
+      if (shouldPause) {
+        if (!bgMusic.paused) bgMusic.pause();
+      } else if (!document.hidden) {
+        if (bgMusic.paused) bgMusic.play().catch(() => {});
+      }
+    }
 
     // Reproduce desde el inicio, evitando solapamientos si se dispara dos veces
     function playOnce(audio) {
@@ -640,6 +676,7 @@
     function update() {
       if (eventSequence) {
         updateSequence();
+        syncBackgroundMusic();
         return;
       }
 
@@ -727,6 +764,7 @@
       }
 
       updateDialog();
+      syncBackgroundMusic();
     }
 
     // ==================== DRAW ====================
@@ -746,9 +784,8 @@
             const kingSprite = SPRITES.KING;
             const sx = kingSprite.col * SPRITE_W;
             const sy = kingSprite.row * SPRITE_H;
-            const scale = 10;
-            const w = SPRITE_W * scale;
-            const h = SPRITE_H * scale;
+            const w = SPRITE_W * KING_SCALE;
+            const h = SPRITE_H * KING_SCALE;
             const cx = (canvas.width - w) / 2;
             const cy = (canvas.height - h) / 2;
             ctx.imageSmoothingEnabled = false;
@@ -826,8 +863,10 @@
         if (rafId) cancelAnimationFrame(rafId);
         shadowAudio.pause();
         colorAudio.pause();
+        bgMusic.pause();
       } else {
         gameLoop();
+        syncBackgroundMusic();
       }
     });
 
@@ -979,12 +1018,14 @@
     }
     gameLoop();
     updateUI();
+    tryPlayBgMusic();
     setTimeout(ensurePlayerSpawn, 100);
 
-    console.log('🎮 Colisión centrada y reducida, personaje reescalado.');
+    console.log('🎮 Colisión centrada, interacción independiente, sprites a escala 4.3.');
     console.log('⬆ 5 pasos → Clon');
     console.log('⬇ 7 pasos → Baby King');
   })();
 </script>
 </body>
 </html>
+
