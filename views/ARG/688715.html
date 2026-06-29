@@ -1,286 +1,149 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DOOR2</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            overflow: hidden;
-            background: #1a1a2e;
-            width: 100vw;
-            height: 100vh;
-        }
-
-        #kaleidoscope {
-            display: block;
-            width: 100vw;
-            height: 100vh;
-            background: #1a1a2e;
-        }
-
-        #cat-container {
-            position: fixed;
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-            z-index: 999;
-            display: none;
-            opacity: 0.3;
-            filter: blur(1.5px) drop-shadow(0 0 2px rgba(255, 255, 0, 0.2));
-            pointer-events: auto;
-            transition: opacity 0.5s ease, filter 0.5s ease;
-        }
-        #cat-container:hover {
-            opacity: 0.7;
-            filter: blur(0px) drop-shadow(0 0 8px rgba(255, 255, 0, 0.8));
-        }
-
-        #cat-container svg {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-
-        .cat-pop {
-            animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-        @keyframes popIn {
-            0% { transform: scale(0) rotate(360deg); opacity: 0; }
-            100% { transform: scale(1) rotate(0deg); opacity: 0.3; }
-        }
-
-        .cat-hide {
-            animation: fadeOut 0.6s ease-in forwards;
-        }
-        @keyframes fadeOut {
-            0% { opacity: 0.3; transform: scale(1); }
-            100% { opacity: 0; transform: scale(0.2); }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>You found the second</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Press Start 2P', monospace;
+    }
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      image-rendering: pixelated;
+      background: black;
+    }
+  </style>
 </head>
 <body>
+  <canvas id="canvas"></canvas>
+  <script>
+    (function() {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
 
-    <canvas id="kaleidoscope"></canvas>
+      // ==================== AJUSTAR TAMAÑO ====================
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
 
-    <!-- Gato amarillo puro, solo silueta (cabeza + orejas) -->
-    <div id="cat-container">
-        <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-            <!-- Cabeza redonda -->
-            <circle cx="24" cy="24" r="18" fill="rgb(255, 255, 0)" />
-            <!-- Orejas izquierda y derecha -->
-            <polygon points="6,14 16,6 12,22" fill="rgb(255, 255, 0)" />
-            <polygon points="42,14 32,6 36,22" fill="rgb(255, 255, 0)" />
-        </svg>
-    </div>
-
-    <script>
-        // =============================================
-        // 1. CALEIDOSCOPIO MEJORADO (más loco, sin negro)
-        // =============================================
-        const canvas = document.getElementById('kaleidoscope');
-        const ctx = canvas.getContext('2d');
-        let W, H, cx, cy, radius;
-
-        function resizeCanvas() {
-            W = window.innerWidth;
-            H = window.innerHeight;
-            canvas.width = W;
-            canvas.height = H;
-            cx = W / 2;
-            cy = H / 2;
-            radius = Math.min(W, H) * 0.92;
+      // ==================== CARGAR TEXTURA ====================
+      const textureImg = new Image();
+      textureImg.src = '/media/texture/bellowtext.png';
+      let textureLoaded = false;
+      textureImg.onload = () => {
+        textureLoaded = true;
+        console.log('✅ Textura bellowtext.png cargada');
+      };
+      textureImg.onerror = () => {
+        console.warn('⚠️ No se pudo cargar bellowtext.png, usando patrón de fallback');
+        // Patrón de fallback: cuadrícula pixelada
+        const fallbackCanvas = document.createElement('canvas');
+        fallbackCanvas.width = 64;
+        fallbackCanvas.height = 64;
+        const fctx = fallbackCanvas.getContext('2d');
+        fctx.fillStyle = '#444';
+        fctx.fillRect(0, 0, 64, 64);
+        fctx.fillStyle = '#888';
+        for (let i = 0; i < 64; i += 8) {
+          fctx.fillRect(i, 0, 2, 64);
+          fctx.fillRect(0, i, 64, 2);
         }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        textureImg.src = fallbackCanvas.toDataURL();
+        textureLoaded = true;
+      };
 
-        // Paleta de colores vivos, sin negro, con mucho amarillo/naranja/rosa/azul/verde
-        const palette = [
-            '#FF0055', '#FF8800', '#FFCC00', '#00FF66', '#00CCFF', '#FF00AA',
-            '#FF5500', '#AAFF00', '#00FFCC', '#FF0066', '#6600FF', '#FFAA00',
-            '#00FF99', '#FF3399', '#33FFCC', '#FF9933', '#33CCFF', '#FF66CC'
-        ];
+      // ==================== PARÁMETROS ====================
+      const LETTER = 'A';
+      const FONT_SIZE = Math.min(window.innerWidth, window.innerHeight) * 0.7;
+      const GLOW_BLUR = 20;        // desenfoque del brillo (píxeles)
+      const GLOW_SCALE = 1.15;      // escala del brillo (1.15 = 15% más grande)
+      const MOVE_AMPLITUDE = 80;    // amplitud de movimiento en píxeles
+      const SPEED = 0.0002;           // velocidad de oscilación
 
-        // Generar muchas formas (más loco)
-        const NUM_SHAPES = 220;
-        const shapes = [];
-        for (let i = 0; i < NUM_SHAPES; i++) {
-            shapes.push({
-                baseX: (Math.random() - 0.5) * radius * 1.8,
-                baseY: (Math.random() - 0.5) * radius * 1.8,
-                size: Math.random() * 28 + 4,
-                color: palette[Math.floor(Math.random() * palette.length)],
-                type: Math.floor(Math.random() * 4), // 0,1,2,3 (añadimos estrella)
-                rotOffset: Math.random() * Math.PI * 2,
-                speed: 0.002 + Math.random() * 0.008,
-                orbit: Math.random() * 0.02,
-            });
-        }
-
-        let angle = 0;
-        const slices = 10; // más sectores para más locura
-
-        function drawKaleidoscope() {
-            // Fondo con degradado oscuro pero sin negro (azul profundo)
-            const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-            grad.addColorStop(0, '#2a1a4a');
-            grad.addColorStop(1, '#0d0d2b');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, W, H);
-
-            ctx.save();
-            ctx.translate(cx, cy);
-            ctx.rotate(angle);
-
-            const sliceAngle = (Math.PI * 2) / slices;
-
-            for (let i = 0; i < slices; i++) {
-                ctx.save();
-                ctx.rotate(i * sliceAngle + sliceAngle / 2);
-
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                ctx.arc(0, 0, radius, -sliceAngle / 2, sliceAngle / 2);
-                ctx.closePath();
-                ctx.clip();
-
-                // Espejo alternado
-                if (i % 2 === 1) ctx.scale(-1, 1);
-
-                shapes.forEach(s => {
-                    // Movimiento caótico: oscilación, rotación, desplazamiento
-                    const t = angle * s.speed * 2 + s.rotOffset;
-                    const offsetX = Math.sin(t * 1.7 + s.baseY * 0.03) * 25;
-                    const offsetY = Math.cos(t * 1.3 + s.baseX * 0.03) * 25;
-                    const x = s.baseX + offsetX;
-                    const y = s.baseY + offsetY;
-
-                    ctx.save();
-                    ctx.translate(x, y);
-                    ctx.rotate(t * 0.5);
-
-                    ctx.fillStyle = s.color;
-                    ctx.shadowColor = s.color;
-                    ctx.shadowBlur = 8;
-
-                    const sz = s.size * (0.8 + 0.4 * Math.sin(t * 0.6 + s.rotOffset));
-
-                    ctx.beginPath();
-                    if (s.type === 0) { // círculo
-                        ctx.arc(0, 0, sz, 0, Math.PI * 2);
-                        ctx.fill();
-                    } else if (s.type === 1) { // cuadrado
-                        ctx.fillRect(-sz / 2, -sz / 2, sz, sz);
-                    } else if (s.type === 2) { // triángulo
-                        ctx.moveTo(0, -sz);
-                        ctx.lineTo(sz, sz);
-                        ctx.lineTo(-sz, sz);
-                        ctx.closePath();
-                        ctx.fill();
-                    } else { // estrella (4 puntas)
-                        for (let j = 0; j < 8; j++) {
-                            const r = j % 2 === 0 ? sz : sz * 0.4;
-                            const a = (j / 8) * Math.PI * 2 - Math.PI / 2;
-                            if (j === 0) ctx.moveTo(r * Math.cos(a), r * Math.sin(a));
-                            else ctx.lineTo(r * Math.cos(a), r * Math.sin(a));
-                        }
-                        ctx.closePath();
-                        ctx.fill();
-                    }
-
-                    ctx.shadowBlur = 0;
-                    ctx.restore();
-                });
-
-                ctx.restore();
-            }
-
-            ctx.restore();
-
-            angle += 0.008; // movimiento más rápido
-            requestAnimationFrame(drawKaleidoscope);
+      // ==================== DIBUJAR ====================
+      function draw(time) {
+        if (!textureLoaded) {
+          ctx.fillStyle = 'white';
+          ctx.font = '20px monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('Cargando textura...', canvas.width/2, canvas.height/2);
+          requestAnimationFrame(draw);
+          return;
         }
 
-        drawKaleidoscope();
+        // Calcular offset oscilante en diagonal
+        // Usamos Math.sin(time * SPEED) para que vaya y vuelva suavemente
+        const phase = Math.sin(time * SPEED);
+        // Desplazamiento en X e Y: se mueven en diagonal (misma fase pero con diferente amplitud para que no sea recta perfecta)
+        const offsetX = phase * MOVE_AMPLITUDE;
+        const offsetY = phase * MOVE_AMPLITUDE * 0.6; // para dar un efecto diagonal más orgánico
 
-        // =============================================
-        // 2. LÓGICA DEL GATO (más pequeño, más camuflado)
-        // =============================================
-        const catContainer = document.getElementById('cat-container');
-        let catTimeout = null;
-        let hideTimeout = null;
-        let attempts = 0;
-        const MAX_ATTEMPTS = 5;
-        const VISIBLE_TIME = 7000;
+        // Crear patrón con la textura
+        const pattern = ctx.createPattern(textureImg, 'repeat');
+        // Aplicar desplazamiento al patrón
+        pattern.setTransform(new DOMMatrix([1, 0, 0, 1, offsetX, offsetY]));
 
-        function getRandomPosition() {
-            const size = 32;
-            const left = Math.random() * (window.innerWidth - size);
-            const top = Math.random() * (window.innerHeight - size);
-            return { left, top };
-        }
+        // Limpiar canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        function showCat() {
-            const pos = getRandomPosition();
-            catContainer.style.left = pos.left + 'px';
-            catContainer.style.top = pos.top + 'px';
-            catContainer.style.display = 'block';
+        // Configurar fuente
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = `bold ${FONT_SIZE}px "Press Start 2P", "Courier New", monospace`;
 
-            catContainer.classList.remove('cat-pop', 'cat-hide');
-            void catContainer.offsetWidth;
-            catContainer.classList.add('cat-pop');
+        // ========== BRILLO (una capa con textura y desenfoque) ==========
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.scale(GLOW_SCALE, GLOW_SCALE);
+        ctx.filter = `blur(${GLOW_BLUR}px)`;
+        ctx.globalAlpha = 0.5; // opacidad del brillo
+        ctx.fillStyle = pattern;
+        ctx.fillText(LETTER, 0, 0);
+        ctx.restore();
 
-            clearTimeout(hideTimeout);
-            hideTimeout = setTimeout(() => {
-                hideCat();
-            }, VISIBLE_TIME);
-        }
+        // ========== K NÍTIDA (encima) ==========
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.filter = 'none';
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = pattern;
+        ctx.fillText(LETTER, 0, 0);
+        ctx.restore();
 
-        function hideCat() {
-            catContainer.classList.remove('cat-pop');
-            catContainer.classList.add('cat-hide');
-            setTimeout(() => {
-                catContainer.style.display = 'none';
-                scheduleCat();
-            }, 600);
-        }
+        // Continuar animación
+        requestAnimationFrame(draw);
+      }
 
-        function scheduleCat() {
-            clearTimeout(catTimeout);
-            const delay = Math.random() * 7000 + 2000; // más variable
+      // Iniciar animación con el tiempo
+      let startTime = performance.now();
+      function animate(time) {
+        const elapsed = (time - startTime) / 1000; // segundos
+        draw(elapsed);
+      }
+      requestAnimationFrame(animate);
 
-            catTimeout = setTimeout(() => {
-                attempts++;
-                if (Math.random() < 0.18 || attempts >= MAX_ATTEMPTS) {
-                    attempts = 0;
-                    showCat();
-                } else {
-                    scheduleCat();
-                }
-            }, delay);
-        }
-
-        catContainer.addEventListener('click', function(e) {
-            e.stopPropagation();
-            window.location.href = 'views/ARG/688715.html';
-        });
-
-        scheduleCat();
-
-        window.addEventListener('resize', function() {
-            if (catContainer.style.display !== 'none' && !catContainer.classList.contains('cat-hide')) {
-                const pos = getRandomPosition();
-                catContainer.style.left = pos.left + 'px';
-                catContainer.style.top = pos.top + 'px';
-            }
-        });
-
-        console.log('🐱 DOOR2: gato amarillo camuflado, ¡encuéntralo!');
-    </script>
+    })();
+  </script>
 </body>
 </html>
