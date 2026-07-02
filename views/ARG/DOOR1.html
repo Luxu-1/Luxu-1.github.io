@@ -14,30 +14,28 @@
     .game-container { position:relative; background:#2a2a2a; border:3px solid #444; border-radius:8px; padding:10px; box-shadow:0 0 30px rgba(0,0,0,0.8); touch-action: none; }
     canvas { display:block; width:500px; height:500px; image-rendering:pixelated; image-rendering:crisp-edges; background:#353535; cursor:none; touch-action: none; }
     .crt-overlay { position: absolute; top: 10px; left: 10px; width: calc(100% - 20px); height: calc(100% - 20px); pointer-events: none; z-index: 10; border-radius: 4px; overflow: hidden; }
-    .crt-overlay::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 2px, transpar[...]
-    .crt-overlay::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%); pointer-ev[...]
+    .crt-overlay::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 2px, transparent 2px, transparent 4px); pointer-events: none; z-index: 11; }
+    .crt-overlay::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%); pointer-events: none; z-index: 12; }
     @keyframes flicker { 0% { opacity: 0.97; } 50% { opacity: 1; } 100% { opacity: 0.97; } }
     .crt-overlay { animation: flicker 0.15s infinite alternate; }
 
-    /* ===== INFO-BAR OCULTA (pero sin romper el layout) ===== */
-    .info-bar {
-      display: none; /* Oculta completamente la barra */
-    }
+    /* ===== INFO-BAR OCULTA ===== */
+    .info-bar { display: none; }
 
     .controls-info { color:rgba(255,255,255,0.2); text-align:center; font-size:14px; padding:4px 0; letter-spacing:1px; }
     .touch-controls { display: none; width:100%; max-width:500px; justify-content:space-between; align-items:center; gap:20px; touch-action: none; padding:0 10px; }
     .dpad { position:relative; width:160px; height:160px; touch-action:none; }
-    .dpad-btn { position:absolute; width:50px; height:50px; background:rgba(255,255,255,0.15); border:2px solid rgba(255,255,255,0.3); border-radius:10px; color:rgba(255,255,255,0.7); font-size:28px; [...]
+    .dpad-btn { position:absolute; width:50px; height:50px; background:rgba(255,255,255,0.15); border:2px solid rgba(255,255,255,0.3); border-radius:10px; color:rgba(255,255,255,0.7); font-size:28px; display:flex; justify-content:center; align-items:center; touch-action:none; cursor:pointer; transition:background 0.1s; -webkit-tap-highlight-color:transparent; }
     .dpad-btn:active { background:rgba(255,255,255,0.35); border-color:rgba(255,255,255,0.6); }
     .dpad-up    { top:0; left:55px; }
     .dpad-down  { bottom:0; left:55px; }
     .dpad-left  { top:55px; left:0; }
     .dpad-right { top:55px; right:0; }
-    .action-btn { width:80px; height:80px; background:rgba(255,255,255,0.2); border:3px solid rgba(255,255,255,0.5); border-radius:50%; color:rgba(255,255,255,0.8); font-size:18px; font-family:'Courie[...]
+    .action-btn { width:80px; height:80px; background:rgba(255,255,255,0.2); border:3px solid rgba(255,255,255,0.5); border-radius:50%; color:rgba(255,255,255,0.8); font-size:18px; font-family:'Courier New',monospace; font-weight:bold; display:flex; justify-content:center; align-items:center; touch-action:none; cursor:pointer; transition:all 0.1s; -webkit-tap-highlight-color:transparent; }
     .action-btn:active { background:rgba(255,200,50,0.4); border-color:rgba(255,200,50,0.8); transform:scale(0.92); }
     @media (pointer: coarse) { .touch-controls { display:flex; } .controls-info .pc-only { display:none; } .controls-info .mobile-only { display:inline-block; } }
     @media (pointer: fine) { .controls-info .pc-only { display:inline-block; } .controls-info .mobile-only { display:none; } }
-    @media (max-width:560px) { canvas { width:90vw; height:90vw; max-width:500px; max-height:500px; } .game-container { padding:6px; } .crt-overlay { top:6px; left:6px; width:calc(100% - 12px); he[...]
+    @media (max-width:560px) { canvas { width:90vw; height:90vw; max-width:500px; max-height:500px; } .game-container { padding:6px; } .crt-overlay { top:6px; left:6px; width:calc(100% - 12px); height:calc(100% - 12px); } .dpad { width:130px; height:130px; } .dpad-btn { width:40px; height:40px; font-size:22px; } .dpad-up    { top:0; left:45px; } .dpad-down  { bottom:0; left:45px; } .dpad-left  { top:45px; left:0; } .dpad-right { top:45px; right:0; } .action-btn { width:65px; height:65px; font-size:15px; } }
   </style>
 </head>
 <body>
@@ -47,7 +45,7 @@
     <div class="crt-overlay"></div>
   </div>
 
-  <!-- INFO-BAR OCULTA (el CSS la oculta, pero el JS aún puede actualizarla sin errores) -->
+  <!-- INFO-BAR OCULTA -->
   <div class="info-bar">
     <span>⬆ <span id="upCounter" class="highlight">0</span></span>
     <span>⬇ <span id="downCounter" class="highlight">0</span></span>
@@ -78,7 +76,7 @@
     const ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = false;
 
-    // ==================== RUTAS / CONFIG CENTRALIZADA ====================
+    // ==================== RUTAS ====================
     const ROUTES = {
       clone: 'https://luxu-1.github.io/views/hat',
       babyKing: 'https://luxu-1.github.io/views/ARG/806392.html'
@@ -88,21 +86,13 @@
     const SPRITE_SHEET_URL = '/media/texture/sprite_sheet.png';
     const SPRITE_W = 22;
     const SPRITE_H = 28;
-    const SCALE = 4.3; // Tamaño de sprite solicitado
+    const SCALE = 4.3;
     const CHAR_W = Math.round(SPRITE_W * SCALE);
     const CHAR_H = Math.round(SPRITE_H * SCALE);
-
-    // Tamaño aparte para el sprite del KING en la secuencia final (antes fijo en 10)
     const KING_SCALE = 14;
-
-    // Colisión: caja pequeña y centrada en el sprite (no se usa para interacción)
     const COLLISION_SHRINK = 0.16;
-    const COLLISION_Y_OFFSET = 0;    // Sin offset: con offset distinto de 0, la caja queda
-                                      // descentrada verticalmente y bloquea el acercamiento
-                                      // desde uno de los lados (por eso fallaba "desde arriba").
-    const INTERACT_DIST = 100;       // Radio circular de interacción (independiente de la colisión;
-                                      // aumentado para poder hablar con objetos desde lejos sin
-                                      // tocar para nada la caja de colisión física)
+    const COLLISION_Y_OFFSET = 0;
+    const INTERACT_DIST = 100;
 
     const SPRITES = {
       IDLE:      { col:0, row:0 },
@@ -121,7 +111,6 @@
       KING:      { col:1, row:3 },
     };
 
-    // Mapa inverso "col,row" -> nombre, para no recorrer SPRITES cada vez (antes O(n) por llamada)
     const SPRITE_LOOKUP = {};
     for (const name in SPRITES) {
       const s = SPRITES[name];
@@ -186,11 +175,10 @@
       speed: 'slow',
       speaker: null,
       complete: false,
-      lines: null,      // Si el diálogo tiene varias líneas, se guardan aquí
-      lineIndex: 0,      // Índice de la línea actual dentro de `lines`
+      lines: null,
+      lineIndex: 0,
     };
 
-    // ==================== COOLDOWN ====================
     let dialogCooldown = 0;
 
     // ==================== CONTADORES ====================
@@ -205,7 +193,7 @@
     // ==================== TECLAS ====================
     const keys = { up:false, down:false, left:false, right:false, action:false };
 
-    // ==================== UI (protegida) ====================
+    // ==================== UI ====================
     const upCounterEl = document.getElementById('upCounter');
     const downCounterEl = document.getElementById('downCounter');
     const leftCounterEl = document.getElementById('leftCounter');
@@ -232,18 +220,13 @@
     // ==================== AUDIOS ====================
     const shadowAudio = new Audio('/media/sound/shadow.mp3');
     const colorAudio = new Audio('/media/sound/color.mp3');
-
-    // Música de fondo: suena siempre, se pausa solo durante el diálogo
-    // del clon o del baby king, y se reanuda al cerrar ese diálogo.
     const bgMusic = new Audio('/media/sound/listenthenews.mp3');
     bgMusic.loop = true;
     bgMusic.volume = 0.6;
-    let bgMusicStoppedForever = false; // Una vez true, nunca vuelve a sonar (hasta recargar la página)
+    let bgMusicStoppedForever = false;
 
     function tryPlayBgMusic() {
       bgMusic.play().catch(() => {
-        // Autoplay bloqueado por el navegador: reintenta tras la primera
-        // interacción del usuario (requisito de Chrome/Safari).
         const resume = () => {
           bgMusic.play().catch(() => {});
           window.removeEventListener('keydown', resume);
@@ -254,7 +237,6 @@
       });
     }
 
-    // Revisa cada frame si la música debe sonar o estar en pausa
     function syncBackgroundMusic() {
       if (bgMusicStoppedForever) {
         if (!bgMusic.paused) bgMusic.pause();
@@ -268,7 +250,6 @@
       }
     }
 
-    // Reproduce desde el inicio, evitando solapamientos si se dispara dos veces
     function playOnce(audio) {
       try {
         audio.pause();
@@ -277,69 +258,45 @@
       } catch (e) { console.warn(e); }
     }
 
-// ==================== SONIDO TICK ====================
-let audioCtx = null;
-function playTickSound(soundType = 'regular', char = '') {
-  // Si el carácter es un espacio, no reproducir sonido
-  if (char === ' ') return;
-  
-  try {
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    
-    // Angel tick: ethereal and shimmering with heavenly choir effect
-    if (soundType === 'angel') {
-      const now = audioCtx.currentTime;
-      const duration = 0.25;
-      
-      // Create THREE slightly detuned sine oscillators for rich choir effect
-      for (let i = 0; i < 3; i++) {
+    // ==================== SONIDO TICK (MEJORADO PARA EL ÁNGEL) ====================
+    let audioCtx = null;
+
+    function isAngel(speaker) {
+      return speaker && typeof speaker === 'object' && speaker.col === 0 && speaker.row === 1;
+    }
+
+    function playTickSound(lowPitch = false, char = '', speaker = null) {
+      if (char === ' ') return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-        osc.type = 'sine';
-        
-        // Base frequency with variation for each voice
-        const baseFreq = 1400 + (Math.random() * 400);
-        osc.frequency.value = baseFreq + (i * 80) - 80;
-        
-        // Gentle attack and smooth exponential decay
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.06 - (i * 0.01), now + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.002, now + duration);
-        
-        osc.start(now);
-        osc.stop(now + duration);
-      }
-    } else if (soundType === 'clone') {
-      // Clone/Baby King: lower, more mysterious
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.type = 'square';
-      
-      osc.frequency.value = 50 + Math.random() * 200;
-      gain.gain.value = 0.09;
-      
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.03);
-    } else {
-      // Regular: high pitch
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.type = 'square';
-      
-      osc.frequency.value = 800 + Math.random() * 200;
-      gain.gain.value = 0.03;
-      
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.03);
+
+        const isAngelSpeaker = isAngel(speaker);
+        if (isAngelSpeaker) {
+          // Sonido angelical: onda senoidal suave, frecuencia aguda y volumen bajo
+          osc.type = 'sine';
+          osc.frequency.value = 1200 + Math.random() * 100;
+          gain.gain.value = 0.025;
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.05);
+        } else {
+          // Sonido normal (cuadrado)
+          osc.type = 'square';
+          if (lowPitch) {
+            osc.frequency.value = 50 + Math.random() * 200;
+            gain.gain.value = 0.09;
+          } else {
+            osc.frequency.value = 800 + Math.random() * 200;
+            gain.gain.value = 0.03;
+          }
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.03);
+        }
+      } catch (e) {}
     }
-  } catch (e) {}
-}
 
     // ==================== DIÁLOGO ====================
     function startDialog(textOrLines, speaker, speed = 'slow') {
@@ -355,12 +312,10 @@ function playTickSound(soundType = 'regular', char = '') {
       dialog.speed = speed;
       dialog.speaker = speaker;
       dialog.complete = false;
-      dialog.charDelay = (speed === 'slow') ? 16 : 2.4; // 'fast' antes en 2, +20% para que el ritmo
-                                                          // de tecleo coincida con las letras mostradas
+      dialog.charDelay = (speed === 'slow') ? 16 : 2.4;
       console.log(`💬 Inicio diálogo: "${dialog.text}" (${speed})`);
     }
 
-    // Pasa a la siguiente línea del diálogo actual (sin cerrarlo ni activar cooldown)
     function advanceDialogLine() {
       dialog.lineIndex++;
       dialog.text = dialog.lines[dialog.lineIndex];
@@ -371,33 +326,25 @@ function playTickSound(soundType = 'regular', char = '') {
       console.log(`💬 Siguiente línea: "${dialog.text}"`);
     }
 
-function updateDialog() {
-  if (!dialog.active || dialog.complete) return;
-  dialog.charTimer++;
-  if (dialog.charTimer >= dialog.charDelay) {
-    dialog.charTimer = 0;
-    if (dialog.charIndex < dialog.text.length) {
-      const currentChar = dialog.text[dialog.charIndex];
-      dialog.displayText += currentChar;
-      dialog.charIndex++;
-      
-      // Determine which sound to play based on speaker
-      let soundType = 'regular';
-      if (dialog.speaker && dialog.speaker.spriteRow === 1) {
-        // Angel (sprite row 1)
-        soundType = 'angel';
-      } else if (dialog.speaker === 'clone' || dialog.speaker === 'babyKing') {
-        soundType = 'clone';
+    function updateDialog() {
+      if (!dialog.active || dialog.complete) return;
+      dialog.charTimer++;
+      if (dialog.charTimer >= dialog.charDelay) {
+        dialog.charTimer = 0;
+        if (dialog.charIndex < dialog.text.length) {
+          const currentChar = dialog.text[dialog.charIndex];
+          dialog.displayText += currentChar;
+          dialog.charIndex++;
+          const isSlow = (dialog.speaker === 'clone' || dialog.speaker === 'babyKing');
+          // Pasamos el speaker para que el ángel tenga su sonido especial
+          playTickSound(isSlow, currentChar, dialog.speaker);
+        } else {
+          dialog.complete = true;
+        }
       }
-      
-      playTickSound(soundType, currentChar);
-    } else {
-      dialog.complete = true;
     }
-  }
-}
 
-    // ==================== DIBUJO DE DIÁLOGO (pixelado) ====================
+    // ==================== DIBUJO DE DIÁLOGO ====================
     function drawDialog() {
       if (!dialog.active) return;
       const dw = canvas.width * 0.85, dh = 100;
@@ -465,8 +412,6 @@ function updateDialog() {
     }
 
     // Ángel y carteles
-    // El ángel ahora tiene 2 líneas: al presionar Z con la primera completa, avanza
-    // a la segunda en vez de cerrar; al presionar Z con la segunda completa, cierra el diálogo.
     addObject(0, 1, 204, 20, true, [
       "* Emperor, do you hear the news? A new king has been born.",
       "* They say he was prophesied, different from others.",
@@ -491,7 +436,7 @@ function updateDialog() {
     addObject(3, 1, 31, 357, false, null);
     addObject(3, 1, 380, 357, false, null);
 
-    // ==================== COLISIONES (caja pequeña y centrada) ====================
+    // ==================== COLISIONES ====================
     function rectCollide(r1, r2) {
       return r1.x < r2.x + r2.width &&
              r1.x + r1.width > r2.x &&
@@ -499,7 +444,6 @@ function updateDialog() {
              r1.y + r1.height > r2.y;
     }
 
-    // Devuelve la caja de colisión reducida y centrada de cualquier entidad con x/y/width/height
     function getCollisionBox(entity) {
       const shrink = COLLISION_SHRINK;
       return {
@@ -672,8 +616,6 @@ function updateDialog() {
       const margin = 5;
       const dirsTriggered = [];
 
-      // Antes solo se detectaba un borde por frame (else if); ahora se revisan todos
-      // para no perder un cruce simultáneo en movimiento diagonal por esquina.
       if (player.y + player.height < -margin) {
         player.y = canvas.height + margin;
         dirsTriggered.push('up');
@@ -704,12 +646,11 @@ function updateDialog() {
       }
     }
 
-    // ==================== INTERACCIÓN (distancia circular) ====================
+    // ==================== INTERACCIÓN ====================
     function checkInteraction() {
       if (dialogCooldown > 0 || eventSequence) return false;
 
       if (dialog.active && dialog.complete) {
-        // Si el diálogo tiene más líneas pendientes, avanza en vez de cerrar
         if (dialog.lines && dialog.lineIndex < dialog.lines.length - 1) {
           advanceDialogLine();
           return true;
@@ -736,7 +677,6 @@ function updateDialog() {
 
       const interactDist = INTERACT_DIST;
 
-      // 1. Objetos del mundo
       for (let obj of worldObjects) {
         if (obj.dialog === null) continue;
         const dx = (player.x + player.width/2) - (obj.x + obj.width/2);
@@ -747,7 +687,6 @@ function updateDialog() {
         }
       }
 
-      // 2. Clon
       if (clone.active && !clone.talked) {
         const dx = (player.x + player.width/2) - (clone.x + clone.width/2);
         const dy = (player.y + player.height/2) - (clone.y + clone.height/2);
@@ -758,7 +697,6 @@ function updateDialog() {
         }
       }
 
-      // 3. Baby King
       if (babyKing.active && !babyKing.talked) {
         const dx = (player.x + player.width/2) - (babyKing.x + babyKing.width/2);
         const dy = (player.y + player.height/2) - (babyKing.y + babyKing.height/2);
@@ -956,8 +894,6 @@ function updateDialog() {
       rafId = requestAnimationFrame(gameLoop);
     }
 
-    // Pausa el loop y los audios cuando la pestaña pierde el foco,
-    // evitando que se "salten" pasos o que el audio siga sonando de fondo.
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         if (rafId) cancelAnimationFrame(rafId);
@@ -1048,19 +984,82 @@ function updateDialog() {
       dpadBtns.forEach(btn => {
         const dir = btn.dataset.dir;
         if (dir === 'up') assignTouchEvents(btn, 'up', 'down');
-        if (dir === 'down') assignTouchEvents(btn, 'down', 'up');
-        if (dir === 'left') assignTouchEvents(btn, 'left', 'right');
-        if (dir === 'right') assignTouchEvents(btn, 'right', 'left');
+        else if (dir === 'down') assignTouchEvents(btn, 'down', 'up');
+        else if (dir === 'left') assignTouchEvents(btn, 'left', 'right');
+        else if (dir === 'right') assignTouchEvents(btn, 'right', 'left');
       });
 
-      assignTouchEvents(actionBtn, 'action');
-    }
+      actionBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys.action = true;
+        if (dialog.active && dialog.complete) {
+          checkInteraction();
+        }
+      }, { passive: false });
 
+      actionBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys.action = false;
+        if (!dialog.active && !player.moving && !eventSequence) {
+          checkInteraction();
+        }
+      }, { passive: false });
+
+      actionBtn.addEventListener('touchcancel', (e) => {
+        e.preventDefault();
+        keys.action = false;
+      }, { passive: false });
+
+      actionBtn.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        keys.action = true;
+        if (dialog.active && dialog.complete) {
+          checkInteraction();
+        }
+      });
+
+      actionBtn.addEventListener('mouseup', (e) => {
+        e.preventDefault();
+        keys.action = false;
+        if (!dialog.active && !player.moving && !eventSequence) {
+          checkInteraction();
+        }
+      });
+      actionBtn.addEventListener('mouseleave', (e) => {
+        keys.action = false;
+      });
+    }
     setupTouchControls();
 
-    // Inicia el juego
+    // ==================== INICIO ====================
+    function ensurePlayerSpawn() {
+      const testRect = { x: player.x, y: player.y, width: player.width, height: player.height };
+      if (isCollidingWithWorld(testRect)) {
+        for (let y = 20; y < canvas.height - player.height - 20; y += 10) {
+          for (let x = 20; x < canvas.width - player.width - 20; x += 10) {
+            const test = { x, y, width: player.width, height: player.height };
+            if (!isCollidingWithWorld(test)) {
+              player.x = x;
+              player.y = y;
+              console.log(`🔄 Jugador reubicado a (${x}, ${y})`);
+              return;
+            }
+          }
+        }
+      }
+    }
+
+    if (spriteSheet.complete && spriteSheet.naturalWidth !== 0) {
+      sheetLoaded = true;
+    }
     gameLoop();
+    updateUI();
     tryPlayBgMusic();
+    setTimeout(ensurePlayerSpawn, 100);
+
+    console.log('🎮 Colisión centrada, interacción independiente, sprites a escala 4.3.');
+    console.log('⬆ 5 pasos → Clon');
+    console.log('⬇ 7 pasos → Baby King');
   })();
 </script>
 </body>
