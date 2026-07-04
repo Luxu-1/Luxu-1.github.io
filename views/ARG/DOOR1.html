@@ -14,8 +14,8 @@
     .game-container { position:relative; background:#2a2a2a; border:3px solid #444; border-radius:8px; padding:10px; box-shadow:0 0 30px rgba(0,0,0,0.8); touch-action: none; }
     canvas { display:block; width:500px; height:500px; image-rendering:pixelated; image-rendering:crisp-edges; background:#353535; cursor:none; touch-action: none; }
     .crt-overlay { position: absolute; top: 10px; left: 10px; width: calc(100% - 20px); height: calc(100% - 20px); pointer-events: none; z-index: 10; border-radius: 4px; overflow: hidden; }
-    .crt-overlay::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 2px, transparent 2px, transparent 4px); pointer-events: none; z-index: 11; }
-    .crt-overlay::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%); pointer-events: none; z-index: 12; }
+    .crt-overlay::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 2px, transparent 2px, transparent 4px); pointer-events: none; }
+    .crt-overlay::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.4) 100%); pointer-events: none; }
     @keyframes flicker { 0% { opacity: 0.97; } 50% { opacity: 1; } 100% { opacity: 0.97; } }
     .crt-overlay { animation: flicker 0.15s infinite alternate; }
 
@@ -25,17 +25,17 @@
     .controls-info { color:rgba(255,255,255,0.2); text-align:center; font-size:14px; padding:4px 0; letter-spacing:1px; }
     .touch-controls { display: none; width:100%; max-width:500px; justify-content:space-between; align-items:center; gap:20px; touch-action: none; padding:0 10px; }
     .dpad { position:relative; width:160px; height:160px; touch-action:none; }
-    .dpad-btn { position:absolute; width:50px; height:50px; background:rgba(255,255,255,0.15); border:2px solid rgba(255,255,255,0.3); border-radius:10px; color:rgba(255,255,255,0.7); font-size:28px; display:flex; justify-content:center; align-items:center; touch-action:none; cursor:pointer; transition:background 0.1s; -webkit-tap-highlight-color:transparent; }
+    .dpad-btn { position:absolute; width:50px; height:50px; background:rgba(255,255,255,0.15); border:2px solid rgba(255,255,255,0.3); border-radius:10px; color:rgba(255,255,255,0.7); font-size:28px; display:flex; justify-content:center; align-items:center; cursor:pointer; user-select:none; }
     .dpad-btn:active { background:rgba(255,255,255,0.35); border-color:rgba(255,255,255,0.6); }
     .dpad-up    { top:0; left:55px; }
     .dpad-down  { bottom:0; left:55px; }
     .dpad-left  { top:55px; left:0; }
     .dpad-right { top:55px; right:0; }
-    .action-btn { width:80px; height:80px; background:rgba(255,255,255,0.2); border:3px solid rgba(255,255,255,0.5); border-radius:50%; color:rgba(255,255,255,0.8); font-size:18px; font-family:'Courier New',monospace; font-weight:bold; display:flex; justify-content:center; align-items:center; touch-action:none; cursor:pointer; transition:all 0.1s; -webkit-tap-highlight-color:transparent; }
+    .action-btn { width:80px; height:80px; background:rgba(255,255,255,0.2); border:3px solid rgba(255,255,255,0.5); border-radius:50%; color:rgba(255,255,255,0.8); font-size:18px; font-family:'Courier New', monospace; display:flex; justify-content:center; align-items:center; cursor:pointer; user-select:none; }
     .action-btn:active { background:rgba(255,200,50,0.4); border-color:rgba(255,200,50,0.8); transform:scale(0.92); }
     @media (pointer: coarse) { .touch-controls { display:flex; } .controls-info .pc-only { display:none; } .controls-info .mobile-only { display:inline-block; } }
     @media (pointer: fine) { .controls-info .pc-only { display:inline-block; } .controls-info .mobile-only { display:none; } }
-    @media (max-width:560px) { canvas { width:90vw; height:90vw; max-width:500px; max-height:500px; } .game-container { padding:6px; } .crt-overlay { top:6px; left:6px; width:calc(100% - 12px); height:calc(100% - 12px); } .dpad { width:130px; height:130px; } .dpad-btn { width:40px; height:40px; font-size:22px; } .dpad-up    { top:0; left:45px; } .dpad-down  { bottom:0; left:45px; } .dpad-left  { top:45px; left:0; } .dpad-right { top:45px; right:0; } .action-btn { width:65px; height:65px; font-size:15px; } }
+    @media (max-width:560px) { canvas { width:90vw; height:90vw; max-width:500px; max-height:500px; } .game-container { padding:6px; } .crt-overlay { top:6px; left:6px; width:calc(100% - 12px); height:calc(100% - 12px); } }
   </style>
 </head>
 <body>
@@ -90,6 +90,8 @@
     const CHAR_W = Math.round(SPRITE_W * SCALE);
     const CHAR_H = Math.round(SPRITE_H * SCALE);
     const KING_SCALE = 14;
+    const KING_IMAGE_SCALE = 1.1;
+    const KING_IMAGE_URL = '/media/texture/In Your Dreams.png';
     const COLLISION_SHRINK = 0.16;
     const COLLISION_Y_OFFSET = 0;
     const INTERACT_DIST = 100;
@@ -216,6 +218,13 @@
     let sheetLoaded = false;
     spriteSheet.onload = () => { sheetLoaded = true; console.log('✅ Sprite sheet cargado'); };
     spriteSheet.onerror = () => { console.error('❌ Error al cargar el sprite sheet.'); };
+
+    // ==================== CARGA DE IMAGEN DEL KING ====================
+    const kingImage = new Image();
+    kingImage.src = KING_IMAGE_URL;
+    let kingImageLoaded = false;
+    kingImage.onload = () => { kingImageLoaded = true; console.log('✅ King image cargada'); };
+    kingImage.onerror = () => { console.error('❌ Error al cargar la imagen del King.'); };
 
     // ==================== AUDIOS ====================
     const shadowAudio = new Audio('/media/sound/shadow.mp3');
@@ -819,15 +828,24 @@
             ctx.fillStyle = color;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
           } else {
-            const kingSprite = SPRITES.KING;
-            const sx = kingSprite.col * SPRITE_W;
-            const sy = kingSprite.row * SPRITE_H;
-            const w = SPRITE_W * KING_SCALE;
-            const h = SPRITE_H * KING_SCALE;
-            const cx = (canvas.width - w) / 2;
-            const cy = (canvas.height - h) / 2;
-            ctx.imageSmoothingEnabled = false;
-            ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, cx, cy, w, h);
+            if (kingImageLoaded) {
+              const w = kingImage.width * KING_IMAGE_SCALE;
+              const h = kingImage.height * KING_IMAGE_SCALE;
+              const cx = (canvas.width - w) / 2;
+              const cy = (canvas.height - h) / 2;
+              ctx.imageSmoothingEnabled = false;
+              ctx.drawImage(kingImage, cx, cy, w, h);
+            } else {
+              const kingSprite = SPRITES.KING;
+              const sx = kingSprite.col * SPRITE_W;
+              const sy = kingSprite.row * SPRITE_H;
+              const w = SPRITE_W * KING_SCALE;
+              const h = SPRITE_H * KING_SCALE;
+              const cx = (canvas.width - w) / 2;
+              const cy = (canvas.height - h) / 2;
+              ctx.imageSmoothingEnabled = false;
+              ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, cx, cy, w, h);
+            }
           }
         }
         return;
@@ -1009,57 +1027,10 @@
         e.preventDefault();
         keys.action = false;
       }, { passive: false });
-
-      actionBtn.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        keys.action = true;
-        if (dialog.active && dialog.complete) {
-          checkInteraction();
-        }
-      });
-
-      actionBtn.addEventListener('mouseup', (e) => {
-        e.preventDefault();
-        keys.action = false;
-        if (!dialog.active && !player.moving && !eventSequence) {
-          checkInteraction();
-        }
-      });
-      actionBtn.addEventListener('mouseleave', (e) => {
-        keys.action = false;
-      });
     }
+
     setupTouchControls();
-
-    // ==================== INICIO ====================
-    function ensurePlayerSpawn() {
-      const testRect = { x: player.x, y: player.y, width: player.width, height: player.height };
-      if (isCollidingWithWorld(testRect)) {
-        for (let y = 20; y < canvas.height - player.height - 20; y += 10) {
-          for (let x = 20; x < canvas.width - player.width - 20; x += 10) {
-            const test = { x, y, width: player.width, height: player.height };
-            if (!isCollidingWithWorld(test)) {
-              player.x = x;
-              player.y = y;
-              console.log(`🔄 Jugador reubicado a (${x}, ${y})`);
-              return;
-            }
-          }
-        }
-      }
-    }
-
-    if (spriteSheet.complete && spriteSheet.naturalWidth !== 0) {
-      sheetLoaded = true;
-    }
-    gameLoop();
-    updateUI();
     tryPlayBgMusic();
-    setTimeout(ensurePlayerSpawn, 100);
-
-    console.log('🎮 Colisión centrada, interacción independiente, sprites a escala 4.3.');
-    console.log('⬆ 5 pasos → Clon');
-    console.log('⬇ 7 pasos → Baby King');
   })();
 </script>
 </body>
