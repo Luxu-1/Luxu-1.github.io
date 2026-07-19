@@ -111,7 +111,7 @@
       CARTEL3:   { col:2, row:2 },
       BABY_KING: { col:0, row:3 },
       KING:      { col:1, row:3 },
-      HAT:      { col:2, row:3 },
+      HAT:       { col:2, row:3 },
     };
 
     const SPRITE_LOOKUP = {};
@@ -167,6 +167,26 @@
       cooldown: 0,
     };
 
+    // ==================== HAT (evento por inactividad) ====================
+    const hat = {
+      active: false,
+      x: 250 - CHAR_W/2,
+      y: 250 - CHAR_H/2,
+      width: CHAR_W,
+      height: CHAR_H,
+      spriteCol: SPRITES.HAT.col,
+      spriteRow: SPRITES.HAT.row,
+      flipX: false,
+      talked: false,
+      dialogLines: [
+        "* Oh, you finally stopped moving...",
+        "* I've been watching you from the shadows.",
+        "* The kingdom is changing, can't you feel it?",
+        "* When the time comes, you'll understand.",
+        "* ... or maybe not. Hehe."
+      ],
+    };
+
     // ==================== DIÁLOGO ====================
     const dialog = {
       active: false,
@@ -192,6 +212,12 @@
       lastDir: null,
       stepsSinceSpawn: 0,
     };
+
+    // ==================== INACTIVIDAD (15 minutos = 900 segundos) ====================
+    const IDLE_THRESHOLD = 15 * 60; // 15 minutos en segundos
+    let idleTimer = 0; // segundos acumulados sin cambio de dirección
+    let lastDir = null;
+    let idleEventTriggered = false;
 
     // ==================== TECLAS ====================
     const keys = { up:false, down:false, left:false, right:false, action:false };
@@ -268,7 +294,7 @@
       } catch (e) { console.warn(e); }
     }
 
-    // ==================== SONIDO TICK (MEJORADO PARA EL ÁNGEL) ====================
+    // ==================== SONIDO TICK ====================
     let audioCtx = null;
 
     function isAngel(speaker) {
@@ -286,14 +312,12 @@
 
         const isAngelSpeaker = isAngel(speaker);
         if (isAngelSpeaker) {
-          // Sonido angelical: onda senoidal suave, frecuencia aguda y volumen bajo
           osc.type = 'sine';
           osc.frequency.value = 1200 + Math.random() * 100;
           gain.gain.value = 0.025;
           osc.start();
           osc.stop(audioCtx.currentTime + 0.05);
         } else {
-          // Sonido normal (cuadrado)
           osc.type = 'square';
           if (lowPitch) {
             osc.frequency.value = 50 + Math.random() * 200;
@@ -345,8 +369,7 @@
           const currentChar = dialog.text[dialog.charIndex];
           dialog.displayText += currentChar;
           dialog.charIndex++;
-          const isSlow = (dialog.speaker === 'clone' || dialog.speaker === 'babyKing');
-          // Pasamos el speaker para que el ángel tenga su sonido especial
+          const isSlow = (dialog.speaker === 'clone' || dialog.speaker === 'babyKing' || dialog.speaker === 'hat');
           playTickSound(isSlow, currentChar, dialog.speaker);
         } else {
           dialog.complete = true;
@@ -430,15 +453,15 @@
     addObject(0, 2, 31, 210, true, [
       "* I told you, a King would be born, a different one, Tyahaha!",
       "-P"
-      ]);
+    ]);
     addObject(1, 2, 204, 357, true, [
       "* The one who seeks to loom high.",
       "-P"
-      ]);
+    ]);
     addObject(2, 2, 380, 210, true, [
       "* Small, naive, still innocent.",
       "-P"
-      ]);
+    ]);
     // Vegetación
     addObject(1, 1, 30, 20, true, null);
     addObject(1, 1, 380, 20, true, null);
@@ -471,6 +494,7 @@
       }
       if (clone.active && rectCollide(rect, getCollisionBox(clone))) return true;
       if (babyKing.active && rectCollide(rect, getCollisionBox(babyKing))) return true;
+      if (hat.active && rectCollide(rect, getCollisionBox(hat))) return true;
       return false;
     }
 
@@ -687,6 +711,18 @@
 
       const interactDist = INTERACT_DIST;
 
+      // Primero, verificar HAT (prioridad)
+      if (hat.active && !hat.talked) {
+        const dx = (player.x + player.width/2) - (hat.x + hat.width/2);
+        const dy = (player.y + player.height/2) - (hat.y + hat.height/2);
+        if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
+          startDialog(hat.dialogLines, 'hat', 'slow');
+          hat.talked = true;
+          return true;
+        }
+      }
+
+      // Objetos del mundo
       for (let obj of worldObjects) {
         if (obj.dialog === null) continue;
         const dx = (player.x + player.width/2) - (obj.x + obj.width/2);
@@ -697,6 +733,7 @@
         }
       }
 
+      // Clon
       if (clone.active && !clone.talked) {
         const dx = (player.x + player.width/2) - (clone.x + clone.width/2);
         const dy = (player.y + player.height/2) - (clone.y + clone.height/2);
@@ -707,6 +744,7 @@
         }
       }
 
+      // Baby King
       if (babyKing.active && !babyKing.talked) {
         const dx = (player.x + player.width/2) - (babyKing.x + babyKing.width/2);
         const dy = (player.y + player.height/2) - (babyKing.y + babyKing.height/2);
@@ -720,6 +758,41 @@
       return false;
     }
 
+    // ==================== EVENTO DE INACTIVIDAD (HAT) ====================
+    function checkIdleEvent() {
+      // Si HAT ya apareció, o hay secuencia, o diálogo activo, no hacer nada
+      if (hat.active || eventSequence || dialog.active) return;
+
+      // Verificar si el jugador está quieto (sin movimiento de teclas)
+      const isIdle = !keys.up && !keys.down && !keys.left && !keys.right;
+
+      // Si se está moviendo, resetear el temporizador
+      if (!isIdle) {
+        idleTimer = 0;
+        return;
+      }
+
+      // Incrementar el temporizador de inactividad (en segundos)
+      idleTimer += 1/60; // ~16.6ms por frame
+
+      // Si supera el umbral, activar HAT
+      if (idleTimer >= IDLE_THRESHOLD && !idleEventTriggered) {
+        idleEventTriggered = true;
+        activateHat();
+      }
+    }
+
+    function activateHat() {
+      hat.active = true;
+      hat.x = 250 - CHAR_W/2;
+      hat.y = 250 - CHAR_H/2;
+      hat.spriteCol = SPRITES.HAT.col;
+      hat.spriteRow = SPRITES.HAT.row;
+      hat.flipX = false;
+      hat.talked = false;
+      console.log('🎩 ¡HAT apareció por inactividad! (15 minutos)');
+    }
+
     // ==================== UPDATE ====================
     function update() {
       if (eventSequence) {
@@ -727,6 +800,9 @@
         syncBackgroundMusic();
         return;
       }
+
+      // Verificar inactividad (cada frame)
+      checkIdleEvent();
 
       let dx=0, dy=0;
       if (keys.up) dy = -1;
@@ -883,6 +959,12 @@
           ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, babyKing.x, babyKing.y, babyKing.width, babyKing.height);
         }
 
+        if (hat.active) {
+          const sx = hat.spriteCol * SPRITE_W;
+          const sy = hat.spriteRow * SPRITE_H;
+          ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, hat.x, hat.y, hat.width, hat.height);
+        }
+
         const sx = player.spriteCol * SPRITE_W;
         const sy = player.spriteRow * SPRITE_H;
         if (player.flipX) {
@@ -1032,6 +1114,7 @@
 
     setupTouchControls();
     tryPlayBgMusic();
+    console.log('🎩 Evento de inactividad: 15 minutos sin moverte → HAT aparecerá.');
   })();
 </script>
 </body>
