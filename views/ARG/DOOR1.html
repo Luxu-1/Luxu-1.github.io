@@ -181,14 +181,16 @@
       dialogLines: [
         "* You found your hat",
         "* Even if you already wore one, this is different",
-        "* It looks old and new at the same time",
-        "* Hat form a man who never learned how to stop",
+        "* Hat of a man who never learned to stop",
         "* Almost impossible to see, there were stains on the leather",
         "* Even today, or a thousand years from now...",
         "...time won't help you clean the stains, you know it",
         "* They stay."
       ],
     };
+
+    // ==================== ESTADO DE "SOLO SOMBRERO" ====================
+    let hatModeActive = false; // True cuando HAT ha aparecido y los demás objetos están ocultos
 
     // ==================== DIÁLOGO ====================
     const dialog = {
@@ -218,7 +220,7 @@
 
     // ==================== INACTIVIDAD (15 minutos = 900 segundos) ====================
     const IDLE_THRESHOLD = 15 * 60; // 15 minutos en segundos
-    let idleTimer = 0; // segundos acumulados sin cambio de dirección
+    let idleTimer = 0;
     let idleEventTriggered = false;
 
     // ==================== TECLAS ====================
@@ -471,6 +473,53 @@
     addObject(3, 1, 31, 357, false, null);
     addObject(3, 1, 380, 357, false, null);
 
+    // ==================== FUNCIONES PARA MODO "SOLO SOMBRERO" ====================
+    function enterHatMode() {
+      hatModeActive = true;
+      // Ocultar todos los objetos del mundo (excepto HAT)
+      for (let obj of worldObjects) {
+        obj._originalCollision = obj.collision;
+        obj.collision = false; // Desactivar colisiones
+        obj._hidden = true; // Marcar como oculto para el dibujo
+      }
+      // Ocultar clon y babyKing
+      if (clone.active) {
+        clone._wasActive = true;
+        clone.active = false;
+      }
+      if (babyKing.active) {
+        babyKing._wasActive = true;
+        babyKing.active = false;
+      }
+      console.log('🎩 Modo "Solo sombrero" activado');
+    }
+
+    function exitHatMode() {
+      hatModeActive = false;
+      // Restaurar objetos del mundo
+      for (let obj of worldObjects) {
+        if (obj._originalCollision !== undefined) {
+          obj.collision = obj._originalCollision;
+          delete obj._originalCollision;
+        }
+        delete obj._hidden;
+      }
+      // Restaurar clon y babyKing si estaban activos antes
+      if (clone._wasActive) {
+        clone.active = true;
+        delete clone._wasActive;
+      }
+      if (babyKing._wasActive) {
+        babyKing.active = true;
+        delete babyKing._wasActive;
+      }
+      // Desactivar HAT
+      hat.active = false;
+      hat.talked = false;
+      idleEventTriggered = false;
+      console.log('🎩 Modo "Solo sombrero" desactivado');
+    }
+
     // ==================== COLISIONES ====================
     function rectCollide(r1, r2) {
       return r1.x < r2.x + r2.width &&
@@ -490,6 +539,12 @@
     }
 
     function isCollidingWithWorld(rect) {
+      // Si estamos en modo "solo sombrero", solo HAT tiene colisión
+      if (hatModeActive) {
+        if (hat.active && rectCollide(rect, getCollisionBox(hat))) return true;
+        return false;
+      }
+
       for (let obj of worldObjects) {
         if (!obj.collision) continue;
         if (rectCollide(rect, getCollisionBox(obj))) return true;
@@ -609,6 +664,7 @@
     }
 
     function activateClone() {
+      if (hatModeActive) return; // No activar si estamos en modo sombrero
       clone.active = true;
       clone.x = 250 - CHAR_W/2;
       clone.y = 250 - CHAR_H/2;
@@ -622,6 +678,7 @@
     }
 
     function activateBabyKing() {
+      if (hatModeActive) return; // No activar si estamos en modo sombrero
       babyKing.active = true;
       babyKing.x = 250 - CHAR_W/2;
       babyKing.y = 250 - CHAR_H/2;
@@ -635,6 +692,7 @@
     }
 
     function activateHat() {
+      if (hatModeActive) return;
       hat.active = true;
       hat.x = 250 - CHAR_W/2;
       hat.y = 250 - CHAR_H/2;
@@ -642,6 +700,8 @@
       hat.spriteRow = SPRITES.HAT.row;
       hat.flipX = false;
       hat.talked = false;
+      // Entrar en modo "solo sombrero"
+      enterHatMode();
       console.log('🎩 ¡HAT apareció!');
     }
 
@@ -677,6 +737,11 @@
       } else if (player.x > canvas.width + margin) {
         player.x = -player.width - margin;
         dirsTriggered.push('right');
+      }
+
+      // Si estamos en modo sombrero y el jugador cruza un borde, salir del modo
+      if (hatModeActive && dirsTriggered.length > 0) {
+        exitHatMode();
       }
 
       for (const dir of dirsTriggered) {
@@ -729,11 +794,14 @@
         const dx = (player.x + player.width/2) - (hat.x + hat.width/2);
         const dy = (player.y + player.height/2) - (hat.y + hat.height/2);
         if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
-          startDialog(hat.dialogLines, 'hat');
+          startDialog(hat.dialogLines, 'hat', 'fast'); // <-- TEXTO RÁPIDO
           hat.talked = true;
           return true;
         }
       }
+
+      // Si estamos en modo sombrero, no permitir interactuar con otros objetos
+      if (hatModeActive) return false;
 
       // Objetos del mundo
       for (let obj of worldObjects) {
@@ -773,7 +841,7 @@
 
     // ==================== EVENTO DE INACTIVIDAD (HAT) ====================
     function checkIdleEvent() {
-      if (hat.active || eventSequence || dialog.active) return;
+      if (hat.active || eventSequence || dialog.active || hatModeActive) return;
 
       const isIdle = !keys.up && !keys.down && !keys.left && !keys.right;
 
@@ -935,13 +1003,17 @@
       }
 
       if (sheetLoaded) {
-        for (let obj of worldObjects) {
-          const sx = obj.spriteCol * SPRITE_W;
-          const sy = obj.spriteRow * SPRITE_H;
-          ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, obj.x, obj.y, obj.width, obj.height);
+        // Dibujar objetos del mundo (solo si no estamos en modo sombrero o si no están ocultos)
+        if (!hatModeActive) {
+          for (let obj of worldObjects) {
+            if (obj._hidden) continue;
+            const sx = obj.spriteCol * SPRITE_W;
+            const sy = obj.spriteRow * SPRITE_H;
+            ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, obj.x, obj.y, obj.width, obj.height);
+          }
         }
 
-        if (clone.active) {
+        if (clone.active && !hatModeActive) {
           const sx = clone.spriteCol * SPRITE_W;
           const sy = clone.spriteRow * SPRITE_H;
           ctx.globalAlpha = 0.7;
@@ -949,12 +1021,13 @@
           ctx.globalAlpha = 1.0;
         }
 
-        if (babyKing.active) {
+        if (babyKing.active && !hatModeActive) {
           const sx = babyKing.spriteCol * SPRITE_W;
           const sy = babyKing.spriteRow * SPRITE_H;
           ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, babyKing.x, babyKing.y, babyKing.width, babyKing.height);
         }
 
+        // HAT siempre se dibuja si está activo (incluso en modo sombrero)
         if (hat.active) {
           const sx = hat.spriteCol * SPRITE_W;
           const sy = hat.spriteRow * SPRITE_H;
@@ -1130,6 +1203,9 @@
     window.dialog = dialog;
     window.counters = counters;
     window.keys = keys;
+    window.hatModeActive = hatModeActive;
+    window.exitHatMode = exitHatMode;
+    window.enterHatMode = enterHatMode;
 
     console.log('🎩 Evento de inactividad: 15 minutos sin moverte → HAT aparecerá.');
     console.log('💡 Comandos disponibles en consola: activateClone(), activateBabyKing(), activateHat(), etc.');
