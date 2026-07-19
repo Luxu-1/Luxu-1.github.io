@@ -216,7 +216,6 @@
     // ==================== INACTIVIDAD (15 minutos = 900 segundos) ====================
     const IDLE_THRESHOLD = 15 * 60; // 15 minutos en segundos
     let idleTimer = 0; // segundos acumulados sin cambio de dirección
-    let lastDir = null;
     let idleEventTriggered = false;
 
     // ==================== TECLAS ====================
@@ -632,6 +631,17 @@
       console.log('👑 Baby King activado');
     }
 
+    function activateHat() {
+      hat.active = true;
+      hat.x = 250 - CHAR_W/2;
+      hat.y = 250 - CHAR_H/2;
+      hat.spriteCol = SPRITES.HAT.col;
+      hat.spriteRow = SPRITES.HAT.row;
+      hat.flipX = false;
+      hat.talked = false;
+      console.log('🎩 ¡HAT apareció!');
+    }
+
     function updateCooldowns() {
       if (clone.active && clone.cooldown > 0) {
         clone.cooldown--;
@@ -760,37 +770,21 @@
 
     // ==================== EVENTO DE INACTIVIDAD (HAT) ====================
     function checkIdleEvent() {
-      // Si HAT ya apareció, o hay secuencia, o diálogo activo, no hacer nada
       if (hat.active || eventSequence || dialog.active) return;
 
-      // Verificar si el jugador está quieto (sin movimiento de teclas)
       const isIdle = !keys.up && !keys.down && !keys.left && !keys.right;
 
-      // Si se está moviendo, resetear el temporizador
       if (!isIdle) {
         idleTimer = 0;
         return;
       }
 
-      // Incrementar el temporizador de inactividad (en segundos)
-      idleTimer += 1/60; // ~16.6ms por frame
+      idleTimer += 1/60;
 
-      // Si supera el umbral, activar HAT
       if (idleTimer >= IDLE_THRESHOLD && !idleEventTriggered) {
         idleEventTriggered = true;
         activateHat();
       }
-    }
-
-    function activateHat() {
-      hat.active = true;
-      hat.x = 250 - CHAR_W/2;
-      hat.y = 250 - CHAR_H/2;
-      hat.spriteCol = SPRITES.HAT.col;
-      hat.spriteRow = SPRITES.HAT.row;
-      hat.flipX = false;
-      hat.talked = false;
-      console.log('🎩 ¡HAT apareció por inactividad! (15 minutos)');
     }
 
     // ==================== UPDATE ====================
@@ -801,7 +795,6 @@
         return;
       }
 
-      // Verificar inactividad (cada frame)
       checkIdleEvent();
 
       let dx=0, dy=0;
@@ -1114,7 +1107,29 @@
 
     setupTouchControls();
     tryPlayBgMusic();
+
+    // ==================== EXPONER AL ÁMBITO GLOBAL (para consola) ====================
+    window.activateClone = activateClone;
+    window.activateBabyKing = activateBabyKing;
+    window.activateHat = activateHat;
+    window.startCloneSequence = startCloneSequence;
+    window.startBabyKingSequence = startBabyKingSequence;
+    window.checkIdleEvent = checkIdleEvent;
+    window.checkInteraction = checkInteraction;
+    window.startDialog = startDialog;
+    window.idleTimer = idleTimer;
+    window.clone = clone;
+    window.babyKing = babyKing;
+    window.hat = hat;
+    window.player = player;
+    window.worldObjects = worldObjects;
+    window.eventSequence = eventSequence;
+    window.dialog = dialog;
+    window.counters = counters;
+    window.keys = keys;
+
     console.log('🎩 Evento de inactividad: 15 minutos sin moverte → HAT aparecerá.');
+    console.log('💡 Comandos disponibles en consola: activateClone(), activateBabyKing(), activateHat(), etc.');
   })();
 </script>
 </body>
