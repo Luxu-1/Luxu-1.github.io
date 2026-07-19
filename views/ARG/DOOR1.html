@@ -179,11 +179,14 @@
       flipX: false,
       talked: false,
       dialogLines: [
-        "* Oh, you finally stopped moving...",
-        "* I've been watching you from the shadows.",
-        "* The kingdom is changing, can't you feel it?",
-        "* When the time comes, you'll understand.",
-        "* ... or maybe not. Hehe."
+        "* You found your hat",
+        "* Even if you already wore one, this is different",
+        "* It looks old and new at the same time",
+        "* Hat form a man who never learned how to stop",
+        "* Almost impossible to see, there were stains on the leather",
+        "* Even today, or a thousand years from now...",
+        "...time won't help you clean the stains, you know it",
+        "* They stay."
       ],
     };
 
@@ -368,7 +371,7 @@
           const currentChar = dialog.text[dialog.charIndex];
           dialog.displayText += currentChar;
           dialog.charIndex++;
-          const isSlow = (dialog.speaker === 'clone' || dialog.speaker === 'babyKing' || dialog.speaker === 'hat');
+          const isSlow = (dialog.speaker === 'clone' || dialog.speaker === 'babyKing');
           playTickSound(isSlow, currentChar, dialog.speaker);
         } else {
           dialog.complete = true;
@@ -726,7 +729,7 @@
         const dx = (player.x + player.width/2) - (hat.x + hat.width/2);
         const dy = (player.y + player.height/2) - (hat.y + hat.height/2);
         if (Math.sqrt(dx*dx + dy*dy) < interactDist) {
-          startDialog(hat.dialogLines, 'hat', 'slow');
+          startDialog(hat.dialogLines, 'hat');
           hat.talked = true;
           return true;
         }
