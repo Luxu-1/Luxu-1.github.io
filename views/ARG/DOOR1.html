@@ -37,31 +37,58 @@
     @media (pointer: fine) { .controls-info .pc-only { display:inline-block; } .controls-info .mobile-only { display:none; } }
     @media (max-width:560px) { canvas { width:90vw; height:90vw; max-width:500px; max-height:500px; } .game-container { padding:6px; } .crt-overlay { top:6px; left:6px; width:calc(100% - 12px); height:calc(100% - 12px); } }
 
-    /* ==================== MODO ARCOÍRIS (infecta la UI, NO la King Image) ====================
-       #rainbowTarget envuelve TODA la interfaz del juego (canvas, CRT overlay,
-       controles táctiles, diálogos) y es lo único que recibe el filtro de
-       matiz (hue-rotate) animado. La King Image se muestra en un <img>
-       independiente (#kingOverlay) que vive FUERA de #rainbowTarget, como
-       hermano directo del body, así que nunca hereda este filtro y se ve
-       siempre nítida y con sus colores originales mientras todo a su
-       alrededor cambia de color. La transición usa ease-in-out y una
-       duración larga para que se sienta como un degradado continuo. */
-    @keyframes rainbowShift {
-      0%   { filter: hue-rotate(0deg)   saturate(1.35) brightness(1.05); }
-      20%  { filter: hue-rotate(72deg)  saturate(1.5)  brightness(1.1); }
-      40%  { filter: hue-rotate(144deg) saturate(1.4)  brightness(1.05); }
-      60%  { filter: hue-rotate(216deg) saturate(1.5)  brightness(1.1); }
-      80%  { filter: hue-rotate(288deg) saturate(1.4)  brightness(1.05); }
-      100% { filter: hue-rotate(360deg) saturate(1.35) brightness(1.05); }
+    /* ==================== MODO ARCOÍRIS (infecta la UI gris con color real) ====================
+       IMPORTANTE: la interfaz es mayormente gris (sin saturación), y un
+       filtro hue-rotate NO tiene ningún efecto visible sobre píxeles grises
+       (rotar un matiz que no existe no cambia nada). Por eso, en vez de
+       hue-rotate, usamos una capa de color real (#colorInfectionLayer) con
+       mix-blend-mode:'color', que toma el brillo/contraste de lo que hay
+       debajo (el gris) y le "inyecta" el matiz que va rotando con el tiempo.
+       Así, el gris progresivamente se "llena" de color, como pediste.
+
+       #colorInfectionLayer se pinta DEBAJO (z-index menor) de:
+         - #kingOverlay (la King Image, siempre intacta)
+         - #babyKingProtected (el sprite de Baby King, siempre intacto)
+       Un blend-mode solo afecta lo que está pintado ANTES/debajo de él, así
+       que todo lo que se pinte después (con z-index mayor) queda protegido
+       automáticamente, sin importar si está anidado adentro o afuera. */
+    #rainbowTarget { position: relative; isolation: isolate; }
+    #colorInfectionLayer {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      pointer-events: none;
+      mix-blend-mode: color;
+      opacity: 0;
+      background-color: hsl(0, 90%, 50%);
+      transition: opacity 0.6s ease;
     }
-    #rainbowTarget.rainbow-mode {
-      animation: rainbowShift 4.5s ease-in-out infinite;
+    @keyframes rainbowHueCycle {
+      0%    { background-color: hsl(0,   90%, 50%); }
+      16.6% { background-color: hsl(60,  90%, 50%); }
+      33.3% { background-color: hsl(120, 90%, 50%); }
+      50%   { background-color: hsl(180, 90%, 50%); }
+      66.6% { background-color: hsl(240, 90%, 50%); }
+      83.3% { background-color: hsl(300, 90%, 50%); }
+      100%  { background-color: hsl(360, 90%, 50%); }
+    }
+    #rainbowTarget.rainbow-mode #colorInfectionLayer {
+      opacity: 0.9;
+      animation: rainbowHueCycle 4.5s linear infinite;
     }
     #kingOverlay {
       position: fixed;
       display: none;
       pointer-events: none;
       z-index: 9999;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+    #babyKingProtected {
+      position: fixed;
+      display: none;
+      pointer-events: none;
+      z-index: 9998;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
     }
@@ -100,10 +127,16 @@
       <button class="action-btn" id="actionBtn">♕</button>
     </div>
   </div>
+
+  <!-- Capa que realmente pinta color sobre el gris (ver comentario arriba) -->
+  <div id="colorInfectionLayer"></div>
 </div>
 
-<!-- King Image: fuera de #rainbowTarget a propósito, para que NUNCA reciba el filtro arcoíris -->
+<!-- King Image: fuera del área que recibe blend, para que NUNCA se tiña -->
 <img id="kingOverlay" alt="">
+
+<!-- Baby King: se dibuja acá (no en el canvas principal) para que NUNCA se tiña -->
+<canvas id="babyKingProtected" width="500" height="500"></canvas>
 
 <script>
   (function() {
@@ -319,6 +352,43 @@
 
     function hideKingOverlay() {
       kingOverlayEl.style.display = 'none';
+    }
+
+    // ==================== CANVAS PROTEGIDO DE BABY KING (colores intactos) ====================
+    // Se dibuja en un canvas transparente aparte, superpuesto exactamente
+    // sobre el canvas principal, con mayor z-index que #colorInfectionLayer.
+    // Así el sprite de Baby King nunca se tiñe, sin importar si el modo
+    // arcoíris está activo o no.
+    const babyKingProtectedCanvas = document.getElementById('babyKingProtected');
+    const babyKingProtectedCtx = babyKingProtectedCanvas.getContext('2d');
+    babyKingProtectedCtx.imageSmoothingEnabled = false;
+
+    function positionBabyKingProtectedCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      babyKingProtectedCanvas.style.width = rect.width + 'px';
+      babyKingProtectedCanvas.style.height = rect.height + 'px';
+      babyKingProtectedCanvas.style.left = rect.left + 'px';
+      babyKingProtectedCanvas.style.top = rect.top + 'px';
+    }
+
+    function renderBabyKingProtected() {
+      const shouldShow = babyKing.active && !hatModeActive && !eventSequence;
+      if (!shouldShow) {
+        if (babyKingProtectedCanvas.style.display !== 'none') {
+          babyKingProtectedCanvas.style.display = 'none';
+          babyKingProtectedCtx.clearRect(0, 0, babyKingProtectedCanvas.width, babyKingProtectedCanvas.height);
+        }
+        return;
+      }
+      if (babyKingProtectedCanvas.style.display !== 'block') {
+        babyKingProtectedCanvas.style.display = 'block';
+        positionBabyKingProtectedCanvas();
+      }
+      babyKingProtectedCtx.clearRect(0, 0, babyKingProtectedCanvas.width, babyKingProtectedCanvas.height);
+      if (!sheetLoaded) return;
+      const sx = babyKing.spriteCol * SPRITE_W;
+      const sy = babyKing.spriteRow * SPRITE_H;
+      babyKingProtectedCtx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, babyKing.x, babyKing.y, babyKing.width, babyKing.height);
     }
 
     // ==================== CARGA DE SPRITE ====================
@@ -1069,7 +1139,7 @@
             // Fallback: si la imagen no cargó, mostramos el sprite en el canvas
             // (este caso raro sí queda sujeto al efecto arcoíris, ya que no hay
             // <img> HTML disponible para protegerlo).
-            ctx.fillStyle = '#000000';
+            ctx.fillStyle = '#3a3a3a';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             const kingSprite = SPRITES.KING;
             const sx = kingSprite.col * SPRITE_W;
@@ -1082,11 +1152,13 @@
             ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, cx, cy, w, h);
           } else {
             // La King Image real se está mostrando vía el <img> HTML (#kingOverlay),
-            // fuera del filtro arcoíris. Acá solo dejamos un fondo negro detrás.
-            ctx.fillStyle = '#000000';
+            // fuera del área de la capa de color. Dejamos un fondo GRIS (no negro)
+            // detrás, para que la capa de color sí tenga brillo sobre el cual pintar.
+            ctx.fillStyle = '#3a3a3a';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
           }
         }
+        renderBabyKingProtected();
         return;
       }
 
@@ -1119,11 +1191,9 @@
           ctx.globalAlpha = 1.0;
         }
 
-        if (babyKing.active && !hatModeActive) {
-          const sx = babyKing.spriteCol * SPRITE_W;
-          const sy = babyKing.spriteRow * SPRITE_H;
-          ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, babyKing.x, babyKing.y, babyKing.width, babyKing.height);
-        }
+        // Baby King ya NO se dibuja acá: se renderiza en su propio canvas
+        // protegido (#babyKingProtected) para que nunca se tiña de color.
+        // Ver renderBabyKingProtected(), llamado al final de draw().
 
         // HAT siempre se dibuja si está activo (incluso en modo sombrero)
         if (hat.active) {
@@ -1152,6 +1222,7 @@
       }
 
       drawDialog();
+      renderBabyKingProtected();
     }
 
     // ==================== GAMELOOP ====================
@@ -1284,6 +1355,7 @@
 
     window.addEventListener('resize', () => {
       if (kingOverlayEl.style.display === 'block') positionKingOverlay();
+      if (babyKingProtectedCanvas.style.display === 'block') positionBabyKingProtectedCanvas();
     });
 
     // ==================== EXPONER AL ÁMBITO GLOBAL (para consola) ====================
@@ -1313,6 +1385,8 @@
     window.showKingOverlay = showKingOverlay;
     window.hideKingOverlay = hideKingOverlay;
     window.positionKingOverlay = positionKingOverlay;
+    window.renderBabyKingProtected = renderBabyKingProtected;
+    window.positionBabyKingProtectedCanvas = positionBabyKingProtectedCanvas;
 
     console.log('🎩 Evento de inactividad: 15 minutos sin moverte → HAT aparecerá.');
     console.log('💡 Comandos disponibles en consola: activateClone(), activateBabyKing(), activateHat(), activateRainbowMode(), deactivateRainbowMode(), etc.');
