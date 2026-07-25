@@ -36,6 +36,24 @@
     @media (pointer: coarse) { .touch-controls { display:flex; } .controls-info .pc-only { display:none; } .controls-info .mobile-only { display:inline-block; } }
     @media (pointer: fine) { .controls-info .pc-only { display:inline-block; } .controls-info .mobile-only { display:none; } }
     @media (max-width:560px) { canvas { width:90vw; height:90vw; max-width:500px; max-height:500px; } .game-container { padding:6px; } .crt-overlay { top:6px; left:6px; width:calc(100% - 12px); height:calc(100% - 12px); } }
+
+    /* ==================== MODO ARCOÍRIS (King Image) ====================
+       Al activarse, aplica un filtro de matiz (hue-rotate) animado sobre TODO
+       el <body> (y por lo tanto sobre todos sus hijos: canvas, CRT overlay,
+       controles táctiles, etc.), como si fuera una única capa de color.
+       La transición usa ease-in-out y una duración larga para que el cambio
+       de color se sienta como un degradado continuo y no como un parpadeo. */
+    @keyframes rainbowShift {
+      0%   { filter: hue-rotate(0deg)   saturate(1.35) brightness(1.05); }
+      20%  { filter: hue-rotate(72deg)  saturate(1.5)  brightness(1.1); }
+      40%  { filter: hue-rotate(144deg) saturate(1.4)  brightness(1.05); }
+      60%  { filter: hue-rotate(216deg) saturate(1.5)  brightness(1.1); }
+      80%  { filter: hue-rotate(288deg) saturate(1.4)  brightness(1.05); }
+      100% { filter: hue-rotate(360deg) saturate(1.35) brightness(1.05); }
+    }
+    body.rainbow-mode {
+      animation: rainbowShift 4.5s ease-in-out infinite;
+    }
   </style>
 </head>
 <body>
@@ -90,7 +108,7 @@
     const CHAR_W = Math.round(SPRITE_W * SCALE);
     const CHAR_H = Math.round(SPRITE_H * SCALE);
     const KING_SCALE = 14;
-    const KING_IMAGE_SCALE = 2.5;
+    const KING_IMAGE_SCALE = 2.8;
     const KING_IMAGE_URL = '/media/texture/In Your Dreams.png';
     const COLLISION_SHRINK = 0.16;
     const COLLISION_Y_OFFSET = 0;
@@ -241,6 +259,17 @@
         if (rightCounterEl) rightCounterEl.textContent = counters.right;
         if (totalStepsEl) totalStepsEl.textContent = counters.total;
       } catch (e) {}
+    }
+
+    // ==================== MODO ARCOÍRIS (efecto tipo Asriel Dreemurr) ====================
+    function activateRainbowMode() {
+      document.body.classList.add('rainbow-mode');
+      console.log('🌈 Modo arcoíris activado (King Image)');
+    }
+
+    function deactivateRainbowMode() {
+      document.body.classList.remove('rainbow-mode');
+      console.log('🌈 Modo arcoíris desactivado');
     }
 
     // ==================== CARGA DE SPRITE ====================
@@ -571,8 +600,13 @@
       eventSequence = 'babyKing';
       sequenceStep = 0;
       sequenceTimer = 0;
+      deactivateRainbowMode(); // por seguridad, siempre arranca limpio
       console.log('👑 Iniciando secuencia de Baby King');
     }
+
+    // Duración (en segundos) que la King Image queda visible con el efecto
+    // arcoíris activo antes de redirigir. Súbelo si quieres que se aprecie más.
+    const KING_RAINBOW_DURATION = 2.5;
 
     function updateSequence() {
       if (!eventSequence) return;
@@ -598,8 +632,18 @@
           if (seconds >= colorDurations[sequenceStep - 1]) {
             sequenceStep++;
             sequenceTimer = 0;
+            if (sequenceStep === 5) {
+              // La King Image está a punto de mostrarse: arranca el modo arcoíris
+              activateRainbowMode();
+            }
           }
         } else if (sequenceStep === 5) {
+          // King Image visible con el efecto arcoíris activo
+          if (seconds >= KING_RAINBOW_DURATION) {
+            sequenceStep = 6;
+            sequenceTimer = 0;
+          }
+        } else if (sequenceStep === 6) {
           window.location.href = ROUTES.babyKing;
           return;
         }
@@ -1206,9 +1250,13 @@
     window.hatModeActive = hatModeActive;
     window.exitHatMode = exitHatMode;
     window.enterHatMode = enterHatMode;
+    window.activateRainbowMode = activateRainbowMode;
+    window.deactivateRainbowMode = deactivateRainbowMode;
 
     console.log('🎩 Evento de inactividad: 15 minutos sin moverte → HAT aparecerá.');
-    console.log('💡 Comandos disponibles en consola: activateClone(), activateBabyKing(), activateHat(), etc.');
+    console.log('💡 Comandos disponibles en consola: activateClone(), activateBabyKing(), activateHat(), activateRainbowMode(), deactivateRainbowMode(), etc.');
+
+    gameLoop();
   })();
 </script>
 </body>
