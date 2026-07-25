@@ -37,12 +37,15 @@
     @media (pointer: fine) { .controls-info .pc-only { display:inline-block; } .controls-info .mobile-only { display:none; } }
     @media (max-width:560px) { canvas { width:90vw; height:90vw; max-width:500px; max-height:500px; } .game-container { padding:6px; } .crt-overlay { top:6px; left:6px; width:calc(100% - 12px); height:calc(100% - 12px); } }
 
-    /* ==================== MODO ARCOÍRIS (King Image) ====================
-       Al activarse, aplica un filtro de matiz (hue-rotate) animado sobre TODO
-       el <body> (y por lo tanto sobre todos sus hijos: canvas, CRT overlay,
-       controles táctiles, etc.), como si fuera una única capa de color.
-       La transición usa ease-in-out y una duración larga para que el cambio
-       de color se sienta como un degradado continuo y no como un parpadeo. */
+    /* ==================== MODO ARCOÍRIS (infecta la UI, NO la King Image) ====================
+       #rainbowTarget envuelve TODA la interfaz del juego (canvas, CRT overlay,
+       controles táctiles, diálogos) y es lo único que recibe el filtro de
+       matiz (hue-rotate) animado. La King Image se muestra en un <img>
+       independiente (#kingOverlay) que vive FUERA de #rainbowTarget, como
+       hermano directo del body, así que nunca hereda este filtro y se ve
+       siempre nítida y con sus colores originales mientras todo a su
+       alrededor cambia de color. La transición usa ease-in-out y una
+       duración larga para que se sienta como un degradado continuo. */
     @keyframes rainbowShift {
       0%   { filter: hue-rotate(0deg)   saturate(1.35) brightness(1.05); }
       20%  { filter: hue-rotate(72deg)  saturate(1.5)  brightness(1.1); }
@@ -51,42 +54,56 @@
       80%  { filter: hue-rotate(288deg) saturate(1.4)  brightness(1.05); }
       100% { filter: hue-rotate(360deg) saturate(1.35) brightness(1.05); }
     }
-    body.rainbow-mode {
+    #rainbowTarget.rainbow-mode {
       animation: rainbowShift 4.5s ease-in-out infinite;
+    }
+    #kingOverlay {
+      position: fixed;
+      display: none;
+      pointer-events: none;
+      z-index: 9999;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
     }
   </style>
 </head>
 <body>
-<div class="game-wrapper">
-  <div class="game-container">
-    <canvas id="gameCanvas" width="500" height="500"></canvas>
-    <div class="crt-overlay"></div>
-  </div>
-
-  <!-- INFO-BAR OCULTA -->
-  <div class="info-bar">
-    <span>⬆ <span id="upCounter" class="highlight">0</span></span>
-    <span>⬇ <span id="downCounter" class="highlight">0</span></span>
-    <span>⬅ <span id="leftCounter" class="highlight">0</span></span>
-    <span>➡ <span id="rightCounter" class="highlight">0</span></span>
-    <span>🚶 <span id="totalSteps" class="highlight">0</span></span>
-  </div>
-
-  <div class="controls-info">
-    <span class="pc-only">WASD / Flechas · Z = correr (mantener) / hablar (quieto)</span>
-    <span class="mobile-only">Botones táctiles</span>
-  </div>
-
-  <div class="touch-controls" id="touchControls">
-    <div class="dpad" id="dpad">
-      <button class="dpad-btn dpad-up" data-dir="up">▲</button>
-      <button class="dpad-btn dpad-down" data-dir="down">▼</button>
-      <button class="dpad-btn dpad-left" data-dir="left">◀</button>
-      <button class="dpad-btn dpad-right" data-dir="right">▶</button>
+<!-- #rainbowTarget: TODO lo que debe "infectarse" de color vive adentro -->
+<div id="rainbowTarget">
+  <div class="game-wrapper">
+    <div class="game-container">
+      <canvas id="gameCanvas" width="500" height="500"></canvas>
+      <div class="crt-overlay"></div>
     </div>
-    <button class="action-btn" id="actionBtn">♕</button>
+
+    <!-- INFO-BAR OCULTA -->
+    <div class="info-bar">
+      <span>⬆ <span id="upCounter" class="highlight">0</span></span>
+      <span>⬇ <span id="downCounter" class="highlight">0</span></span>
+      <span>⬅ <span id="leftCounter" class="highlight">0</span></span>
+      <span>➡ <span id="rightCounter" class="highlight">0</span></span>
+      <span>🚶 <span id="totalSteps" class="highlight">0</span></span>
+    </div>
+
+    <div class="controls-info">
+      <span class="pc-only">WASD / Flechas · Z = correr (mantener) / hablar (quieto)</span>
+      <span class="mobile-only">Botones táctiles</span>
+    </div>
+
+    <div class="touch-controls" id="touchControls">
+      <div class="dpad" id="dpad">
+        <button class="dpad-btn dpad-up" data-dir="up">▲</button>
+        <button class="dpad-btn dpad-down" data-dir="down">▼</button>
+        <button class="dpad-btn dpad-left" data-dir="left">◀</button>
+        <button class="dpad-btn dpad-right" data-dir="right">▶</button>
+      </div>
+      <button class="action-btn" id="actionBtn">♕</button>
+    </div>
   </div>
 </div>
+
+<!-- King Image: fuera de #rainbowTarget a propósito, para que NUNCA reciba el filtro arcoíris -->
+<img id="kingOverlay" alt="">
 
 <script>
   (function() {
@@ -261,15 +278,47 @@
       } catch (e) {}
     }
 
-    // ==================== MODO ARCOÍRIS (efecto tipo Asriel Dreemurr) ====================
+    // ==================== MODO ARCOÍRIS (infecta la UI, la King Image queda intacta) ====================
+    const rainbowTargetEl = document.getElementById('rainbowTarget');
+    const kingOverlayEl = document.getElementById('kingOverlay');
+    kingOverlayEl.src = KING_IMAGE_URL;
+
     function activateRainbowMode() {
-      document.body.classList.add('rainbow-mode');
-      console.log('🌈 Modo arcoíris activado (King Image)');
+      rainbowTargetEl.classList.add('rainbow-mode');
+      console.log('🌈 Modo arcoíris activado (la UI se infecta, la King Image queda intacta)');
     }
 
     function deactivateRainbowMode() {
-      document.body.classList.remove('rainbow-mode');
+      rainbowTargetEl.classList.remove('rainbow-mode');
       console.log('🌈 Modo arcoíris desactivado');
+    }
+
+    // Posiciona el <img> de la King Image exactamente encima del canvas,
+    // usando coordenadas de viewport (position: fixed), para que quede
+    // pixel-perfect sin importar si el canvas se ve a 500px o escalado (mobile).
+    function positionKingOverlay() {
+      const rect = canvas.getBoundingClientRect();
+      const scaleFactor = rect.width / canvas.width; // canvas.width interno = 500
+      const naturalW = kingImage.naturalWidth || SPRITE_W;
+      const naturalH = kingImage.naturalHeight || SPRITE_H;
+      const w = naturalW * KING_IMAGE_SCALE * scaleFactor;
+      const h = naturalH * KING_IMAGE_SCALE * scaleFactor;
+      const left = rect.left + (rect.width - w) / 2;
+      const top = rect.top + (rect.height - h) / 2;
+      kingOverlayEl.style.width = w + 'px';
+      kingOverlayEl.style.height = h + 'px';
+      kingOverlayEl.style.left = left + 'px';
+      kingOverlayEl.style.top = top + 'px';
+    }
+
+    function showKingOverlay() {
+      if (!kingImageLoaded) return;
+      positionKingOverlay();
+      kingOverlayEl.style.display = 'block';
+    }
+
+    function hideKingOverlay() {
+      kingOverlayEl.style.display = 'none';
     }
 
     // ==================== CARGA DE SPRITE ====================
@@ -601,6 +650,7 @@
       sequenceStep = 0;
       sequenceTimer = 0;
       deactivateRainbowMode(); // por seguridad, siempre arranca limpio
+      hideKingOverlay();
       console.log('👑 Iniciando secuencia de Baby King');
     }
 
@@ -634,11 +684,14 @@
             sequenceTimer = 0;
             if (sequenceStep === 5) {
               // La King Image está a punto de mostrarse: arranca el modo arcoíris
+              // (infecta la UI) y muestra la imagen intacta encima.
               activateRainbowMode();
+              showKingOverlay();
             }
           }
         } else if (sequenceStep === 5) {
-          // King Image visible con el efecto arcoíris activo
+          // King Image visible e intacta, con el efecto arcoíris infectando el resto de la UI
+          positionKingOverlay(); // por si cambia el tamaño de ventana/orientación
           if (seconds >= KING_RAINBOW_DURATION) {
             sequenceStep = 6;
             sequenceTimer = 0;
@@ -1012,25 +1065,26 @@
           if (color) {
             ctx.fillStyle = color;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+          } else if (!kingImageLoaded) {
+            // Fallback: si la imagen no cargó, mostramos el sprite en el canvas
+            // (este caso raro sí queda sujeto al efecto arcoíris, ya que no hay
+            // <img> HTML disponible para protegerlo).
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const kingSprite = SPRITES.KING;
+            const sx = kingSprite.col * SPRITE_W;
+            const sy = kingSprite.row * SPRITE_H;
+            const w = SPRITE_W * KING_SCALE;
+            const h = SPRITE_H * KING_SCALE;
+            const cx = (canvas.width - w) / 2;
+            const cy = (canvas.height - h) / 2;
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, cx, cy, w, h);
           } else {
-            if (kingImageLoaded) {
-              const w = kingImage.width * KING_IMAGE_SCALE;
-              const h = kingImage.height * KING_IMAGE_SCALE;
-              const cx = (canvas.width - w) / 2;
-              const cy = (canvas.height - h) / 2;
-              ctx.imageSmoothingEnabled = false;
-              ctx.drawImage(kingImage, cx, cy, w, h);
-            } else {
-              const kingSprite = SPRITES.KING;
-              const sx = kingSprite.col * SPRITE_W;
-              const sy = kingSprite.row * SPRITE_H;
-              const w = SPRITE_W * KING_SCALE;
-              const h = SPRITE_H * KING_SCALE;
-              const cx = (canvas.width - w) / 2;
-              const cy = (canvas.height - h) / 2;
-              ctx.imageSmoothingEnabled = false;
-              ctx.drawImage(spriteSheet, sx, sy, SPRITE_W, SPRITE_H, cx, cy, w, h);
-            }
+            // La King Image real se está mostrando vía el <img> HTML (#kingOverlay),
+            // fuera del filtro arcoíris. Acá solo dejamos un fondo negro detrás.
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
           }
         }
         return;
@@ -1228,6 +1282,10 @@
     setupTouchControls();
     tryPlayBgMusic();
 
+    window.addEventListener('resize', () => {
+      if (kingOverlayEl.style.display === 'block') positionKingOverlay();
+    });
+
     // ==================== EXPONER AL ÁMBITO GLOBAL (para consola) ====================
     window.activateClone = activateClone;
     window.activateBabyKing = activateBabyKing;
@@ -1252,6 +1310,9 @@
     window.enterHatMode = enterHatMode;
     window.activateRainbowMode = activateRainbowMode;
     window.deactivateRainbowMode = deactivateRainbowMode;
+    window.showKingOverlay = showKingOverlay;
+    window.hideKingOverlay = hideKingOverlay;
+    window.positionKingOverlay = positionKingOverlay;
 
     console.log('🎩 Evento de inactividad: 15 minutos sin moverte → HAT aparecerá.');
     console.log('💡 Comandos disponibles en consola: activateClone(), activateBabyKing(), activateHat(), activateRainbowMode(), deactivateRainbowMode(), etc.');
