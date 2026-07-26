@@ -459,37 +459,46 @@
       return speaker && typeof speaker === 'object' && speaker.col === 0 && speaker.row === 1;
     }
 
-    function playTickSound(lowPitch = false, char = '', speaker = null) {
-      if (char === ' ') return;
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+function playTickSound(lowPitch = false, char = '', speaker = null) {
+  if (char === ' ') return;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
 
-        const isAngelSpeaker = isAngel(speaker);
-        if (isAngelSpeaker) {
-          osc.type = 'sine';
-          osc.frequency.value = 1200 + Math.random() * 100;
-          gain.gain.value = 0.025;
-          osc.start();
-          osc.stop(audioCtx.currentTime + 0.05);
-        } else {
-          osc.type = 'square';
-          if (lowPitch) {
-            osc.frequency.value = 50 + Math.random() * 200;
-            gain.gain.value = 0.09;
-          } else {
-            osc.frequency.value = 800 + Math.random() * 200;
-            gain.gain.value = 0.03;
-          }
-          osc.start();
-          osc.stop(audioCtx.currentTime + 0.03);
-        }
-      } catch (e) {}
+    const isAngelSpeaker = isAngel(speaker);
+    if (isAngelSpeaker) {
+      // Ángel: notas suaves de piano (agudas)
+      const notes = [698, 784, 880, 988, 1047];
+      osc.type = 'sine';
+      osc.frequency.value = notes[Math.floor(Math.random() * notes.length)];
+      gain.gain.value = 0.015;
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.08);
+    } else if (lowPitch) {
+      // Slow: notas graves y lentas
+      const notes = [110, 147, 165, 196, 220];
+      osc.type = 'sine';
+      osc.frequency.value = notes[Math.floor(Math.random() * notes.length)];
+      gain.gain.value = 0.06;
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.12);
+    } else {
+      // Piano normal
+      const notes = [523, 587, 659, 698, 784];
+      osc.type = 'sine';
+      osc.frequency.value = notes[Math.floor(Math.random() * notes.length)];
+      gain.gain.value = 0.02;
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.04);
     }
-
+  } catch (e) {}
+}
     // ==================== DIÁLOGO ====================
     function startDialog(textOrLines, speaker, speed = 'slow') {
       if (dialog.active || dialogCooldown > 0) return;
