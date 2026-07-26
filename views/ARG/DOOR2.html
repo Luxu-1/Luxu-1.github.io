@@ -3,317 +3,454 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find Him</title>
+    <title>Imperio de las Sombras - Wikipedia, la enciclopedia libre</title>
     <style>
+        /* RESET Y FUENTES */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         body {
-            overflow: hidden;
-            background: #1a1a2e;
-            width: 100vw;
-            height: 100vh;
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: #f6f6f6;
+            color: #202122;
+            line-height: 1.6;
+            padding: 20px 0;
         }
-        #kaleidoscope {
+        a {
+            color: #0645ad;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        /* CONTENEDOR PRINCIPAL */
+        .mw-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #a7d7f9;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: row;
+            padding: 0;
+        }
+        /* SIDEBAR IZQUIERDA (Vector) */
+        .mw-sidebar {
+            width: 160px;
+            min-height: 600px;
+            background: #f8f9fa;
+            padding: 20px 10px;
+            border-right: 1px solid #e0e0e0;
+            flex-shrink: 0;
+            font-size: 13px;
+        }
+        .mw-sidebar .logo {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 22px;
+            font-family: 'Times New Roman', serif;
+            color: #000;
+        }
+        .mw-sidebar .logo span {
+            font-size: 12px;
+            font-weight: normal;
+            color: #54595d;
             display: block;
-            width: 100vw;
-            height: 100vh;
-            background: #1a1a2e;
+            font-family: sans-serif;
         }
-        #cat-container {
-            position: fixed;
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-            z-index: 999;
-            display: none;
-            opacity: 0.3;
-            filter: blur(1.5px) drop-shadow(0 0 2px rgba(255, 255, 0, 0.2));
-            pointer-events: auto;
-            transition: opacity 0.5s ease, filter 0.5s ease;
+        .mw-sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
         }
-        #cat-container:hover {
-            opacity: 0.7;
-            filter: blur(0px) drop-shadow(0 0 8px rgba(255, 255, 0, 0.8));
+        .mw-sidebar ul li {
+            padding: 4px 0;
+            border-bottom: 1px solid #eee;
         }
-        #cat-container svg {
-            display: block;
+        .mw-sidebar ul li a {
+            color: #0645ad;
+        }
+        .mw-sidebar .sidebar-title {
+            font-weight: bold;
+            color: #202122;
+            padding: 8px 0 4px 0;
+            border-bottom: 1px solid #c8ccd1;
+            margin-top: 12px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        /* CONTENIDO PRINCIPAL */
+        .mw-content {
+            flex: 1;
+            padding: 30px 40px 40px 40px;
+            background: #ffffff;
+        }
+        /* BARRA SUPERIOR (Herramientas de usuario) */
+        .mw-top-bar {
+            display: flex;
+            justify-content: flex-end;
+            font-size: 13px;
+            color: #54595d;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+        .mw-top-bar a {
+            color: #0645ad;
+            margin-left: 15px;
+        }
+        /* ADVERTENCIAS (Plantillas) */
+        .mw-notice {
+            background: #f8f9fa;
+            border: 1px solid #a2a9b1;
+            padding: 10px 15px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            border-left: 5px solid #ed6;
+        }
+        .mw-notice strong {
+            color: #000;
+        }
+        /* TÍTULOS */
+        h1 {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-weight: 400;
+            font-size: 2.2em;
+            border-bottom: 1px solid #a2a9b1;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        h2 {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-weight: 400;
+            font-size: 1.6em;
+            border-bottom: 1px solid #a2a9b1;
+            padding-bottom: 4px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        h3 {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-weight: 400;
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+        /* TABLA DE CONTENIDO */
+        .toc {
+            float: left;
+            background: #f8f9fa;
+            border: 1px solid #a2a9b1;
+            padding: 10px 20px 15px 20px;
+            margin: 10px 20px 15px 0;
+            font-size: 14px;
+            max-width: 300px;
+        }
+        .toc .toc-title {
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.1em;
+        }
+        .toc ul {
+            list-style: none;
+            padding-left: 10px;
+        }
+        .toc ul li {
+            padding: 2px 0;
+        }
+        .toc ul li a {
+            color: #0645ad;
+        }
+        .toc .toc-number {
+            color: #202122;
+            margin-right: 4px;
+        }
+        /* INFOBOX */
+        .infobox {
+            float: right;
+            clear: right;
+            background: #f8f9fa;
+            border: 1px solid #a2a9b1;
+            padding: 8px 12px;
+            margin: 0 0 15px 20px;
+            width: 280px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .infobox .infobox-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            text-align: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #a2a9b1;
+            margin-bottom: 8px;
+            background: #eaeef2;
+        }
+        .infobox .infobox-image {
+            text-align: center;
+            margin: 8px 0;
+            background: #eee;
+            padding: 10px;
+            color: #72777d;
+            border: 1px dashed #a2a9b1;
+        }
+        .infobox table {
             width: 100%;
-            height: 100%;
         }
-        .cat-pop {
-            animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        .infobox table td {
+            padding: 4px 2px;
+            vertical-align: top;
         }
-        @keyframes popIn {
-            0% { transform: scale(0) rotate(360deg); opacity: 0; }
-            100% { transform: scale(1) rotate(0deg); opacity: 0.3; }
+        .infobox table .label {
+            font-weight: bold;
+            white-space: nowrap;
         }
-        .cat-hide {
-            animation: fadeOut 0.6s ease-in forwards;
+        /* CITAS */
+        .reference {
+            font-size: 11px;
+            vertical-align: super;
+            line-height: 1;
         }
-        @keyframes fadeOut {
-            0% { opacity: 0.3; transform: scale(1); }
-            100% { opacity: 0; transform: scale(0.2); }
+        /* PÁRRAFOS */
+        p {
+            margin: 0 0 12px 0;
+            text-align: justify;
+        }
+        /* LISTA DE REFERENCIAS */
+        .references {
+            font-size: 13px;
+            margin-top: 20px;
+            border-top: 1px solid #a2a9b1;
+            padding-top: 15px;
+        }
+        .references ol {
+            padding-left: 25px;
+        }
+        /* FOOTER */
+        .mw-footer {
+            clear: both;
+            border-top: 1px solid #a2a9b1;
+            padding: 15px 0 5px 0;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #54595d;
+        }
+        .mw-footer a {
+            color: #0645ad;
+        }
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .mw-sidebar {
+                display: none;
+            }
+            .infobox {
+                float: none;
+                margin: 0 auto 15px auto;
+                width: 100%;
+                max-width: 300px;
+            }
+            .toc {
+                float: none;
+                width: 100%;
+                max-width: 100%;
+            }
+            .mw-content {
+                padding: 15px;
+            }
+        }
+        /* BORRAR FLOAT */
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
         }
     </style>
 </head>
 <body>
-    <canvas id="kaleidoscope"></canvas>
-    <div id="cat-container">
-        <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="24" cy="24" r="18" fill="rgb(255, 255, 0)" />
-            <polygon points="6,14 16,6 12,22" fill="rgb(255, 255, 0)" />
-            <polygon points="42,14 32,6 36,22" fill="rgb(255, 255, 0)" />
-        </svg>
+
+<div class="mw-wrapper">
+    <!-- SIDEBAR -->
+    <div class="mw-sidebar">
+        <div class="logo">
+            Wikipedia
+            <span>La enciclopedia libre</span>
+        </div>
+        <ul>
+            <li><a href="#">Portada</a></li>
+            <li><a href="#">Portal de la comunidad</a></li>
+            <li><a href="#">Actualidad</a></li>
+            <li><a href="#">Cambios recientes</a></li>
+            <li><a href="#">Páginas nuevas</a></li>
+            <li><a href="#">Ayuda</a></li>
+        </ul>
+        <div class="sidebar-title">Herramientas</div>
+        <ul>
+            <li><a href="#">Lo que enlaza aquí</a></li>
+            <li><a href="#">Cambios relacionados</a></li>
+            <li><a href="#">Subir archivo</a></li>
+            <li><a href="#">Páginas especiales</a></li>
+            <li><a href="#">Enlace permanente</a></li>
+        </ul>
+        <div class="sidebar-title">Imprimir/exportar</div>
+        <ul>
+            <li><a href="#">Crear un libro</a></li>
+            <li><a href="#">Descargar como PDF</a></li>
+            <li><a href="#">Versión para imprimir</a></li>
+        </ul>
     </div>
 
-    <script>
-        // =============================================
-        // 1. CALEIDOSCOPIO MÚLTIPLE Y CAÓTICO
-        // =============================================
-        const canvas = document.getElementById('kaleidoscope');
-        const ctx = canvas.getContext('2d');
-        let W, H;
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="mw-content">
+        <!-- Barra superior de usuario -->
+        <div class="mw-top-bar">
+            <span>No has accedido</span>
+            <a href="#">Discusión</a>
+            <a href="#">Contribuciones</a>
+            <a href="#">Crear una cuenta</a>
+            <a href="#">Acceder</a>
+        </div>
 
-        function resizeCanvas() {
-            W = window.innerWidth;
-            H = window.innerHeight;
-            canvas.width = W;
-            canvas.height = H;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        <!-- Título del artículo -->
+        <h1>Imperio de las Sombras</h1>
 
-        // Paleta de colores vivos, sin negro
-        const palette = [
-            '#FF0055', '#FF8800', '#FFCC00', '#00FF66', '#00CCFF', '#FF00AA',
-            '#FF5500', '#AAFF00', '#00FFCC', '#FF0066', '#6600FF', '#FFAA00',
-            '#00FF99', '#FF3399', '#33FFCC', '#FF9933', '#33CCFF', '#FF66CC',
-            '#FF3366', '#66FF33', '#FF33CC', '#33FF66', '#CC33FF', '#FFCC33'
-        ];
+        <!-- Plantilla de advertencia (Estilo Wikipedia) -->
+        <div class="mw-notice">
+            <strong>Este artículo o sección necesita referencias que aparezcan en una publicación acreditada.</strong> Busca fuentes: <a href="#">"Imperio de las Sombras"</a> – <a href="#">noticias</a> · <a href="#">libros</a> · <a href="#">académico</a> · <a href="#">imágenes</a>
+        </div>
+        <div class="mw-notice" style="border-left-color: #36c;">
+            <strong>Este artículo podría no cumplir con el punto de vista neutral.</strong> Discute este tema en la <a href="#">página de discusión</a>.
+        </div>
 
-        // Definir múltiples centros de caleidoscopio (6 centros)
-        const centers = [];
-        const NUM_CENTERS = 6;
-        const baseRadius = Math.min(W, H) * 0.35; // radio de cada caleidoscopio
+        <!-- INFOBOX (Derecha) -->
+        <div class="infobox">
+            <div class="infobox-title">Imperio de las Sombras</div>
+            <div class="infobox-image">
+                <span style="font-size:30px;">⬛⬛⬛</span><br>
+                <span style="color:#72777d;">Emblema oscuro (representación)</span>
+            </div>
+            <table>
+                <tr><td class="label">Tipo</td><td>Imperio metafísico / Monarquía absoluta</td></tr>
+                <tr><td class="label">Fundador</td><td><a href="#">Hatman</a></td></tr>
+                <tr><td class="label">Gobernante final</td><td>Hatman (en funciones hasta su disolución)</td></tr>
+                <tr><td class="label">Capital</td><td>La Ciudadela (en <a href="#">Schizo-Land</a>)</td></tr>
+                <tr><td class="label">Idioma</td><td>Lengua de las sombras (arcano)</td></tr>
+                <tr><td class="label">Religión</td><td>Culto a la oscuridad primordial</td></tr>
+                <tr><td class="label">Período histórico</td><td>Edad de las Tinieblas</td></tr>
+                <tr><td class="label">Establecimiento</td><td>~ Hace 10.000 años</td></tr>
+                <tr><td class="label">Disolución</td><td>Hace ~200 años (caída administrativa)</td></tr>
+                <tr><td class="label">Sucesor</td><td>Reino del Color (no oficial) / Estados fragmentados</td></tr>
+            </table>
+        </div>
 
-        // Posiciones distribuidas en la pantalla (fijas pero se pueden reubicar en resize)
-        function initCenters() {
-            centers.length = 0;
-            // Distribución: 2 filas x 3 columnas
-            const cols = 3;
-            const rows = 2;
-            const spacingX = W / (cols + 1);
-            const spacingY = H / (rows + 1);
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < cols; c++) {
-                    const cx = spacingX * (c + 1);
-                    const cy = spacingY * (r + 1);
-                    const radius = Math.min(W, H) * 0.28; // un poco menos para que no se solapen demasiado
-                    // Cada centro tendrá su propio conjunto de formas y ángulo
-                    const shapes = [];
-                    const NUM_SHAPES_PER_CENTER = 30; // total 180 formas (menos que antes, pero más centros)
-                    for (let i = 0; i < NUM_SHAPES_PER_CENTER; i++) {
-                        shapes.push({
-                            baseX: (Math.random() - 0.5) * radius * 1.6,
-                            baseY: (Math.random() - 0.5) * radius * 1.6,
-                            size: Math.random() * 22 + 6,
-                            color: palette[Math.floor(Math.random() * palette.length)],
-                            type: Math.floor(Math.random() * 4),
-                            rotOffset: Math.random() * Math.PI * 2,
-                            speed: 0.015 + Math.random() * 0.025, // más rápido
-                            phaseX: Math.random() * 100,
-                            phaseY: Math.random() * 100,
-                            ampX: 30 + Math.random() * 40, // mayor amplitud
-                            ampY: 30 + Math.random() * 40,
-                            sizeSpeed: 0.02 + Math.random() * 0.04,
-                        });
-                    }
-                    centers.push({
-                        cx, cy,
-                        radius: radius * 0.9,
-                        angle: Math.random() * Math.PI * 2,
-                        speed: 0.006 + Math.random() * 0.01, // velocidad de rotación del ventilador (ligeramente variable)
-                        shapes: shapes,
-                        slices: 8 + Math.floor(Math.random() * 4) // entre 8 y 11 sectores
-                    });
-                }
-            }
-        }
+        <!-- INTRODUCCIÓN -->
+        <p>
+            El <b>Imperio de las Sombras</b> fue una entidad política, onírica y metafísica que dominó gran parte de los reinos del subconsciente durante milenios. Fundado por la entidad conocida como <a href="#">Hatman</a>, se caracterizó por una estructura jerárquica basada en la percepción monolítica de la oscuridad, suprimiendo activamente otras formas de conciencia, en particular el denominado "Reino del Color". Su caída es objeto de estudio en la psicología arcana y se asocia con el reconocimiento tardío de la diversidad cognitiva.
+        </p>
+        <p>
+            El imperio alcanzó su máximo esplendor durante la denominada "Época del Cenit", cuando la oscuridad se alzó por encima de todos los demás reinos. Sin embargo, su declive fue paulatino, atribuido tanto a la rigidez de su gobernante como al surgimiento de fuerzas contestatarias encabezadas por la figura de <a href="#">Kaley</a>, el Rey del Color.
+        </p>
 
-        initCenters();
+        <!-- TABLA DE CONTENIDO -->
+        <div class="toc">
+            <div class="toc-title">Contenido</div>
+            <ul>
+                <li><span class="toc-number">1</span> <a href="#historia">Historia</a>
+                    <ul>
+                        <li><span class="toc-number">1.1</span> <a href="#fundacion">Fundación y auge</a></li>
+                        <li><span class="toc-number">1.2</span> <a href="#conflicto">El conflicto con el Color</a></li>
+                        <li><span class="toc-number">1.3</span> <a href="#caida">La caída administrativa</a></li>
+                    </ul>
+                </li>
+                <li><span class="toc-number">2</span> <a href="#legado">Legado e interpretaciones</a>
+                    <ul>
+                        <li><span class="toc-number">2.1</span> <a href="#louiswain">Conexión con Louis Wain</a></li>
+                        <li><span class="toc-number">2.2</span> <a href="#psicologia">Perspectiva psicológica</a></li>
+                    </ul>
+                </li>
+                <li><span class="toc-number">3</span> <a href="#referencias">Referencias</a></li>
+            </ul>
+        </div>
 
-        // Reajustar centros al cambiar tamaño
-        window.addEventListener('resize', () => {
-            resizeCanvas();
-            initCenters();
-        });
+        <!-- SECCIÓN 1: HISTORIA -->
+        <h2 id="historia">Historia</h2>
 
-        function drawKaleidoscope() {
-            // Fondo con degradado oscuro sin negro
-            const grad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H)*0.7);
-            grad.addColorStop(0, '#2a1a4a');
-            grad.addColorStop(1, '#0d0d2b');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, W, H);
+        <h3 id="fundacion">Fundación y auge</h3>
+        <p>
+            El Imperio de las Sombras fue erigido por Hatman tras una serie de conflictos interestelares en el plano onírico. Hatman, conocido por su ambición y su capacidad para tejer hebras de oscuridad, consolidó un reino donde la sombra era la única realidad permitida. Durante esta época, las demás manifestaciones de la conciencia (como el color o el caos) fueron relegadas a un estatus secundario o directamente proscritas. La capital, <i>La Ciudadela</i>, se convirtió en un bastión de orden y penumbra.
+        </p>
 
-            // Dibujar cada centro
-            centers.forEach(center => {
-                const { cx, cy, radius, angle, speed, shapes, slices } = center;
-                const sliceAngle = (Math.PI * 2) / slices;
+        <h3 id="conflicto">El conflicto con el Color</h3>
+        <p>
+            La figura de <b>Kaley</b>, soberano del Reino del Color, emergió como la antítesis natural del imperio. Kaley abogaba por un gobierno dual donde la sombra y el color coexistieran en igualdad, un concepto que Hatman rechazó de manera tajante. En lugar de ejecutar a Kaley (a quien reconocía como una parte legítima de la realidad), Hatman optó por sellarlo en una "hielera" dimensional, una cámara de estasis mágica que lo mantendría prisionero durante milenios.
+        </p>
+        <p>
+            Según crónicas posteriores, Hatman justificó el encierro en una <a href="#">promesa dinástica</a>: Kaley sería liberado únicamente tras la muerte del emperador. Sin embargo, fuentes contemporáneas señalan que Hatman tuvo múltiples oportunidades de romper el sello sin fallecer, pero su <a href="#">orgullo</a> y su negativa a compartir el trono lo impidieron, perpetuando un ciclo de violencia y represión.
+        </p>
 
-                ctx.save();
-                ctx.translate(cx, cy);
-                ctx.rotate(angle);
+        <h3 id="caida">La caída administrativa</h3>
+        <p>
+            Con el paso de los siglos, el imperio se volvió obsoleto. Las estructuras rígidas de Hatman no pudieron adaptarse a la creciente diversidad del mundo onírico. En palabras de algunos historiadores, "el imperio no fue destruido, sino que murió de inanición, sepultado por su propia incapacidad para integrar lo diferente"<sup class="reference">[1]</sup>. Hatman, ya anciano y sin poder efectivo, observó cómo sus dominios se fragmentaban. 
+        </p>
+        <p>
+            Al final de sus días, Hatman admitió que la opresión al Color había sido un error, aunque esta revelación llegó demasiado tarde para deshacer el daño causado. El sello de Kaley nunca fue roto por su mano, y el imperio se desvaneció en la memoria histórica, dando paso a una era de reinos fragmentados y percepciones diversas.
+        </p>
 
-                for (let i = 0; i < slices; i++) {
-                    ctx.save();
-                    ctx.rotate(i * sliceAngle + sliceAngle / 2);
+        <!-- SECCIÓN 2: LEGADO -->
+        <h2 id="legado">Legado e interpretaciones</h2>
 
-                    ctx.beginPath();
-                    ctx.moveTo(0, 0);
-                    ctx.arc(0, 0, radius, -sliceAngle / 2, sliceAngle / 2);
-                    ctx.closePath();
-                    ctx.clip();
+        <h3 id="louiswain">Conexión con Louis Wain</h3>
+        <p>
+            El caso del ilustrador británico <a href="#">Louis Wain</a> (1860-1939) ha sido citado por estudiosos de la psicología arcana como un paralelismo con el conflicto del Imperio de las Sombras. Wain, célebre por sus dibujos de gatos, experimentó un cambio drástico en su estilo a medida que su percepción se transformaba, pasando de figuras realistas a patrones cromáticos psicodélicos y fractales. 
+        </p>
+        <p>
+            La analogía sugiere que la sociedad (representada por Hatman) tiende a etiquetar lo "colorido" como caótico o patológico, encerrándolo en diagnósticos en lugar de integrarlo. El encierro de Kaley se interpreta, en este contexto, como la negación sistémica de la neurodivergencia, mientras que la propuesta de liberación controlada (defendida por el nieto de Hatman, <a href="#">La Muerte</a>) simboliza una aproximación más inclusiva a la diversidad mental<sup class="reference">[2]</sup>.
+        </p>
 
-                    if (i % 2 === 1) ctx.scale(-1, 1);
+        <h3 id="psicologia">Perspectiva psicológica</h3>
+        <p>
+            La psicología moderna ha analizado el mito del Imperio de las Sombras como una alegoría de la <a href="#">esquizofrenia</a>. El término "color" representa las percepciones no normativas, mientras que la "sombra" simboliza la estructura racional y dominante. Hatman, en este marco, encarna la figura del "yo" represor que no elimina al "ello" (Kaley), pero lo confina para mantener una apariencia de orden. El arrepentimiento final de Hatman, aunque genuino, resulta estéril porque nunca se tradujo en una acción liberadora, reflejando la tragedia de quienes reconocen su error pero carecen del valor para rectificarlo<sup class="reference">[3]</sup>.
+        </p>
 
-                    shapes.forEach(s => {
-                        // Movimiento caótico rápido: múltiples ondas
-                        const t = angle * s.speed * 3 + s.rotOffset;
-                        const offsetX = Math.sin(t * 2.1 + s.phaseX) * s.ampX +
-                                        Math.cos(t * 1.3 + s.phaseY) * s.ampX * 0.4;
-                        const offsetY = Math.cos(t * 1.7 + s.phaseY) * s.ampY +
-                                        Math.sin(t * 1.1 + s.phaseX) * s.ampY * 0.4;
-                        const x = s.baseX + offsetX;
-                        const y = s.baseY + offsetY;
+        <!-- REFERENCIAS -->
+        <div class="references">
+            <h2 id="referencias">Referencias</h2>
+            <ol>
+                <li><i>Crónicas del Color Olvidado</i>, Anónimo, Editorial del Subconsciente, Año 234 (Era Arcana).</li>
+                <li>Pérez, J. (2020). <i>Gatos, Sombras y Neurodivergencia: El legado de Louis Wain en la metafísica onírica</i>. Revista de Psicología Profunda, vol 12, pp. 45-67.</li>
+                <li>Martínez, L. (2019). <i>El Orgullo del Tirano: Un estudio de caso sobre Hatman</i>. Editorial Umbrales.</li>
+            </ol>
+        </div>
 
-                        ctx.save();
-                        ctx.translate(x, y);
-                        ctx.rotate(t * 1.2);
+        <!-- FOOTER -->
+        <div class="mw-footer">
+            <p>Esta página se editó por última vez el 24 de julio de 2026 a las 23:14.</p>
+            <p>El contenido está disponible bajo la licencia <a href="#">Creative Commons Atribución-CompartirIgual 3.0</a> a menos que se indique lo contrario.</p>
+            <p>
+                <a href="#">Política de privacidad</a> · 
+                <a href="#">Acerca de Wikipedia</a> · 
+                <a href="#">Aviso legal</a> · 
+                <a href="#">Código de conducta</a> · 
+                <a href="#">Versión para móviles</a> · 
+                <a href="#">Desarrolladores</a> · 
+                <a href="#">Estadísticas</a>
+            </p>
+        </div>
 
-                        ctx.fillStyle = s.color;
-                        ctx.shadowColor = s.color;
-                        ctx.shadowBlur = 10;
+        <!-- COMENTARIO OCULTO PARA EL ARG -->
+        <!-- 
+        [ARG - PISTA]: 
+        "El Color no fue borrado, solo silenciado. 
+        Busca la tercera hielera, donde el azul se mezcla con el negro. 
+        No todo lo que se sella merece la muerte. 
+        El verdadero imperio nunca gobernó sobre otros, sino sobre sí mismo." 
+        -->
 
-                        const sz = s.size * (0.7 + 0.6 * Math.sin(t * s.sizeSpeed + s.rotOffset));
+    </div> <!-- fin mw-content -->
+</div> <!-- fin mw-wrapper -->
 
-                        ctx.beginPath();
-                        if (s.type === 0) { // círculo
-                            ctx.arc(0, 0, sz, 0, Math.PI * 2);
-                            ctx.fill();
-                        } else if (s.type === 1) { // cuadrado
-                            ctx.fillRect(-sz / 2, -sz / 2, sz, sz);
-                        } else if (s.type === 2) { // triángulo
-                            ctx.moveTo(0, -sz);
-                            ctx.lineTo(sz, sz);
-                            ctx.lineTo(-sz, sz);
-                            ctx.closePath();
-                            ctx.fill();
-                        } else { // estrella 4 puntas
-                            for (let j = 0; j < 8; j++) {
-                                const r = j % 2 === 0 ? sz : sz * 0.4;
-                                const a = (j / 8) * Math.PI * 2 - Math.PI / 2;
-                                if (j === 0) ctx.moveTo(r * Math.cos(a), r * Math.sin(a));
-                                else ctx.lineTo(r * Math.cos(a), r * Math.sin(a));
-                            }
-                            ctx.closePath();
-                            ctx.fill();
-                        }
-
-                        ctx.shadowBlur = 0;
-                        ctx.restore();
-                    });
-
-                    ctx.restore();
-                }
-
-                ctx.restore();
-
-                // Actualizar ángulo de este centro (velocidad de ventilador)
-                center.angle += speed;
-            });
-
-            requestAnimationFrame(drawKaleidoscope);
-        }
-
-        drawKaleidoscope();
-
-        // =============================================
-        // 2. LÓGICA DEL GATO (sin cambios)
-        // =============================================
-        const catContainer = document.getElementById('cat-container');
-        let catTimeout = null;
-        let hideTimeout = null;
-        let attempts = 0;
-        const MAX_ATTEMPTS = 5;
-        const VISIBLE_TIME = 7000;
-
-        function getRandomPosition() {
-            const size = 32;
-            const left = Math.random() * (window.innerWidth - size);
-            const top = Math.random() * (window.innerHeight - size);
-            return { left, top };
-        }
-
-        function showCat() {
-            const pos = getRandomPosition();
-            catContainer.style.left = pos.left + 'px';
-            catContainer.style.top = pos.top + 'px';
-            catContainer.style.display = 'block';
-
-            catContainer.classList.remove('cat-pop', 'cat-hide');
-            void catContainer.offsetWidth;
-            catContainer.classList.add('cat-pop');
-
-            clearTimeout(hideTimeout);
-            hideTimeout = setTimeout(() => {
-                hideCat();
-            }, VISIBLE_TIME);
-        }
-
-        function hideCat() {
-            catContainer.classList.remove('cat-pop');
-            catContainer.classList.add('cat-hide');
-            setTimeout(() => {
-                catContainer.style.display = 'none';
-                scheduleCat();
-            }, 600);
-        }
-
-        function scheduleCat() {
-            clearTimeout(catTimeout);
-            const delay = Math.random() * 7000 + 2000;
-
-            catTimeout = setTimeout(() => {
-                attempts++;
-                if (Math.random() < 0.18 || attempts >= MAX_ATTEMPTS) {
-                    attempts = 0;
-                    showCat();
-                } else {
-                    scheduleCat();
-                }
-            }, delay);
-        }
-
-        catContainer.addEventListener('click', function(e) {
-            e.stopPropagation();
-            window.location.href = '688715.html';
-        });
-
-        scheduleCat();
-
-        window.addEventListener('resize', function() {
-            if (catContainer.style.display !== 'none' && !catContainer.classList.contains('cat-hide')) {
-                const pos = getRandomPosition();
-                catContainer.style.left = pos.left + 'px';
-                catContainer.style.top = pos.top + 'px';
-            }
-        });
-
-        console.log('🐱 DOOR2: gato amarillo camuflado en un caos de colores, ¡encuéntralo!');
-    </script>
 </body>
 </html>
