@@ -25,9 +25,13 @@
         a:hover {
             text-decoration: underline;
         }
+        a:visited {
+            color: #0b0080;
+        }
+        
         /* CONTENEDOR PRINCIPAL */
         .mw-wrapper {
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto;
             background: #ffffff;
             border: 1px solid #a7d7f9;
@@ -35,43 +39,56 @@
             display: flex;
             flex-direction: row;
             padding: 0;
+            min-height: 100vh;
         }
-        /* SIDEBAR IZQUIERDA (Vector) */
+
+        /* ===== SIDEBAR IZQUIERDA (Vector 2022) ===== */
         .mw-sidebar {
-            width: 160px;
+            width: 176px;
             min-height: 600px;
             background: #f8f9fa;
-            padding: 20px 10px;
+            padding: 20px 12px;
             border-right: 1px solid #e0e0e0;
             flex-shrink: 0;
             font-size: 13px;
+            position: sticky;
+            top: 0;
+            align-self: flex-start;
+            max-height: 100vh;
+            overflow-y: auto;
         }
         .mw-sidebar .logo {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             font-weight: bold;
             font-size: 22px;
-            font-family: 'Times New Roman', serif;
+            font-family: 'Times New Roman', 'Georgia', serif;
             color: #000;
+            line-height: 1.2;
         }
         .mw-sidebar .logo span {
             font-size: 12px;
             font-weight: normal;
             color: #54595d;
             display: block;
-            font-family: sans-serif;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .mw-sidebar .logo img {
+            max-width: 120px;
+            height: auto;
         }
         .mw-sidebar ul {
             list-style: none;
             padding: 0;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         .mw-sidebar ul li {
-            padding: 4px 0;
+            padding: 3px 0;
             border-bottom: 1px solid #eee;
         }
         .mw-sidebar ul li a {
             color: #0645ad;
+            font-size: 12.5px;
         }
         .mw-sidebar .sidebar-title {
             font-weight: bold;
@@ -79,43 +96,57 @@
             padding: 8px 0 4px 0;
             border-bottom: 1px solid #c8ccd1;
             margin-top: 12px;
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        /* CONTENIDO PRINCIPAL */
+
+        /* ===== CONTENIDO PRINCIPAL ===== */
         .mw-content {
             flex: 1;
             padding: 30px 40px 40px 40px;
             background: #ffffff;
+            min-width: 0;
         }
-        /* BARRA SUPERIOR (Herramientas de usuario) */
+
+        /* ===== BARRA SUPERIOR ===== */
         .mw-top-bar {
             display: flex;
             justify-content: flex-end;
-            font-size: 13px;
+            font-size: 12.5px;
             color: #54595d;
             border-bottom: 1px solid #e0e0e0;
             padding-bottom: 8px;
             margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 5px 15px;
         }
         .mw-top-bar a {
             color: #0645ad;
-            margin-left: 15px;
         }
-        /* ADVERTENCIAS (Plantillas) */
+        .mw-top-bar .user-menu {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        /* ===== ADVERTENCIAS ===== */
         .mw-notice {
             background: #f8f9fa;
             border: 1px solid #a2a9b1;
             padding: 10px 15px;
             font-size: 13px;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             border-left: 5px solid #ed6;
         }
         .mw-notice strong {
             color: #000;
         }
-        /* TÍTULOS */
+        .mw-notice-neutral {
+            border-left-color: #36c;
+        }
+
+        /* ===== TÍTULOS ===== */
         h1 {
             font-family: 'Georgia', 'Times New Roman', serif;
             font-weight: 400;
@@ -132,6 +163,7 @@
             padding-bottom: 4px;
             margin-top: 30px;
             margin-bottom: 15px;
+            scroll-margin-top: 20px;
         }
         h3 {
             font-family: 'Georgia', 'Times New Roman', serif;
@@ -139,37 +171,65 @@
             font-size: 1.3em;
             margin-top: 25px;
             margin-bottom: 10px;
+            scroll-margin-top: 20px;
         }
-        /* TABLA DE CONTENIDO */
+
+        /* ===== TABLA DE CONTENIDO (con resaltado activo) ===== */
         .toc {
             float: left;
             background: #f8f9fa;
             border: 1px solid #a2a9b1;
             padding: 10px 20px 15px 20px;
             margin: 10px 20px 15px 0;
-            font-size: 14px;
-            max-width: 300px;
+            font-size: 13.5px;
+            max-width: 320px;
+            width: auto;
         }
         .toc .toc-title {
             font-weight: bold;
             text-align: center;
             font-size: 1.1em;
+            margin-bottom: 5px;
         }
         .toc ul {
             list-style: none;
-            padding-left: 10px;
+            padding-left: 0;
+        }
+        .toc ul ul {
+            padding-left: 20px;
         }
         .toc ul li {
             padding: 2px 0;
+            line-height: 1.4;
         }
         .toc ul li a {
             color: #0645ad;
+        }
+        .toc ul li a:hover {
+            text-decoration: underline;
         }
         .toc .toc-number {
             color: #202122;
             margin-right: 4px;
         }
-        /* INFOBOX */
+        /* === RESALTADO DE SECCIÓN ACTIVA === */
+        .toc ul li a.active-section {
+            font-weight: 700;
+            color: #000000 !important;
+            background: transparent;
+            cursor: default;
+            text-decoration: none;
+        }
+        .toc ul li a.active-section:hover {
+            text-decoration: none;
+            cursor: default;
+        }
+        /* Estilo para los enlaces normales (azul) */
+        .toc ul li a:not(.active-section) {
+            color: #0645ad;
+        }
+
+        /* ===== INFOBOX ===== */
         .infobox {
             float: right;
             clear: right;
@@ -209,18 +269,21 @@
             font-weight: bold;
             white-space: nowrap;
         }
-        /* CITAS */
+
+        /* ===== CITAS ===== */
         .reference {
             font-size: 11px;
             vertical-align: super;
             line-height: 1;
         }
-        /* PÁRRAFOS */
+
+        /* ===== PÁRRAFOS ===== */
         p {
             margin: 0 0 12px 0;
             text-align: justify;
         }
-        /* LISTA DE REFERENCIAS */
+
+        /* ===== REFERENCIAS ===== */
         .references {
             font-size: 13px;
             margin-top: 20px;
@@ -230,7 +293,8 @@
         .references ol {
             padding-left: 25px;
         }
-        /* FOOTER */
+
+        /* ===== FOOTER ===== */
         .mw-footer {
             clear: both;
             border-top: 1px solid #a2a9b1;
@@ -242,8 +306,12 @@
         .mw-footer a {
             color: #0645ad;
         }
-        /* RESPONSIVE */
-        @media (max-width: 900px) {
+        .mw-footer p {
+            text-align: left;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
             .mw-sidebar {
                 display: none;
             }
@@ -259,10 +327,31 @@
                 max-width: 100%;
             }
             .mw-content {
-                padding: 15px;
+                padding: 15px 20px;
             }
         }
-        /* BORRAR FLOAT */
+        @media (max-width: 600px) {
+            body {
+                padding: 0;
+            }
+            .mw-wrapper {
+                border: none;
+                box-shadow: none;
+            }
+            .mw-content {
+                padding: 10px 15px;
+            }
+            .mw-top-bar {
+                font-size: 11px;
+                gap: 3px 10px;
+            }
+            .infobox {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        /* ===== UTILITY ===== */
         .clearfix::after {
             content: "";
             clear: both;
@@ -273,7 +362,7 @@
 <body>
 
 <div class="mw-wrapper">
-    <!-- SIDEBAR -->
+    <!-- ===== SIDEBAR ===== -->
     <div class="mw-sidebar">
         <div class="logo">
             Wikipedia
@@ -303,29 +392,32 @@
         </ul>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL -->
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
     <div class="mw-content">
-        <!-- Barra superior de usuario -->
+
+        <!-- Barra superior -->
         <div class="mw-top-bar">
             <span>No has accedido</span>
-            <a href="#">Discusión</a>
-            <a href="#">Contribuciones</a>
-            <a href="#">Crear una cuenta</a>
-            <a href="#">Acceder</a>
+            <div class="user-menu">
+                <a href="#">Discusión</a>
+                <a href="#">Contribuciones</a>
+                <a href="#">Crear una cuenta</a>
+                <a href="#">Acceder</a>
+            </div>
         </div>
 
-        <!-- Título del artículo -->
+        <!-- Título -->
         <h1>Imperio de las Sombras</h1>
 
-        <!-- Plantilla de advertencia (Estilo Wikipedia) -->
+        <!-- Advertencias -->
         <div class="mw-notice">
             <strong>Este artículo o sección necesita referencias que aparezcan en una publicación acreditada.</strong> Busca fuentes: <a href="#">"Imperio de las Sombras"</a> – <a href="#">noticias</a> · <a href="#">libros</a> · <a href="#">académico</a> · <a href="#">imágenes</a>
         </div>
-        <div class="mw-notice" style="border-left-color: #36c;">
+        <div class="mw-notice mw-notice-neutral">
             <strong>Este artículo podría no cumplir con el punto de vista neutral.</strong> Discute este tema en la <a href="#">página de discusión</a>.
         </div>
 
-        <!-- INFOBOX (Derecha) -->
+        <!-- ===== INFOBOX ===== -->
         <div class="infobox">
             <div class="infobox-title">Imperio de las Sombras</div>
             <div class="infobox-image">
@@ -346,7 +438,7 @@
             </table>
         </div>
 
-        <!-- INTRODUCCIÓN -->
+        <!-- ===== INTRODUCCIÓN ===== -->
         <p>
             El <b>Imperio de las Sombras</b> fue una entidad política, onírica y metafísica que dominó gran parte de los reinos del subconsciente durante milenios. Fundado por la entidad conocida como <a href="#">Hatman</a>, se caracterizó por una estructura jerárquica basada en la percepción monolítica de la oscuridad, suprimiendo activamente otras formas de conciencia, en particular el denominado "Reino del Color". Su caída es objeto de estudio en la psicología arcana y se asocia con el reconocimiento tardío de la diversidad cognitiva.
         </p>
@@ -354,28 +446,28 @@
             El imperio alcanzó su máximo esplendor durante la denominada "Época del Cenit", cuando la oscuridad se alzó por encima de todos los demás reinos. Sin embargo, su declive fue paulatino, atribuido tanto a la rigidez de su gobernante como al surgimiento de fuerzas contestatarias encabezadas por la figura de <a href="#">Kaley</a>, el Rey del Color.
         </p>
 
-        <!-- TABLA DE CONTENIDO -->
-        <div class="toc">
+        <!-- ===== TABLA DE CONTENIDO (con IDs para anclaje y resaltado) ===== -->
+        <div class="toc" id="toc">
             <div class="toc-title">Contenido</div>
             <ul>
-                <li><span class="toc-number">1</span> <a href="#historia">Historia</a>
+                <li><span class="toc-number">1</span> <a href="#historia" class="toc-link" data-target="historia">Historia</a>
                     <ul>
-                        <li><span class="toc-number">1.1</span> <a href="#fundacion">Fundación y auge</a></li>
-                        <li><span class="toc-number">1.2</span> <a href="#conflicto">El conflicto con el Color</a></li>
-                        <li><span class="toc-number">1.3</span> <a href="#caida">La caída administrativa</a></li>
+                        <li><span class="toc-number">1.1</span> <a href="#fundacion" class="toc-link" data-target="fundacion">Fundación y auge</a></li>
+                        <li><span class="toc-number">1.2</span> <a href="#conflicto" class="toc-link" data-target="conflicto">El conflicto con el Color</a></li>
+                        <li><span class="toc-number">1.3</span> <a href="#caida" class="toc-link" data-target="caida">La caída administrativa</a></li>
                     </ul>
                 </li>
-                <li><span class="toc-number">2</span> <a href="#legado">Legado e interpretaciones</a>
+                <li><span class="toc-number">2</span> <a href="#legado" class="toc-link" data-target="legado">Legado e interpretaciones</a>
                     <ul>
-                        <li><span class="toc-number">2.1</span> <a href="#louiswain">Conexión con Louis Wain</a></li>
-                        <li><span class="toc-number">2.2</span> <a href="#psicologia">Perspectiva psicológica</a></li>
+                        <li><span class="toc-number">2.1</span> <a href="#louiswain" class="toc-link" data-target="louiswain">Conexión con Louis Wain</a></li>
+                        <li><span class="toc-number">2.2</span> <a href="#psicologia" class="toc-link" data-target="psicologia">Perspectiva psicológica</a></li>
                     </ul>
                 </li>
-                <li><span class="toc-number">3</span> <a href="#referencias">Referencias</a></li>
+                <li><span class="toc-number">3</span> <a href="#referencias" class="toc-link" data-target="referencias">Referencias</a></li>
             </ul>
         </div>
 
-        <!-- SECCIÓN 1: HISTORIA -->
+        <!-- ===== SECCIÓN 1: HISTORIA ===== -->
         <h2 id="historia">Historia</h2>
 
         <h3 id="fundacion">Fundación y auge</h3>
@@ -399,7 +491,7 @@
             Al final de sus días, Hatman admitió que la opresión al Color había sido un error, aunque esta revelación llegó demasiado tarde para deshacer el daño causado. El sello de Kaley nunca fue roto por su mano, y el imperio se desvaneció en la memoria histórica, dando paso a una era de reinos fragmentados y percepciones diversas.
         </p>
 
-        <!-- SECCIÓN 2: LEGADO -->
+        <!-- ===== SECCIÓN 2: LEGADO ===== -->
         <h2 id="legado">Legado e interpretaciones</h2>
 
         <h3 id="louiswain">Conexión con Louis Wain</h3>
@@ -415,7 +507,7 @@
             La psicología moderna ha analizado el mito del Imperio de las Sombras como una alegoría de la <a href="#">esquizofrenia</a>. El término "color" representa las percepciones no normativas, mientras que la "sombra" simboliza la estructura racional y dominante. Hatman, en este marco, encarna la figura del "yo" represor que no elimina al "ello" (Kaley), pero lo confina para mantener una apariencia de orden. El arrepentimiento final de Hatman, aunque genuino, resulta estéril porque nunca se tradujo en una acción liberadora, reflejando la tragedia de quienes reconocen su error pero carecen del valor para rectificarlo<sup class="reference">[3]</sup>.
         </p>
 
-        <!-- REFERENCIAS -->
+        <!-- ===== REFERENCIAS ===== -->
         <div class="references">
             <h2 id="referencias">Referencias</h2>
             <ol>
@@ -425,7 +517,7 @@
             </ol>
         </div>
 
-        <!-- FOOTER -->
+        <!-- ===== FOOTER ===== -->
         <div class="mw-footer">
             <p>Esta página se editó por última vez el 24 de julio de 2026 a las 23:14.</p>
             <p>El contenido está disponible bajo la licencia <a href="#">Creative Commons Atribución-CompartirIgual 3.0</a> a menos que se indique lo contrario.</p>
@@ -440,7 +532,7 @@
             </p>
         </div>
 
-        <!-- COMENTARIO OCULTO PARA EL ARG -->
+        <!-- ===== PISTA OCULTA PARA EL ARG ===== -->
         <!-- 
         [ARG - PISTA]: 
         "El Color no fue borrado, solo silenciado. 
@@ -451,6 +543,83 @@
 
     </div> <!-- fin mw-content -->
 </div> <!-- fin mw-wrapper -->
+
+<!-- ===== JAVASCRIPT: Resaltado de sección activa al hacer scroll ===== -->
+<script>
+    (function() {
+        'use strict';
+
+        // Obtener todos los enlaces de la tabla de contenido
+        const tocLinks = document.querySelectorAll('.toc-link');
+        // Mapa para guardar la referencia a cada sección
+        const sectionMap = new Map();
+
+        // Guardar cada sección referenciada por su ID
+        tocLinks.forEach(link => {
+            const targetId = link.getAttribute('data-target');
+            if (targetId) {
+                const section = document.getElementById(targetId);
+                if (section) {
+                    sectionMap.set(targetId, section);
+                }
+            }
+        });
+
+        // Función para actualizar el resaltado
+        function updateActiveSection() {
+            let currentActiveId = null;
+            let currentActiveTop = -Infinity;
+
+            // Recorrer todas las secciones para ver cuál está más cerca del top
+            sectionMap.forEach((section, id) => {
+                const rect = section.getBoundingClientRect();
+                // Si la sección está visible (top >= 0) y es la que está más arriba
+                if (rect.top <= 120) { // 120px de margen para la barra superior
+                    if (rect.top > currentActiveTop) {
+                        currentActiveTop = rect.top;
+                        currentActiveId = id;
+                    }
+                }
+            });
+
+            // Si no se encontró ninguna sección visible, usar la primera
+            if (!currentActiveId && tocLinks.length > 0) {
+                const firstTarget = tocLinks[0].getAttribute('data-target');
+                if (firstTarget && sectionMap.has(firstTarget)) {
+                    currentActiveId = firstTarget;
+                }
+            }
+
+            // Actualizar clases
+            tocLinks.forEach(link => {
+                const targetId = link.getAttribute('data-target');
+                if (targetId === currentActiveId) {
+                    link.classList.add('active-section');
+                } else {
+                    link.classList.remove('active-section');
+                }
+            });
+        }
+
+        // Ejecutar al cargar y al hacer scroll
+        window.addEventListener('load', function() {
+            // Pequeño retraso para que el DOM esté completamente renderizado
+            setTimeout(updateActiveSection, 100);
+        });
+        window.addEventListener('scroll', updateActiveSection);
+        window.addEventListener('resize', updateActiveSection);
+
+        // También actualizar cuando se hace clic en un enlace (por si hay scroll suave)
+        tocLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                // No prevenir el comportamiento por defecto para que el anclaje funcione
+                // Actualizar después de un breve retraso para que el scroll termine
+                setTimeout(updateActiveSection, 300);
+            });
+        });
+
+    })();
+</script>
 
 </body>
 </html>
