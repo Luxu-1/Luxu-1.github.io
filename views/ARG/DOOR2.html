@@ -374,66 +374,61 @@
             margin: 0;
         }
 
-        /* ===================== MODO RAINBOW ===================== */
-        /* Capa de color que tiñe toda la página */
-        #rainbow-overlay {
+        /* ========== NUEVOS ESTILOS PARA EL EFECTO ========== */
+        /* Overlay negro con transición */
+        #dark-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
+            background: #000;
             z-index: 9998;
-            mix-blend-mode: color;
             opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.8s ease;
+        }
+        #dark-overlay.active {
+            opacity: 1;
+        }
+
+        /* Contenedor de la palabra (oculto hasta que toque) */
+        #word-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none; /* se muestra con display:block cuando toca */
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        #word-container .mentiroso {
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            font-size: 15vw;
+            font-weight: 900;
+            text-align: center;
+            letter-spacing: 0.05em;
             background: linear-gradient(45deg, #ff0000, #ff8800, #ffff00, #00ff00, #0088ff, #8800ff, #ff00ff);
             background-size: 400% 400%;
-            animation: rainbow-bg 3s ease infinite;
-            transition: opacity 1.2s ease;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: rainbow-text 2s ease infinite;
+            text-shadow: 0 0 30px rgba(255,255,255,0.3);
+            opacity: 0;
+            transition: opacity 0.01s; /* cambio brusco, pero lo forzamos con JS */
         }
-        #rainbow-overlay.active {
-            opacity: 0.85;
+        #word-container.show .mentiroso {
+            opacity: 1;
         }
-        @keyframes rainbow-bg {
+
+        @keyframes rainbow-text {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
-        }
-
-        /* Contenedor de los textos LIAR (por encima de la capa de color) */
-        #liar-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 9999;
-            overflow: hidden;
-        }
-        .liar-text {
-            position: absolute;
-            font-size: 12vw;
-            font-weight: 900;
-            font-family: 'Impact', 'Arial Black', sans-serif;
-            color: white;
-            text-shadow: 0 0 20px rgba(0,0,0,0.5);
-            mix-blend-mode: overlay;
-            white-space: nowrap;
-            will-change: transform;
-            animation: liar-move 2.5s linear infinite;
-            opacity: 0.7;
-        }
-        /* Cada elemento tendrá diferentes posiciones y retrasos para simular un flujo continuo */
-        @keyframes liar-move {
-            0% {
-                transform: translate(100vw, 100vh) rotate(0deg) scale(1);
-                opacity: 0.7;
-            }
-            100% {
-                transform: translate(-100vw, -100vh) rotate(720deg) scale(1.2);
-                opacity: 0.2;
-            }
         }
     </style>
 <style>
@@ -2245,7 +2240,7 @@ th[data-hve-editing] {
         <p style="cursor: move;">El Imperio mantuvo contactos complejos con las demás especies que poblaban Schicía. Si bien la política oficial era la de&nbsp; desplazar a aquellos que se opusieran a la expansión, también hubo alianzas y acuerdos de cooperación. La más notable de estas alianzas fue la establecida con el <a href="#">Mothman</a>, una criatura alada que, según las crónicas, se convirtió en un valioso aliado de Hatman durante las campañas políticas.</p>
 
         <h3 id="mothman" style="cursor: move;">El Mothman y su papel en el Imperio</h3>
-        <p style="cursor: move;">El <a href="#">Mothman</a> (literalmente "hombre polilla") es una entidad recurrente en el folclore de Schícia. Durante el apogeo del Imperio, Hatman logró establecer un vínculo con este críptido, que actuó como segundo al mando. Se dice que el Mothman poseía una visión nocturna excepcional y podía cubrir grandes distancias en pocas horas, lo que lo convertía en un aliado estratégico. A diferencia de otras especies, el Mothman no buscaba territorio ni recursos, sino que parecía guiado por las tranquilidades que le brindaban formar parte del Imperio. Hatman, reconociendo su utilidad, le otorgó el título de <i style="cursor: text;">Compañero del Rey</i>&nbsp;y mandó erigir estatuas y monumentos conmemorativas en su honor en varias ciudades, como <a href="#">Tenebris</a> y <a href="#">Nox</a>. Con el fin del Imperio, se desconoce la actual relación entre Hatman y Mothman, pero este último sigue siendo una figura venerada en algunas comunidades.</p>
+        <p style="cursor: move;">El <a href="#">Mothman</a> (literalmente "hombre polilla") es una entidad recurrente en el folclore de Schícia. Durante el apogeo del Imperio, Hatman logró establecer un vínculo con este críptido, que actuó como segundo al mando. Se dice que el Mothman poseía una visión nocturna excepcional y podía cubrir grandes distancias en pocas horas, lo que lo convertía en un aliado estratégico. A diferencia de otras especies, el Mothman no buscaba territorio ni recursos, sino que parecía guiado por las tranquilidades que le brindaba formar parte del Imperio. Hatman, reconociendo su utilidad, le otorgó el título de <i style="cursor: text;">Compañero del Rey</i>&nbsp;y mandó erigir estatuas y monumentos conmemorativas en su honor en varias ciudades, como <a href="#">Tenebris</a> y <a href="#">Nox</a>. Con el fin del Imperio, se desconoce la actual relación entre Hatman y Mothman, pero este último sigue siendo una figura venerada en algunas comunidades.</p>
 
         <!-- ===== SECCIÓN 4: CONFLICTO CON EL COLOR (CENTRAL) ===== -->
         <h2 id="conflicto-color" style="cursor: move;">Conflicto con el color</h2>
@@ -2362,82 +2357,67 @@ th[data-hve-editing] {
     })();
 </script>
 
-<!-- ===== RAINBOW + LIAR ===== -->
-<div id="rainbow-overlay"></div>
-<div id="liar-container"></div>
+<!-- ===== NUEVO EFECTO: OSCURECER Y MOSTRAR "MENTIROSO" ===== -->
+<div id="dark-overlay"></div>
+
+<div id="word-container">
+    <span class="mentiroso">MENTIROSO</span>
+</div>
 
 <script>
     (function() {
-        // Elemento que recibe los clics
         const trigger = document.querySelector('.conflicto-vacio');
         if (!trigger) return;
 
         let clickCount = 0;
-        let rainbowActivated = false;
+        let activated = false;
 
-        // Capa rainbow y contenedor de textos
-        const overlay = document.getElementById('rainbow-overlay');
-        const container = document.getElementById('liar-container');
+        const overlay = document.getElementById('dark-overlay');
+        const wordContainer = document.getElementById('word-container');
+        const wordSpan = document.querySelector('.mentiroso');
 
-        // Función para crear los textos LIAR
-        function spawnLiars() {
-            const count = 20; // cantidad de elementos para flujo continuo
-            const fragment = document.createDocumentFragment();
-            for (let i = 0; i < count; i++) {
-                const span = document.createElement('span');
-                span.className = 'liar-text';
-                span.textContent = 'LIAR';
-                // Posiciones iniciales aleatorias dentro de la pantalla
-                const x = Math.random() * 100;
-                const y = Math.random() * 100;
-                span.style.left = x + '%';
-                span.style.top = y + '%';
-                // Retrasos y duraciones escalonadas
-                const delay = (i / count) * 2.5; // hasta 2.5s
-                const duration = 2.0 + Math.random() * 1.0;
-                span.style.animationDuration = duration + 's';
-                span.style.animationDelay = delay + 's';
-                // Tamaño variable para mayor caos
-                const size = 8 + Math.random() * 8;
-                span.style.fontSize = size + 'vw';
-                // Opacidad y rotación inicial
-                span.style.opacity = 0.3 + Math.random() * 0.5;
-                fragment.appendChild(span);
-            }
-            container.appendChild(fragment);
-        }
+        // Audio surprise
+        const surpriseAudio = new Audio('/media/sound/surprise.mp3');
 
-        // Activar el efecto rainbow
-        function activateRainbow() {
-            if (rainbowActivated) return;
-            rainbowActivated = true;
+        function startEffect() {
+            if (activated) return;
+            activated = true;
 
-            // Mostrar la capa de color
+            // 1) Oscurecer la página con transición
             overlay.classList.add('active');
 
-            // Generar los textos LIAR
-            spawnLiars();
-
-            // Redirigir después de 5 segundos
+            // 2) Esperar 2.5 segundos (mientras se oscurece), luego mostrar la palabra
             setTimeout(function() {
-                window.location.href = 'views/ARG/688715.html';
-            }, 5000);
+                // Mostrar el contenedor (se pone en bloque) y forzar la opacidad a 1
+                wordContainer.style.display = 'flex';
+                // Forzar un reflow para que la transición no se aplique (queremos que aparezca de golpe)
+                void wordContainer.offsetWidth; // truco para reflow
+                wordContainer.classList.add('show'); // la clase hace que el span tenga opacity:1
+
+                // Reproducir sonido surprise
+                surpriseAudio.currentTime = 0;
+                surpriseAudio.play().catch(function(e) {
+                    console.warn('No se pudo reproducir surprise.mp3:', e);
+                });
+
+                // 3) Esperar 5 segundos y redirigir
+                setTimeout(function() {
+                    window.location.href = '/688715.html';
+                }, 5000);
+
+            }, 2500); // 2.5 segundos para que el negro se establezca
         }
 
         // Contador de clics
         trigger.addEventListener('click', function(e) {
-            if (rainbowActivated) return;
+            if (activated) return;
             clickCount++;
             if (clickCount >= 25) {
-                activateRainbow();
+                startEffect();
             }
         });
 
-        // Opcional: feedback visual del contador (no solicitado, pero útil)
-        // Podríamos mostrar el conteo en el tooltip o en el propio elemento
-        // pero no es necesario para la funcionalidad.
-
-        console.log('🌈 Door2: Haz 25 clics en "documentación insuficiente" para activar el efecto.');
+        console.log('🔮 Door2: Haz 25 clics en "documentación insuficiente" para activar el efecto.');
     })();
 </script>
 
