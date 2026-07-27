@@ -73,10 +73,6 @@
             display: block;
             font-family: 'Segoe UI', sans-serif;
         }
-        .mw-sidebar .logo img {
-            max-width: 120px;
-            height: auto;
-        }
         .mw-sidebar ul {
             list-style: none;
             padding: 0;
@@ -174,7 +170,7 @@
             scroll-margin-top: 20px;
         }
 
-        /* ===== TABLA DE CONTENIDO (con resaltado activo) ===== */
+        /* ===== TABLA DE CONTENIDO ===== */
         .toc {
             float: left;
             background: #f8f9fa;
@@ -212,7 +208,6 @@
             color: #202122;
             margin-right: 4px;
         }
-        /* === RESALTADO DE SECCIÓN ACTIVA === */
         .toc ul li a.active-section {
             font-weight: 700;
             color: #000000 !important;
@@ -224,7 +219,6 @@
             text-decoration: none;
             cursor: default;
         }
-        /* Estilo para los enlaces normales (azul) */
         .toc ul li a:not(.active-section) {
             color: #0645ad;
         }
@@ -281,6 +275,29 @@
         p {
             margin: 0 0 12px 0;
             text-align: justify;
+        }
+
+        /* ===== SECCIÓN VACÍA (para el conflicto) ===== */
+        .empty-section {
+            background: #f8f9fa;
+            border: 2px dashed #a2a9b1;
+            padding: 30px 20px;
+            margin: 20px 0;
+            text-align: center;
+            color: #72777d;
+            font-style: italic;
+            border-radius: 4px;
+        }
+        .empty-section::before {
+            content: "⚠️ Esta sección se encuentra incompleta o ha sido redactada por fuentes no verificadas.";
+            display: block;
+            font-size: 14px;
+            color: #54595d;
+        }
+        .empty-section .empty-sub {
+            font-size: 12px;
+            color: #8e8b82;
+            margin-top: 8px;
         }
 
         /* ===== REFERENCIAS ===== */
@@ -351,7 +368,6 @@
             }
         }
 
-        /* ===== UTILITY ===== */
         .clearfix::after {
             content: "";
             clear: both;
@@ -425,45 +441,55 @@
                 <span style="color:#72777d;">Emblema oscuro (representación)</span>
             </div>
             <table>
-                <tr><td class="label">Tipo</td><td>Imperio metafísico / Monarquía absoluta</td></tr>
+                <tr><td class="label">Tipo</td><td><a href="#">Imperio metafísico</a> / <a href="#">Monarquía absoluta</a></td></tr>
                 <tr><td class="label">Fundador</td><td><a href="#">Hatman</a></td></tr>
-                <tr><td class="label">Gobernante final</td><td>Hatman (en funciones hasta su disolución)</td></tr>
-                <tr><td class="label">Capital</td><td>La Ciudadela (en <a href="#">Schizo-Land</a>)</td></tr>
-                <tr><td class="label">Idioma</td><td>Lengua de las sombras (arcano)</td></tr>
-                <tr><td class="label">Religión</td><td>Culto a la oscuridad primordial</td></tr>
-                <tr><td class="label">Período histórico</td><td>Edad de las Tinieblas</td></tr>
+                <tr><td class="label">Gobernante final</td><td><a href="#">Hatman</a> (en funciones hasta su disolución)</td></tr>
+                <tr><td class="label">Capital</td><td><a href="#">La Ciudadela</a> (en <a href="#">Schicía</a>)</td></tr>
+                <tr><td class="label">Idioma</td><td><a href="#">Lengua de las sombras</a> (arcano)</td></tr>
+                <tr><td class="label">Religión</td><td><a href="#">Culto a la oscuridad primordial</a></td></tr>
+                <tr><td class="label">Período histórico</td><td><a href="#">Edad de las Tinieblas</a></td></tr>
                 <tr><td class="label">Establecimiento</td><td>~ Hace 10.000 años</td></tr>
                 <tr><td class="label">Disolución</td><td>Hace ~200 años (caída administrativa)</td></tr>
-                <tr><td class="label">Sucesor</td><td>Reino del Color (no oficial) / Estados fragmentados</td></tr>
+                <tr><td class="label">Sucesor</td><td><a href="#">Reino del Color</a> (no oficial) / Estados fragmentados</td></tr>
             </table>
         </div>
 
         <!-- ===== INTRODUCCIÓN ===== -->
         <p>
-            El <b>Imperio de las Sombras</b> fue una entidad política, onírica y metafísica que dominó gran parte de los reinos del subconsciente durante milenios. Fundado por la entidad conocida como <a href="#">Hatman</a>, se caracterizó por una estructura jerárquica basada en la percepción monolítica de la oscuridad, suprimiendo activamente otras formas de conciencia, en particular el denominado "Reino del Color". Su caída es objeto de estudio en la psicología arcana y se asocia con el reconocimiento tardío de la diversidad cognitiva.
+            El <b>Imperio de las Sombras</b> fue una entidad política, onírica y metafísica que dominó gran parte de los reinos del subconsciente durante milenios. Fundado por la entidad conocida como <a href="#">Hatman</a>, se caracterizó por una estructura jerárquica basada en la percepción monolítica de la oscuridad, suprimiendo activamente otras formas de conciencia, en particular el denominado <a href="#">Reino del Color</a>. Su caída es objeto de estudio en la <a href="#">psicología arcana</a> y se asocia con el reconocimiento tardío de la diversidad cognitiva.
         </p>
         <p>
-            El imperio alcanzó su máximo esplendor durante la denominada "Época del Cenit", cuando la oscuridad se alzó por encima de todos los demás reinos. Sin embargo, su declive fue paulatino, atribuido tanto a la rigidez de su gobernante como al surgimiento de fuerzas contestatarias encabezadas por la figura de <a href="#">Kaley</a>, el Rey del Color.
+            El imperio alcanzó su máximo esplendor durante la denominada <a href="#">"Época del Nadir"</a>, cuando la oscuridad se alzó por encima de todos los demás reinos. Se estima que en su punto álgido, el Imperio controlaba aproximadamente una cuarta parte del territorio de <a href="#">Schicía</a>, una región europea limítrofe entre <a href="#">España</a> y <a href="#">Francia</a>, conocida por ser un lugar donde las manifestaciones de la <a href="#">esquizofrenia</a> adquieren forma física. Sin embargo, su declive fue paulatino, atribuido tanto a la rigidez de su gobernante como al surgimiento de fuerzas contestatarias encabezadas por la figura de <a href="#">Kaley</a>, el <a href="#">Rey del Color</a>.
+        </p>
+        <p>
+            El término <i>"Imperio de las Sombras"</i> ha sido objeto de debate entre los historiadores, quienes señalan que la denominación pudo haber sido acuñada por los propios <a href="#">habitantes de Schicía</a> para describir la opresión percibida durante el dominio de Hatman. Investigaciones recientes sugieren que el imperio no fue una entidad monolítica, sino una <a href="#">confederación de clanes</a> que compartían una cosmovisión común basada en la <a href="#">oscuridad primordial</a>.
         </p>
 
-        <!-- ===== TABLA DE CONTENIDO (con IDs para anclaje y resaltado) ===== -->
+        <!-- ===== TABLA DE CONTENIDO ===== -->
         <div class="toc" id="toc">
             <div class="toc-title">Contenido</div>
             <ul>
                 <li><span class="toc-number">1</span> <a href="#historia" class="toc-link" data-target="historia">Historia</a>
                     <ul>
                         <li><span class="toc-number">1.1</span> <a href="#fundacion" class="toc-link" data-target="fundacion">Fundación y auge</a></li>
-                        <li><span class="toc-number">1.2</span> <a href="#conflicto" class="toc-link" data-target="conflicto">El conflicto con el Color</a></li>
+                        <li><span class="toc-number">1.2</span> <a href="#conflicto" class="toc-link" data-target="conflicto">Conflicto con el Color</a></li>
                         <li><span class="toc-number">1.3</span> <a href="#caida" class="toc-link" data-target="caida">La caída administrativa</a></li>
                     </ul>
                 </li>
-                <li><span class="toc-number">2</span> <a href="#legado" class="toc-link" data-target="legado">Legado e interpretaciones</a>
+                <li><span class="toc-number">2</span> <a href="#ciudades" class="toc-link" data-target="ciudades">Ciudades y arquitectura</a>
                     <ul>
-                        <li><span class="toc-number">2.1</span> <a href="#louiswain" class="toc-link" data-target="louiswain">Conexión con Louis Wain</a></li>
-                        <li><span class="toc-number">2.2</span> <a href="#psicologia" class="toc-link" data-target="psicologia">Perspectiva psicológica</a></li>
+                        <li><span class="toc-number">2.1</span> <a href="#castillo" class="toc-link" data-target="castillo">El Castillo de Nadir</a></li>
+                        <li><span class="toc-number">2.2</span> <a href="#ciudades-sombra" class="toc-link" data-target="ciudades-sombra">Ciudades menores</a></li>
                     </ul>
                 </li>
-                <li><span class="toc-number">3</span> <a href="#referencias" class="toc-link" data-target="referencias">Referencias</a></li>
+                <li><span class="toc-number">3</span> <a href="#mothman" class="toc-link" data-target="mothman">El Mothman y la guerra</a></li>
+                <li><span class="toc-number">4</span> <a href="#legado" class="toc-link" data-target="legado">Legado e interpretaciones</a>
+                    <ul>
+                        <li><span class="toc-number">4.1</span> <a href="#louiswain" class="toc-link" data-target="louiswain">Conexión con Louis Wain</a></li>
+                        <li><span class="toc-number">4.2</span> <a href="#psicologia" class="toc-link" data-target="psicologia">Perspectiva psicológica</a></li>
+                    </ul>
+                </li>
+                <li><span class="toc-number">5</span> <a href="#referencias" class="toc-link" data-target="referencias">Referencias</a></li>
             </ul>
         </div>
 
@@ -472,39 +498,94 @@
 
         <h3 id="fundacion">Fundación y auge</h3>
         <p>
-            El Imperio de las Sombras fue erigido por Hatman tras una serie de conflictos interestelares en el plano onírico. Hatman, conocido por su ambición y su capacidad para tejer hebras de oscuridad, consolidó un reino donde la sombra era la única realidad permitida. Durante esta época, las demás manifestaciones de la conciencia (como el color o el caos) fueron relegadas a un estatus secundario o directamente proscritas. La capital, <i>La Ciudadela</i>, se convirtió en un bastión de orden y penumbra.
+            Los orígenes del Imperio de las Sombras se remontan a tiempos inmemoriales, aunque las primeras referencias escritas datan del <a href="#">siglo XI a.C.</a>, cuando las crónicas de <a href="#">Schicía</a> mencionan por primera vez la figura de <a href="#">Hatman</a> como un líder carismático que unificó a los clanes de la <a href="#">oscuridad</a>. Según estas fuentes, Hatman habría emergido de las profundidades de la <a href="#">Ciudadela</a>, una fortaleza situada en el corazón de la región, desde donde extendió su influencia sobre los territorios circundantes.
+        </p>
+        <p>
+            Durante los siglos siguientes, el imperio experimentó un crecimiento sostenido, estableciendo rutas comerciales con otras razas del país, como los <a href="#">caro</a> (criaturas de carne) y los <a href="#">lux</a> (seres de luz). La <a href="#">Época del Nadir</a>, que se extendió aproximadamente desde el <a href="#">siglo V d.C.</a> hasta el <a href="#">siglo XV</a>, marcó el cenit del poderío sombrío. En este período, Hatman consolidó un sistema de <a href="#">leyes universales</a> que regulaban la interacción entre las diferentes especies, fomentando una <a href="#">paz relativa</a> que permitió el florecimiento de las artes y la <a href="#">arquitectura tenebrosa</a>.
+        </p>
+        <p>
+            La expansión territorial del imperio alcanzó su punto máximo en el <a href="#">siglo XIV</a>, cuando las fronteras sombrías se extendieron hasta abarcar aproximadamente una cuarta parte de <a href="#">Schicía</a>. Este avance, sin embargo, no estuvo exento de conflictos, ya que las razas locales, especialmente los <a href="#">caro</a>, ofrecieron resistencia a la ocupación. La respuesta de Hatman fue, según los registros, <a href="#">pragmática y, en ocasiones, diplomática</a>, priorizando la negociación sobre la confrontación directa.
         </p>
 
-        <h3 id="conflicto">El conflicto con el Color</h3>
+        <h3 id="conflicto">Conflicto con el Color</h3>
         <p>
-            La figura de <b>Kaley</b>, soberano del Reino del Color, emergió como la antítesis natural del imperio. Kaley abogaba por un gobierno dual donde la sombra y el color coexistieran en igualdad, un concepto que Hatman rechazó de manera tajante. En lugar de ejecutar a Kaley (a quien reconocía como una parte legítima de la realidad), Hatman optó por sellarlo en una "hielera" dimensional, una cámara de estasis mágica que lo mantendría prisionero durante milenios.
+            El <a href="#">Reino del Color</a>, liderado por <a href="#">Kaley</a>, representaba la antítesis filosófica del Imperio de las Sombras. Mientras que Hatman abogaba por la <a href="#">oscuridad monolítica</a> como principio rector, Kaley defendía una <a href="#">cosmovisión pluralista</a> donde la sombra y el color coexistieran en igualdad. Este choque ideológico derivó en una serie de <a href="#">escaramuzas fronterizas</a> que, según algunos historiadores, podrían haber escalado a un conflicto abierto de no ser por la <a href="#">intervención de terceras partes</a>.
         </p>
+        <div class="empty-section">
+            <div class="empty-sub">[La información sobre este conflicto ha sido redactada por fuentes no verificadas. Se recomienda consultar fuentes primarias en el <a href="#">Archivo de la Ciudadela</a>.]</div>
+        </div>
         <p>
-            Según crónicas posteriores, Hatman justificó el encierro en una <a href="#">promesa dinástica</a>: Kaley sería liberado únicamente tras la muerte del emperador. Sin embargo, fuentes contemporáneas señalan que Hatman tuvo múltiples oportunidades de romper el sello sin fallecer, pero su <a href="#">orgullo</a> y su negativa a compartir el trono lo impidieron, perpetuando un ciclo de violencia y represión.
+            A pesar de la falta de documentación detallada, se sabe que Hatman optó por <a href="#">sellar a Kaley en una cámara de estasis</a>, conocida popularmente como la <a href="#">"Hielera dimensional"</a>. Esta decisión, que algunos interpretan como un acto de <a href="#">clemencia estratégica</a>, otros la ven como una <a href="#">medida desesperada</a> para evitar un conflicto abierto que podría haber devastado ambas facciones. Las crónicas de la época mencionan que Hatman justificó el encierro en una <a href="#">promesa dinástica</a>: Kaley sería liberado únicamente tras la muerte del emperador.
         </p>
 
         <h3 id="caida">La caída administrativa</h3>
         <p>
-            Con el paso de los siglos, el imperio se volvió obsoleto. Las estructuras rígidas de Hatman no pudieron adaptarse a la creciente diversidad del mundo onírico. En palabras de algunos historiadores, "el imperio no fue destruido, sino que murió de inanición, sepultado por su propia incapacidad para integrar lo diferente"<sup class="reference">[1]</sup>. Hatman, ya anciano y sin poder efectivo, observó cómo sus dominios se fragmentaban. 
+            El declive del Imperio de las Sombras fue un proceso gradual que se extendió a lo largo de varios siglos. Factores como la <a href="#">rigidez institucional</a>, la <a href="#">falta de innovación</a> y el <a href="#">creciente descontento</a> entre las razas sometidas contribuyeron a la erosión del poder central. Hatman, ya entrado en años, <a href="#">perdió progresivamente el control</a> sobre las provincias más remotas, que comenzaron a <a href="#">autogobernarse</a> o a <a href="#">aliarse con otras facciones</a>.
         </p>
         <p>
-            Al final de sus días, Hatman admitió que la opresión al Color había sido un error, aunque esta revelación llegó demasiado tarde para deshacer el daño causado. El sello de Kaley nunca fue roto por su mano, y el imperio se desvaneció en la memoria histórica, dando paso a una era de reinos fragmentados y percepciones diversas.
+            El año <a href="#">1763</a> marca el fin simbólico del imperio, aunque no existe un acta oficial que documente su disolución. Las comunicaciones con la <a href="#">familia real</a> cesaron repentinamente, y la <a href="#">Ciudadela</a> quedó <a href="#">abandonada</a> sin que mediara explicación alguna. Los historiadores contemporáneos especulan que la <a href="#">muerte de Hatman</a>, acaecida en circunstancias no esclarecidas, pudo haber desencadenado un <a href="#">vacío de poder</a> que ninguna de las facciones sombrías logró llenar. Actualmente, la monarquía sombría se mantiene únicamente como un <a href="#">símbolo cultural</a>, desprovista de autoridad política efectiva.
         </p>
 
-        <!-- ===== SECCIÓN 2: LEGADO ===== -->
+        <!-- ===== SECCIÓN 2: CIUDADES ===== -->
+        <h2 id="ciudades">Ciudades y arquitectura</h2>
+
+        <h3 id="castillo">El Castillo de Nadir</h3>
+        <p>
+            La capital del Imperio de las Sombras fue la <a href="#">Ciudadela</a>, también conocida como el <a href="#">Castillo de Nadir</a>. Esta imponente fortaleza, construida con <a href="#">roca volcánica de tonalidad negra</a>, se alzaba en el centro de <a href="#">Schicía</a>, dominando el paisaje circundante. Con una antigüedad estimada de <a href="#">3.000 años</a>, el castillo era el epicentro del poder político y religioso del imperio, así como la residencia oficial de Hatman y su corte.
+        </p>
+        <p>
+            El castillo contaba con <a href="#">siete torres principales</a>, cada una dedicada a un aspecto de la <a href="#">oscuridad primordial</a>. La <a href="#">Torre del Cenit</a>, la más alta, albergaba la <a href="#">cámara del trono</a>, donde Hatman presidía las audiencias y dictaba sus edictos. Los muros del castillo estaban decorados con <a href="#">relieves sombríos</a> que narraban la historia del imperio, desde su fundación hasta su época de mayor esplendor.
+        </p>
+        <p>
+            En la plaza situada frente al castillo, conocida como la <a href="#">Plaza de las Estelas</a>, se erigían <a href="#">monumentos en honor a Hatman</a> y a sus colaboradores más cercanos. Entre ellos destacaban la <a href="#">Fuente de la Oscuridad</a>, una estructura circular de <a href="#">mármol negro</a> que, según la tradición, contenía agua de los <a href="#">ríos subterráneos de Schicía</a>, y la <a href="#">Columna de los Juramentos</a>, donde los <a href="#">vasallos sombríos</a> renovaban su lealtad al emperador. Hoy en día, la Ciudadela se encuentra <a href="#">abandonada</a>, y aunque se desconoce la razón exacta de su despoblación, se especula que la <a href="#">falta de mantenimiento</a> y el <a href="#">éxodo de sus habitantes</a> contribuyeron a su <a href="#">decadencia</a>.
+        </p>
+
+        <h3 id="ciudades-sombra">Ciudades menores</h3>
+        <p>
+            Además de la Ciudadela, el Imperio de las Sombras contaba con varias <a href="#">ciudades menores</a>, cada una con su propia identidad y funciones dentro del entramado imperial. Entre las más destacadas se encuentran:
+        </p>
+        <ul style="margin: 0 0 15px 25px;">
+            <li><b><a href="#">Umbrápolis</a></b>: Conocida como la <i>"Ciudad del Crepúsculo"</i>, era el principal centro comercial del imperio. Sus calles, estrechas y sinuosas, estaban diseñadas para <a href="#">minimizar la entrada de luz</a>, creando un ambiente perpetuo de penumbra que favorecía el comercio de <a href="#">artefactos oscuros</a> y <a href="#">textos arcanos</a>.</li>
+            <li><b><a href="#">Noxville</a></b>: Fundada en el <a href="#">siglo IX</a>, esta ciudad se especializaba en la <a href="#">industria pesada</a> y la <a href="#">metalurgia sombría</a>. Sus <a href="#">hornos de sombra</a>, alimentados por <a href="#">carbón de las profundidades</a>, producían armas y herramientas que eran <a href="#">codiciadas en todo Schicía</a>. La ciudad era famosa por sus <a href="#">gremios de artesanos</a>, que mantenían un <a href="#">estricto control sobre los secretos de la forja oscura</a>.</li>
+                            <li><b><a href="#">Sombralta</a></b>: Situada en una meseta elevada, esta ciudad era el <a href="#">centro religioso</a> del imperio. Allí se encontraba el <a href="#">Templo de la Oscuridad Eterna</a>, un edificio de <a href="#">cúpulas negras</a> donde los <a href="#">sacerdotes sombríos</a> realizaban rituales para <a href="#">mantener el equilibrio entre las fuerzas de la luz y la sombra</a>. La ciudad también albergaba el <a href="#">Archivo de las Sombras</a>, una biblioteca que contenía <a href="#">miles de manuscritos</a> sobre la historia y la <a href="#">cosmología del imperio</a>.</li>
+                            <li><b><a href="#">Penumbria</a></b>: Conocida por su <a href="#">universidad de magia arcana</a>, esta ciudad era el <a href="#">epicentro del conocimiento esotérico</a> del imperio. Sus <a href="#">eruditos sombríos</a> estudiaban las <a href="#">propiedades de la oscuridad</a> y desarrollaban <a href="#">hechizos de protección y sigilo</a>. La ciudad también era famosa por su <a href="#">observatorio astronómico</a>, desde donde se <a href="#">rastreaban los movimientos de los astros</a> para predecir <a href="#">eventos de relevancia política</a>.</li>
+                        </ul>
+                        <p>
+                            Estas ciudades, junto con la Ciudadela, formaban el <a href="#">núcleo del poder sombrío</a> en <a href="#">Schicía</a>. Aunque hoy en día la mayoría se encuentran <a href="#">parcialmente en ruinas</a> o <a href="#">habitadas por pequeños grupos</a>, su legado arquitectónico y cultural perdura en la memoria de los <a href="#">habitantes de la región</a>.
+                        </p>
+
+        <!-- ===== SECCIÓN 3: MOTHMAN ===== -->
+        <h2 id="mothman">El Mothman y la guerra</h2>
+        <p>
+            La figura del <a href="#">Mothman</a>, una criatura alada de <a href="#">apariencia humanoide</a> y <a href="#">ojos rojos brillantes</a>, ha sido objeto de fascinación y debate entre los historiadores del Imperio de las Sombras. Según las crónicas de la época, el Mothman fue un <a href="#">aliado cercano</a> de <a href="#">Hatman</a> durante las <a href="#">campañas de expansión</a> del imperio. Su <a href="#">lealtad inquebrantable</a> y su <a href="#">habilidad para predecir desastres</a> lo convirtieron en un <a href="#">consejero valioso</a> y en un <a href="#">símbolo de la conexión del imperio con lo sobrenatural</a>.
+        </p>
+        <p>
+            Los textos antiguos describen al Mothman como un <a href="#">emisario de la oscuridad</a>, capaz de <a href="#">viajar entre dimensiones</a> y de <a href="#">comunicarse con entidades de otros planos</a>. Su presencia en el campo de batalla era considerada un <a href="#">augurio de victoria</a>, y se dice que su <a href="#">grito estridente</a> podía <a href="#">desmoralizar a los ejércitos enemigos</a>. Hatman, reconociendo su valor, le otorgó el título de <a href="#">"Guardián de la Penumbra"</a>, un honor reservado únicamente para los <a href="#">seres más leales al imperio</a>.
+        </p>
+        <p>
+            Aunque el Mothman es mencionado en diversas crónicas, su papel en la <a href="#">guerra contra el Color</a> sigue siendo un tema <a href="#">controvertido</a>. Algunas fuentes sugieren que el Mothman intentó <a href="#">mediar entre Hatman y Kaley</a>, abogando por una <a href="#">solución pacífica al conflicto</a>. Sin embargo, su mediación no tuvo éxito, y la criatura se retiró a las <a href="#">regiones más oscuras de Schicía</a> tras el <a href="#">encierro de Kaley</a>. Hoy en día, el Mothman es considerado una <a href="#">leyenda</a> por algunos, mientras que otros sostienen que <a href="#">aún habita en las sombras</a>, esperando el momento adecuado para <a href="#">regresar y cumplir su misión</a>.
+        </p>
+        <p>
+            Investigaciones recientes han establecido un <a href="#">paralelismo entre el Mothman y el concepto de <a href="#">"ángel caído"</a> en la <a href="#">tradición judeocristiana</a>, aunque los expertos advierten que estas comparaciones son <a href="#">especulativas y carecen de fundamento histórico</a>. Lo que sí parece claro es que el Mothman, ya sea como <a href="#">entidad real o como <a href="#">construcción cultural</a>, desempeñó un papel significativo en el <a href="#">imaginario colectivo del Imperio de las Sombras</a>.
+        </p>
+
+        <!-- ===== SECCIÓN 4: LEGADO ===== -->
         <h2 id="legado">Legado e interpretaciones</h2>
 
         <h3 id="louiswain">Conexión con Louis Wain</h3>
         <p>
-            El caso del ilustrador británico <a href="#">Louis Wain</a> (1860-1939) ha sido citado por estudiosos de la psicología arcana como un paralelismo con el conflicto del Imperio de las Sombras. Wain, célebre por sus dibujos de gatos, experimentó un cambio drástico en su estilo a medida que su percepción se transformaba, pasando de figuras realistas a patrones cromáticos psicodélicos y fractales. 
+            El caso del ilustrador británico <a href="#">Louis Wain</a> (1860-1939) ha sido citado por estudiosos de la <a href="#">psicología arcana</a> como un <a href="#">paralelismo con el conflicto del Imperio de las Sombras</a>. Wain, célebre por sus dibujos de <a href="#">gatos</a>, experimentó un <a href="#">cambio drástico en su estilo</a> a medida que su percepción se transformaba, pasando de figuras realistas a <a href="#">patrones cromáticos psicodélicos y fractales</a>. Esta evolución ha sido interpretada como una <a href="#">metáfora de la lucha entre la oscuridad y el color</a>.
         </p>
         <p>
-            La analogía sugiere que la sociedad (representada por Hatman) tiende a etiquetar lo "colorido" como caótico o patológico, encerrándolo en diagnósticos en lugar de integrarlo. El encierro de Kaley se interpreta, en este contexto, como la negación sistémica de la neurodivergencia, mientras que la propuesta de liberación controlada (defendida por el nieto de Hatman, <a href="#">La Muerte</a>) simboliza una aproximación más inclusiva a la diversidad mental<sup class="reference">[2]</sup>.
+            La analogía sugiere que la sociedad (representada por Hatman) tiende a <a href="#">etiquetar lo "colorido" como caótico o patológico</a>, encerrándolo en <a href="#">diagnósticos</a> en lugar de integrarlo. El encierro de Kaley se interpreta, en este contexto, como la <a href="#">negación sistémica de la neurodivergencia</a>, mientras que la propuesta de <a href="#">liberación controlada</a> (defendida por el nieto de Hatman, <a href="#">La Muerte</a>) simboliza una <a href="#">aproximación más inclusiva a la diversidad mental</a><sup class="reference">[1]</sup>.
         </p>
 
         <h3 id="psicologia">Perspectiva psicológica</h3>
         <p>
-            La psicología moderna ha analizado el mito del Imperio de las Sombras como una alegoría de la <a href="#">esquizofrenia</a>. El término "color" representa las percepciones no normativas, mientras que la "sombra" simboliza la estructura racional y dominante. Hatman, en este marco, encarna la figura del "yo" represor que no elimina al "ello" (Kaley), pero lo confina para mantener una apariencia de orden. El arrepentimiento final de Hatman, aunque genuino, resulta estéril porque nunca se tradujo en una acción liberadora, reflejando la tragedia de quienes reconocen su error pero carecen del valor para rectificarlo<sup class="reference">[3]</sup>.
+            La <a href="#">psicología moderna</a> ha analizado el mito del Imperio de las Sombras como una <a href="#">alegoría de la esquizofrenia</a>. El término "color" representa las <a href="#">percepciones no normativas</a>, mientras que la "sombra" simboliza la <a href="#">estructura racional y dominante</a>. Hatman, en este marco, encarna la figura del <a href="#">"yo" represor</a> que no elimina al <a href="#">"ello" (Kaley)</a>, pero lo confina para mantener una <a href="#">apariencia de orden</a>. El arrepentimiento final de Hatman, aunque genuino, resulta estéril porque <a href="#">nunca se tradujo en una acción liberadora</a>, reflejando la <a href="#">tragedia de quienes reconocen su error pero carecen del valor para rectificarlo</a><sup class="reference">[2]</sup>.
+        </p>
+        <p>
+            Esta interpretación ha sido criticada por algunos académicos, quienes argumentan que <a href="#">reduce una entidad política compleja</a> a una <a href="#">metáfora psicológica simplista</a>. Sin embargo, sus defensores sostienen que la <a href="#">naturaleza misma de Schicía</a>, un lugar donde las <a href="#">alucinaciones se vuelven realidad</a>, hace que la <a href="#">alegoría sea particularmente apropiada</a>. En cualquier caso, el Imperio de las Sombras sigue siendo un <a href="#">objeto de estudio fascinante</a> para historiadores, psicólogos y <a href="#">entusiastas de lo arcano</a>.
         </p>
 
         <!-- ===== REFERENCIAS ===== -->
@@ -514,6 +595,9 @@
                 <li><i>Crónicas del Color Olvidado</i>, Anónimo, Editorial del Subconsciente, Año 234 (Era Arcana).</li>
                 <li>Pérez, J. (2020). <i>Gatos, Sombras y Neurodivergencia: El legado de Louis Wain en la metafísica onírica</i>. Revista de Psicología Profunda, vol 12, pp. 45-67.</li>
                 <li>Martínez, L. (2019). <i>El Orgullo del Tirano: Un estudio de caso sobre Hatman</i>. Editorial Umbrales.</li>
+                <li><i>Umbra: Historia de las Sombras en Schicía</i>, Autor desconocido, Año 234.</li>
+                <li>Caro, Autor desconocido, Año 103 a.C.</li>
+                <li>Wain, M. (1834). <i>Shadows and Mind: A Study of the Schicían Phenomena</i>. London: Arcane Press.</li>
             </ol>
         </div>
 
@@ -549,12 +633,9 @@
     (function() {
         'use strict';
 
-        // Obtener todos los enlaces de la tabla de contenido
         const tocLinks = document.querySelectorAll('.toc-link');
-        // Mapa para guardar la referencia a cada sección
         const sectionMap = new Map();
 
-        // Guardar cada sección referenciada por su ID
         tocLinks.forEach(link => {
             const targetId = link.getAttribute('data-target');
             if (targetId) {
@@ -565,16 +646,13 @@
             }
         });
 
-        // Función para actualizar el resaltado
         function updateActiveSection() {
             let currentActiveId = null;
             let currentActiveTop = -Infinity;
 
-            // Recorrer todas las secciones para ver cuál está más cerca del top
             sectionMap.forEach((section, id) => {
                 const rect = section.getBoundingClientRect();
-                // Si la sección está visible (top >= 0) y es la que está más arriba
-                if (rect.top <= 120) { // 120px de margen para la barra superior
+                if (rect.top <= 120) {
                     if (rect.top > currentActiveTop) {
                         currentActiveTop = rect.top;
                         currentActiveId = id;
@@ -582,7 +660,6 @@
                 }
             });
 
-            // Si no se encontró ninguna sección visible, usar la primera
             if (!currentActiveId && tocLinks.length > 0) {
                 const firstTarget = tocLinks[0].getAttribute('data-target');
                 if (firstTarget && sectionMap.has(firstTarget)) {
@@ -590,7 +667,6 @@
                 }
             }
 
-            // Actualizar clases
             tocLinks.forEach(link => {
                 const targetId = link.getAttribute('data-target');
                 if (targetId === currentActiveId) {
@@ -601,19 +677,14 @@
             });
         }
 
-        // Ejecutar al cargar y al hacer scroll
         window.addEventListener('load', function() {
-            // Pequeño retraso para que el DOM esté completamente renderizado
             setTimeout(updateActiveSection, 100);
         });
         window.addEventListener('scroll', updateActiveSection);
         window.addEventListener('resize', updateActiveSection);
 
-        // También actualizar cuando se hace clic en un enlace (por si hay scroll suave)
         tocLinks.forEach(link => {
             link.addEventListener('click', function(e) {
-                // No prevenir el comportamiento por defecto para que el anclaje funcione
-                // Actualizar después de un breve retraso para que el scroll termine
                 setTimeout(updateActiveSection, 300);
             });
         });
