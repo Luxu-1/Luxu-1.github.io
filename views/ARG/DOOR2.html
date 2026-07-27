@@ -28,7 +28,7 @@
         a:visited {
             color: #0b0080;
         }
-        
+
         /* CONTENEDOR PRINCIPAL */
         .mw-wrapper {
             max-width: 1280px;
@@ -42,7 +42,7 @@
             min-height: 100vh;
         }
 
-        /* ===== SIDEBAR IZQUIERDA (Vector 2022) ===== */
+        /* SIDEBAR */
         .mw-sidebar {
             width: 176px;
             min-height: 600px;
@@ -97,7 +97,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* ===== CONTENIDO PRINCIPAL ===== */
+        /* CONTENIDO PRINCIPAL */
         .mw-content {
             flex: 1;
             padding: 30px 40px 40px 40px;
@@ -105,7 +105,7 @@
             min-width: 0;
         }
 
-        /* ===== BARRA SUPERIOR ===== */
+        /* BARRA SUPERIOR */
         .mw-top-bar {
             display: flex;
             justify-content: flex-end;
@@ -126,7 +126,7 @@
             align-items: center;
         }
 
-        /* ===== ADVERTENCIAS ===== */
+        /* ADVERTENCIAS */
         .mw-notice {
             background: #f8f9fa;
             border: 1px solid #a2a9b1;
@@ -141,12 +141,8 @@
         .mw-notice-neutral {
             border-left-color: #36c;
         }
-        .mw-notice-danger {
-            border-left-color: #d33;
-            background: #fef6f6;
-        }
 
-        /* ===== TÍTULOS ===== */
+        /* TÍTULOS */
         h1 {
             font-family: 'Georgia', 'Times New Roman', serif;
             font-weight: 400;
@@ -174,7 +170,7 @@
             scroll-margin-top: 20px;
         }
 
-        /* ===== TABLA DE CONTENIDO ===== */
+        /* TABLA DE CONTENIDO */
         .toc {
             float: left;
             background: #f8f9fa;
@@ -227,7 +223,7 @@
             color: #0645ad;
         }
 
-        /* ===== INFOBOX ===== */
+        /* INFOBOX */
         .infobox {
             float: right;
             clear: right;
@@ -268,38 +264,20 @@
             white-space: nowrap;
         }
 
-        /* ===== CITAS ===== */
+        /* CITAS */
         .reference {
             font-size: 11px;
             vertical-align: super;
             line-height: 1;
         }
 
-        /* ===== PÁRRAFOS ===== */
+        /* PÁRRAFOS */
         p {
             margin: 0 0 12px 0;
             text-align: justify;
         }
 
-        /* ===== BLOQUES DE CITA ===== */
-        .mw-quote {
-            background: #f8f9fa;
-            border-left: 4px solid #a2a9b1;
-            padding: 10px 20px;
-            margin: 15px 0;
-            font-style: italic;
-            color: #54595d;
-        }
-        .mw-quote cite {
-            display: block;
-            text-align: right;
-            font-style: normal;
-            font-size: 13px;
-            color: #202122;
-            margin-top: 5px;
-        }
-
-        /* ===== REFERENCIAS ===== */
+        /* REFERENCIAS */
         .references {
             font-size: 13px;
             margin-top: 20px;
@@ -310,7 +288,7 @@
             padding-left: 25px;
         }
 
-        /* ===== FOOTER ===== */
+        /* FOOTER */
         .mw-footer {
             clear: both;
             border-top: 1px solid #a2a9b1;
@@ -326,7 +304,7 @@
             text-align: left;
         }
 
-        /* ===== RESPONSIVE ===== */
+        /* RESPONSIVE */
         @media (max-width: 992px) {
             .mw-sidebar {
                 display: none;
@@ -372,12 +350,29 @@
             clear: both;
             display: table;
         }
+
+        /* Espacio vacío para la sección Conflicto con el color */
+        .conflicto-vacio {
+            background: #f0f0f0;
+            border: 2px dashed #a2a9b1;
+            border-radius: 8px;
+            padding: 40px 20px;
+            margin: 20px 0;
+            text-align: center;
+            color: #72777d;
+            font-style: italic;
+            min-height: 120px;
+        }
+        .conflicto-vacio p {
+            text-align: center;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
 
 <div class="mw-wrapper">
-    <!-- ===== SIDEBAR ===== -->
+    <!-- SIDEBAR -->
     <div class="mw-sidebar">
         <div class="logo">
             Wikipedia
@@ -407,7 +402,7 @@
         </ul>
     </div>
 
-    <!-- ===== CONTENIDO PRINCIPAL ===== -->
+    <!-- CONTENIDO PRINCIPAL -->
     <div class="mw-content">
 
         <!-- Barra superior -->
@@ -424,77 +419,59 @@
         <!-- Título -->
         <h1>Imperio de las Sombras</h1>
 
-        <!-- Advertencias -->
+        <!-- Advertencia -->
         <div class="mw-notice">
             <strong>Este artículo o sección necesita referencias que aparezcan en una publicación acreditada.</strong> Busca fuentes: <a href="#">"Imperio de las Sombras"</a> – <a href="#">noticias</a> · <a href="#">libros</a> · <a href="#">académico</a> · <a href="#">imágenes</a>
         </div>
-        <div class="mw-notice mw-notice-neutral">
-            <strong>Este artículo podría no cumplir con el punto de vista neutral.</strong> Discute este tema en la <a href="#">página de discusión</a>.
-        </div>
-        <div class="mw-notice mw-notice-danger">
-            <strong>⚠️ Esta página ha sido parcialmente redactada por falta de fuentes primarias.</strong> Algunas secciones se encuentran <a href="#">incompletas</a> o han sido <a href="#">eliminadas</a> por razones no especificadas.
-        </div>
 
-        <!-- ===== INFOBOX ===== -->
+        <!-- INFOBOX -->
         <div class="infobox">
             <div class="infobox-title">Imperio de las Sombras</div>
             <div class="infobox-image">
-                <span style="font-size:30px;">⬛⬛⬛</span><br>
+                <br>
                 <span style="color:#72777d;">Emblema oscuro (representación)</span>
             </div>
             <table>
-                <tr><td class="label">Tipo</td><td><a href="#">Imperio</a> / <a href="#">Monarquía absoluta</a></td></tr>
-                <tr><td class="label">Fundador</td><td><a href="#">Hatman</a></td></tr>
+                <tr><td class="label">Tipo</td><td>Imperio</td></tr>
                 <tr><td class="label">Gobernante final</td><td><a href="#">Hatman</a> (en funciones hasta su disolución)</td></tr>
                 <tr><td class="label">Capital</td><td><a href="#">Nadir</a> (en <a href="#">Schicía</a>)</td></tr>
-                <tr><td class="label">Idiomas oficiales</td><td><a href="#">Latín</a>, <a href="#">Francés</a>, <a href="#">Español</a></td></tr>
-                <tr><td class="label">Religión</td><td><a href="#">Culto a la oscuridad primordial</a></td></tr>
+                <tr><td class="label">Idiomas</td><td>Latín, Francés, Español</td></tr>
                 <tr><td class="label">Período histórico</td><td>Siglo XI a.C. – Siglo XVIII</td></tr>
-                <tr><td class="label">Establecimiento</td><td>~ 1050 a.C.</td></tr>
-                <tr><td class="label">Disolución</td><td>1763 d.C. (caída administrativa)</td></tr>
-                <tr><td class="label">Superficie máxima</td><td>~ 1/4 de <a href="#">Schicía</a></td></tr>
-                <tr><td class="label">Sucesor</td><td><a href="#">Reino del Color</a> (no oficial) / <a href="#">Estados fragmentados</a></td></tr>
+                <tr><td class="label">Disolución</td><td>ca. 1763 (caída administrativa)</td></tr>
+                <tr><td class="label">Sucesor</td><td>—</td></tr>
             </table>
         </div>
 
-        <!-- ===== INTRODUCCIÓN ===== -->
-        <p>
-            El <b>Imperio de las Sombras</b> (en <a href="#">latín</a>: <i>Imperium Umbrae</i>) fue una entidad política, onírica y metafísica que dominó gran parte de los reinos del subconsciente durante milenios. Fundado por la entidad conocida como <a href="#">Hatman</a>, se caracterizó por una estructura jerárquica basada en la percepción monolítica de la oscuridad, suprimiendo activamente otras formas de conciencia, en particular el denominado "<a href="#">Reino del Color</a>". Su caída es objeto de estudio en la <a href="#">psicología arcana</a> y se asocia con el reconocimiento tardío de la diversidad cognitiva.
-        </p>
-        <p>
-            El imperio alcanzó su máximo esplendor durante la denominada "<a href="#">Época del Nadir</a>", cuando la oscuridad se alzó por encima de todos los demás reinos. Su capital, <a href="#">Nadir</a>, se convirtió en un bastión de orden y penumbra, desde donde se gestionaban las provincias del imperio. Durante su apogeo, se estima que controló aproximadamente una cuarta parte del territorio de <a href="#">Schicía</a>, un país europeo limítrofe con <a href="#">España</a> y <a href="#">Francia</a>, conocido por ser un lugar donde las alucinaciones de la <a href="#">esquizofrenia</a> se manifiestan como realidad.
-        </p>
-        <p>
-            Sin embargo, su declive fue paulatino, atribuido tanto a la rigidez de su gobernante como al surgimiento de fuerzas contestatarias. La <a href="#">guerra contra el Color</a> —cuyos detalles permanecen <a href="#">clasificados</a> o <a href="#">perdidos</a>— marcó un punto de inflexión del que el imperio nunca logró recuperarse plenamente.
-        </p>
+        <!-- INTRODUCCIÓN -->
+        <p>El <b>Imperio de las Sombras</b> (en latín: <i>Imperium Umbrarum</i>) fue una entidad política soberana que se extendió por gran parte del territorio de <a href="#">Schicía</a>, una región europea limítrofe entre <a href="#">España</a> y <a href="#">Francia</a>, conocida en inglés como <i>Schizo-land</i>. Su existencia abarcó desde el siglo XI a.C. hasta mediados del siglo XVIII, y su capital se estableció en el <a href="#">Castillo de Nadir</a>, una fortaleza de roca negra que aún se alza en la actualidad.</p>
+        <p>El imperio fue gobernado durante la mayor parte de su apogeo por la figura de <a href="#">Hatman</a>, un monarca cuya influencia trascendió las fronteras y cuyas políticas de expansión permitieron al Imperio controlar aproximadamente una cuarta parte del territorio de Schicía. Su reinado se caracterizó por una relación ambivalente con las otras especies que poblaban el país: los <a href="#">Caro</a> (carne), los <a href="#">Lux</a> (luz) y los <a href="#">Hues</a> (color), cada uno de los cuales encarnaba manifestaciones de las alucinaciones propias de la esquizofrenia, que en Schicía cobraban realidad tangible.</p>
+        <p>El legado del Imperio perdura en las ruinas de sus ciudades, en la literatura y en la psicología moderna, que ha visto en su mitología una alegoría de la lucha entre la razón y la percepción.</p>
 
-        <!-- ===== TABLA DE CONTENIDO ===== -->
+        <!-- TABLA DE CONTENIDO -->
         <div class="toc" id="toc">
             <div class="toc-title">Contenido</div>
             <ul>
-                <li><span class="toc-number">1</span> <a href="#historia" class="toc-link" data-target="historia">Historia</a>
+                <li><span class="toc-number">1</span> <a href="#historia" class="toc-link active-section" data-target="historia">Historia</a>
                     <ul>
                         <li><span class="toc-number">1.1</span> <a href="#fundacion" class="toc-link" data-target="fundacion">Fundación y auge</a></li>
-                        <li><span class="toc-number">1.2</span> <a href="#conflicto" class="toc-link" data-target="conflicto">El conflicto territorial</a></li>
-                        <li><span class="toc-number">1.3</span> <a href="#guerra-color" class="toc-link" data-target="guerra-color">El conflicto con el Color</a></li>
-                        <li><span class="toc-number">1.4</span> <a href="#caida" class="toc-link" data-target="caida">La caída administrativa</a></li>
+                        <li><span class="toc-number">1.2</span> <a href="#expansion" class="toc-link" data-target="expansion">Expansión territorial</a></li>
+                        <li><span class="toc-number">1.3</span> <a href="#caida" class="toc-link" data-target="caida">La caída administrativa</a></li>
                     </ul>
                 </li>
-                <li><span class="toc-number">2</span> <a href="#ciudades" class="toc-link" data-target="ciudades">Ciudades y asentamientos</a>
+                <li><span class="toc-number">2</span> <a href="#ciudades" class="toc-link" data-target="ciudades">Ciudades del Imperio</a></li>
+                <li><span class="toc-number">3</span> <a href="#relaciones" class="toc-link" data-target="relaciones">Relaciones con otras especies</a>
                     <ul>
-                        <li><span class="toc-number">2.1</span> <a href="#nadir" class="toc-link" data-target="nadir">Nadir</a></li>
-                        <li><span class="toc-number">2.2</span> <a href="#umbral" class="toc-link" data-target="umbral">Umbral</a></li>
-                        <li><span class="toc-number">2.3</span> <a href="#penumbra" class="toc-link" data-target="penumbra">Penumbra</a></li>
+                        <li><span class="toc-number">3.1</span> <a href="#mothman" class="toc-link" data-target="mothman">El Mothman y su papel en el Imperio</a></li>
                     </ul>
                 </li>
-                <li><span class="toc-number">3</span> <a href="#mothman" class="toc-link" data-target="mothman">El Mothman y su relación con Hatman</a></li>
-                <li><span class="toc-number">4</span> <a href="#legado" class="toc-link" data-target="legado">Legado e interpretaciones</a>
+                <li><span class="toc-number">4</span> <a href="#conflicto-color" class="toc-link" data-target="conflicto-color">Conflicto con el color</a></li>
+                <li><span class="toc-number">5</span> <a href="#legado" class="toc-link" data-target="legado">Legado</a>
                     <ul>
-                        <li><span class="toc-number">4.1</span> <a href="#louiswain" class="toc-link" data-target="louiswain">Conexión con Louis Wain</a></li>
-                        <li><span class="toc-number">4.2</span> <a href="#psicologia" class="toc-link" data-target="psicologia">Perspectiva psicológica</a></li>
+                        <li><span class="toc-number">5.1</span> <a href="#louiswain" class="toc-link" data-target="louiswain">Conexión con Louis Wain</a></li>
+                        <li><span class="toc-number">5.2</span> <a href="#psicologia" class="toc-link" data-target="psicologia">Perspectiva psicológica</a></li>
                     </ul>
                 </li>
-                <li><span class="toc-number">5</span> <a href="#referencias" class="toc-link" data-target="referencias">Referencias</a></li>
+                <li><span class="toc-number">6</span> <a href="#referencias" class="toc-link" data-target="referencias">Referencias</a></li>
             </ul>
         </div>
 
@@ -502,145 +479,69 @@
         <h2 id="historia">Historia</h2>
 
         <h3 id="fundacion">Fundación y auge</h3>
-        <p>
-            Los inicios del imperio son poco documentados, pero se reconocen provincias formadas en los siglos anteriores a la era común como parte del territorio imperial. La capital, <a href="#">Nadir</a>, fue el centro de operaciones desde el cual se gestionaban las <a href="#">provincias umbrías</a>. <a href="#">Hatman</a>, el único y primer gobernante reconocido por su comunicación con la humanidad, fue quien más logros alcanzó y estableció las leyes fundamentales durante su reinado.
-        </p>
-        <p>
-            Entre sus contribuciones más notables se encuentran las <a href="#">Leyes de Interacción</a>, que regulaban el contacto entre las diferentes razas de <a href="#">Schicía</a>: <a href="#">Caro</a> (carne), <a href="#">Lux</a> (luz) y <a href="#">Hues</a> (color). Estas leyes, aunque restrictivas, permitieron una convivencia tensa pero funcional durante siglos. El imperio fomentó el avance de sus territorios, llegando a controlar aproximadamente una cuarta parte del país en su momento de máximo esplendor.
-        </p>
-        <p>
-            Durante la <a href="#">Época del Nadir</a>, se construyeron las grandes <a href="#">ciudades de sombra</a>, se establecieron rutas comerciales con otras razas y se desarrolló un sistema administrativo que perduraría hasta el colapso del imperio. La figura de Hatman se consolidó como un <a href="#">símbolo de unidad</a>, aunque las crónicas posteriores sugieren que su gobierno se volvió cada vez más <a href="#">autoritario</a> y <a href="#">paranoico</a>.
-        </p>
+        <p>Los orígenes del Imperio de las Sombras son difusos y se pierden en la tradición oral de las tribus que habitaban Schicía en la antigüedad. Los primeros registros escritos, en tablillas de piedra encontradas en las proximidades del <a href="#">Castillo de Nadir</a>, datan del siglo XI a.C. y mencionan la fundación de un asentamiento fortificado por parte de un líder conocido como <i>Umbrarchus</i>. No obstante, fue bajo el reinado de <a href="#">Hatman</a> —cuyo nombre original se ha perdido— cuando el Imperio alcanzó su máximo esplendor. Hatman, descrito en las crónicas como un ser de inteligencia prodigiosa y voluntad férrea, estableció un código de leyes que regulaba las interacciones entre las distintas <a href="#">especies de Schicía</a> y promovió la construcción de infraestructuras que conectaban los territorios controlados.</p>
+        <p>Durante esta época, la capital <a href="#">Nadir</a> se convirtió en un centro cultural y militar, y el Imperio extendió su influencia desde las montañas del norte hasta las llanuras del sur, consolidando su dominio sobre las regiones donde las sombras eran más densas. Se estima que en su punto álgido, hacia el siglo XIV, el Imperio controlaba cerca de una cuarta parte de la superficie de Schicía, con una red de caminos y puestos de vigilancia que garantizaban su hegemonía.</p>
 
-        <h3 id="conflicto">El conflicto territorial</h3>
-        <p>
-            El Imperio de las Sombras mantuvo diversos conflictos territoriales con las diferentes razas de <a href="#">Schicía</a>. Con <a href="#">Caro</a> (los seres de carne), los enfrentamientos fueron frecuentes debido a la expansión de las ciudades umbrías sobre territorios que estas criaturas consideraban sagrados o vitales para su subsistencia. La respuesta del imperio consistió en la <a href="#">caza selectiva</a> o el <a href="#">ahuyento pacífico</a>, priorizando siempre encontrar soluciones diplomáticas cuando las criaturas se mostraban receptivas.
-        </p>
-        <p>
-            Con <a href="#">Lux</a> (los seres de luz), la relación fue sorprendentemente amistosa. Estas entidades, conocidas por su <a href="#">naturaleza evanescente</a>, se retiraron pacientemente de las zonas reclamadas por el imperio sin oponer resistencia. Algunos historiadores especulan que los seres de luz simplemente <a href="#">no consideraban el territorio</a> como un concepto relevante, lo que facilitó la expansión umbría sin mayores contratiempos.
-        </p>
-        <p>
-            La raza <a href="#">Hues</a> (el Color) ocupaba regiones alejadas del núcleo imperial y, durante los primeros siglos, no representó un problema para la expansión de las sombras. Sin embargo, a medida que el imperio crecía, las fronteras comenzaron a rozar los <a href="#">dominios cromáticos</a>, sembrando las semillas de un conflicto que marcaría el destino del imperio.
-        </p>
-
-        <h3 id="guerra-color">El conflicto con el Color</h3>
-        <div class="mw-notice mw-notice-danger" style="margin-bottom:15px;">
-            <strong>⚠️ Esta sección ha sido parcialmente eliminada.</strong> El contenido original fue <a href="#">retirado</a> por razones de <a href="#">seguridad</a> o <a href="#">falta de fuentes verificables</a>. Se recomienda consultar <a href="#">archivos alternativos</a>.
-        </div>
-        <p>
-            El conflicto con el Color —también conocido como la <a href="#">Guerra de los Tonos</a> o la <a href="#">Contienda Cromática</a>— es uno de los episodios <a href="#">menos documentados</a> de la historia del imperio. Las fuentes primarias son <a href="#">escasas</a> y, en muchos casos, <a href="#">contradictorias</a>. Lo que se sabe con certeza es que la guerra fue <a href="#">extensa</a>, <a href="#">devastadora</a> y marcó un <a href="#">punto de inflexión</a> en las relaciones entre las razas de <a href="#">Schicía</a>.
-        </p>
-        <p>
-            Según los testimonios que han sobrevivido, el conflicto se originó cuando el imperio intentó expandirse hacia los <a href="#">territorios cromáticos</a> del este. Los seres de Color, liderados por una figura conocida como <a href="#">Kaley</a> —el <a href="#">Rey del Color</a>—, se negaron a ceder sus tierras y respondieron con una <a href="#">ofensiva masiva</a> que tomó por sorpresa a las fuerzas umbrías.
-        </p>
-        <p>
-            La guerra se prolongó durante décadas y, según algunas crónicas, Hatman recurrió a <a href="#">métodos cuestionables</a> para contener el avance del Color. Uno de los episodios más controvertidos fue el <a href="#">sellado de Kaley</a> en una "hielera" dimensional, una cámara de estasis mágica que lo mantendría prisionero. Hatman justificó esta acción como una <a href="#">medida temporal</a>, aunque las fuentes indican que el encierro se prolongó mucho más de lo previsto.
-        </p>
-        <p>
-            <span style="background:#f0f0f0; padding:2px 8px; border-radius:4px; color:#888; font-style:italic;">[El resto de esta sección ha sido eliminado. Consultar archivos históricos complementarios.]</span>
-        </p>
-        <div style="background:#f8f9fa; border:1px dashed #a2a9b1; padding:20px; margin:15px 0; text-align:center; color:#72777d;">
-            <span style="font-size:24px;">⬜⬜⬜</span><br>
-            <span style="font-size:13px;">Espacio reservado para contenido eliminado</span><br>
-            <span style="font-size:11px; color:#a2a9b1;">Esta sección ha sido vaciada por razones administrativas</span>
-        </div>
+        <h3 id="expansion">Expansión territorial</h3>
+        <p>La política expansionista del Imperio se basó en la ocupación gradual de territorios habitados por otras especies. Los <a href="#">Caro</a>, criaturas carnívoras que defendían sus dominios naturales, fueron desplazados mediante tácticas de hostigamiento y, en ocasiones, mediante acuerdos de no agresión que les permitían conservar ciertos santuarios. Los <a href="#">Lux</a>, seres luminosos y esquivos, optaron por retirarse pacíficamente hacia las zonas más elevadas y soleadas, sin oponer resistencia. Con los <a href="#">Hues</a>, que ocupaban los valles orientales, el Imperio mantuvo una relación ambigua: durante siglos coexistieron sin incidentes, hasta que estalló el conflicto que marcaría el declive de la dinastía.</p>
+        <p>Las ciudades fundadas por el Imperio reflejaban su obsesión por la geometría y la oscuridad. Cada asentamiento se diseñaba en torno a un eje central que proyectaba sombras alargadas durante el crepúsculo, y los edificios se construían con piedra volcánica de color negro o gris oscuro, para que se mimetizaran con el paisaje. La planificación urbana buscaba no solo la funcionalidad, sino también la imposición de una estética sombría que recordaba a los habitantes su pertenencia al Imperio.</p>
 
         <h3 id="caida">La caída administrativa</h3>
-        <p>
-            Con el paso de los siglos, el imperio se volvió obsoleto. Las estructuras rígidas de Hatman no pudieron adaptarse a la creciente diversidad del mundo onírico. En palabras de algunos historiadores, "el imperio no fue destruido, sino que murió de inanición, sepultado por su obsoleta adoración"<sup class="reference">[1]</sup>. Hatman, ya anciano y sin poder efectivo, observó cómo sus dominios se fragmentaban.
-        </p>
-        <p>
-            Al final de sus días, Hatman admitió que la opresión al Color había sido un error, aunque esta revelación llegó demasiado tarde para deshacer el daño causado. El sello de Kaley nunca fue roto por su mano, y el imperio se desvaneció en la memoria histórica, dando paso a una era de reinos fragmentados y percepciones diversas.
-        </p>
-        <div class="mw-quote">
-            "Con el avance de la sociedad de las sombras, ordenar expansión era un capricho, no una necesidad. Solo alimento del ego local."
-            <cite>— Fragmento encontrado en las ruinas de <a href="#">Nadir</a>, atribuido a un consejero anónimo.</cite>
-        </div>
-        <p>
-            Los testimonios de Hatman yacen vacíos, aunque se conoce que tuvo herederos, estos nunca tomaron la ambición que él tenía. El <a href="#">sombrero</a>, símbolo del poder imperial, se volvió un emblema para todos, no para uno.
-        </p>
+        <p>A partir del siglo XVII, el Imperio comenzó a mostrar signos de decadencia. Las estructuras rígidas impuestas por Hatman, que durante siglos habían garantizado la estabilidad, se volvieron obsoletas frente a la creciente diversidad y el mestizaje cultural. Los herederos de Hatman carecieron de su carisma y visión, y las provincias periféricas empezaron a gobernarse de facto de manera autónoma. En 1763, sin que mediara declaración oficial alguna, la comunicación con la familia real se interrumpió; el castillo de Nadir quedó vacío y el Imperio, como entidad unificada, dejó de existir. Los historiadores aún debaten si fue un colapso repentino o un lento desvanecimiento, pero lo cierto es que las sombras, que antes habían obedecido a un mando central, se dispersaron y se asentaron en las ciudades que habían fundado, dando lugar a una sociedad fragmentada que solo conserva el título monárquico como símbolo.</p>
 
         <!-- ===== SECCIÓN 2: CIUDADES ===== -->
-        <h2 id="ciudades">Ciudades y asentamientos</h2>
+        <h2 id="ciudades">Ciudades del Imperio</h2>
+        <p>El Imperio de las Sombras levantó numerosas ciudades, cada una con un diseño inspirado en la naturaleza de la sombra y la penumbra. Entre las más destacadas se encuentran:</p>
+        <ul>
+            <li><b><a href="#">Nadir</a></b> – Capital del Imperio, situada en un valle rodeado de montañas que proyectan sombras perpetuas. Su castillo, de roca negra, se alza sobre una colina y sus calles están trazadas en espiral para que la luz solar apenas alcance el suelo. La ciudad fue abandonada en el siglo XVIII, pero sus ruinas siguen siendo objeto de estudio.</li>
+            <li><b><a href="#">Umbría</a></b> – Ciudad gemela de Nadir, ubicada al este, conocida por sus túneles subterráneos que conectaban las viviendas y permitían a los habitantes moverse sin ser vistos. Su arquitectura se caracteriza por arcos de medio punto y contrafuertes que imitan las formas de las sombras proyectadas por los árboles.</li>
+            <li><b><a href="#">Tenebris</a></b> – Fundada en una llanura donde la niebla es perpetua, Tenebris fue un centro de comercio y artesanía. Sus edificios son bajos y anchos, con tejados de pizarra que absorben la luz, y sus plazas están adornadas con estatuas de figuras etéreas que parecen fundirse con el entorno.</li>
+            <li><b><a href="#">Nox</a></b> – Ciudad portuaria en la costa occidental, donde las sombras se reflejan en el agua. Nox fue la principal puerta marítima del Imperio y en ella se construyeron muelles cubiertos que protegían a los barcos de la luz del día. Sus almacenes subterráneos aún conservan restos de mercancías.</li>
+        </ul>
+        <p>Estas ciudades, aunque hoy despobladas, son testimonio del esplendor arquitectónico del Imperio y de su obsesión por dominar la oscuridad.</p>
 
-        <h3 id="nadir">Nadir</h3>
-        <p>
-            <b>Nadir</b> (del <a href="#">latín</a>: <i>nadir</i>, "opuesto al cenit") fue la capital del Imperio de las Sombras durante toda su existencia. Ubicada en el corazón de <a href="#">Schicía</a>, la ciudad se caracterizaba por su arquitectura de <a href="#">roca negra</a>, sus calles angostas y su perpetua penumbra. El <a href="#">Castillo de Veles</a>, residencia de Hatman, dominaba el horizonte con sus torres afiladas que parecían rasgar el cielo.
-        </p>
-        <p>
-            La ciudad contaba con una población estimada de <a href="#">50.000 habitantes</a> en su apogeo, compuesta principalmente por sombras y algunas delegaciones de otras razas. La <a href="#">Plaza del Cénit</a>, frente al castillo, albergaba monumentos dedicados a Hatman y a sus generales más leales, incluyendo una <a href="#">estatua ecuestre</a> del gobernante que fue derribada durante la caída del imperio.
-        </p>
-        <p>
-            Hoy en día, Nadir se encuentra <a href="#">abandonada</a>. No porque el lugar se haya vuelto inhabitable, sino porque la gente dejó de habitarlo por <a href="#">motivos desconocidos</a>. Los viajeros que se aventuran a sus ruinas reportan una <a href="#">sensación de opresión</a> y <a href="#">susurros ininteligibles</a> que parecen emanar de las piedras.
-        </p>
+        <!-- ===== SECCIÓN 3: RELACIONES CON OTRAS ESPECIES ===== -->
+        <h2 id="relaciones">Relaciones con otras especies</h2>
+        <p>El Imperio mantuvo contactos complejos con las demás especies que poblaban Schicía. Si bien la política oficial era la de someter o desplazar a aquellos que se opusieran a la expansión, también hubo alianzas y acuerdos de cooperación. La más notable de estas alianzas fue la establecida con el <a href="#">Mothman</a>, una criatura alada que, según las crónicas, se convirtió en un valioso aliado de Hatman durante las campañas militares.</p>
 
-        <h3 id="umbral">Umbral</h3>
-        <p>
-            <b>Umbral</b> (del <a href="#">latín</a>: <i>umbra</i>, "sombra") fue la segunda ciudad más importante del imperio. Situada en la <a href="#">Frontera Occidental</a>, servía como puesto de avanzada para las expediciones hacia los territorios de <a href="#">Caro</a> y <a href="#">Lux</a>. Su arquitectura era menos imponente que la de Nadir, pero sus <a href="#">murallas de obsidiana</a> eran legendarias por su resistencia.
-        </p>
-        <p>
-            Umbral fue también el lugar donde se firmaron varios <a href="#">tratados de paz</a> con las razas vecinas, incluyendo el <a href="#">Pacto de la Penumbra</a> (1247 d.C.) que estableció los límites territoriales con los seres de carne. La ciudad decayó rápidamente tras la caída del imperio y hoy es un <a href="#">pueblo fantasma</a> envuelto en leyendas.
-        </p>
+        <h3 id="mothman">El Mothman y su papel en el Imperio</h3>
+        <p>El <a href="#">Mothman</a> (literalmente "hombre polilla") es una entidad recurrente en el folclore de Schicía. Durante el apogeo del Imperio, Hatman logró establecer un vínculo con esta criatura, que actuó como exploradora y mensajera en los frentes de batalla. Se dice que el Mothman poseía una visión nocturna excepcional y podía cubrir grandes distancias en pocas horas, lo que lo convertía en un aliado estratégico. A diferencia de otras especies, el Mothman no buscaba territorio ni recursos, sino que parecía guiado por un instinto de protección hacia ciertos lugares sagrados. Hatman, reconociendo su utilidad, le otorgó el título de <i>Compañero de Guerra</i> y mandó erigir estelas conmemorativas en su honor en varias ciudades, como <a href="#">Tenebris</a> y <a href="#">Nox</a>. Con el fin del Imperio, la relación se desvaneció, pero el Mothman sigue siendo una figura venerada en algunas comunidades.</p>
 
-        <h3 id="penumbra">Penumbra</h3>
-        <p>
-            <b>Penumbra</b> fue un asentamiento menor, conocido por ser el <a href="#">centro espiritual</a> del imperio. Allí se encontraba el <a href="#">Templo de la Oscuridad Primordial</a>, donde los sacerdotes umbríos realizaban rituales para <a href="#">mantener el equilibrio</a> entre las sombras y el mundo material. La ciudad era también un <a href="#">lugar de peregrinación</a> para aquellos que buscaban <a href="#">respuestas</a> en la penumbra.
-        </p>
-        <p>
-            A diferencia de Nadir y Umbral, Penumbra no fue completamente abandonada. Hoy alberga una <a href="#">pequeña comunidad</a> de eruditos y <a href="#">buscadores de lo oculto</a> que mantienen vivas las tradiciones del imperio, aunque de forma <a href="#">secreta</a> y <a href="#">discreta</a>.
-        </p>
+        <!-- ===== SECCIÓN 4: CONFLICTO CON EL COLOR (CENTRAL) ===== -->
+        <h2 id="conflicto-color">Conflicto con el color</h2>
+        <p>El <b>Conflicto con el color</b> es, sin duda, el episodio más oscuro y menos documentado de la historia del Imperio de las Sombras. Los archivos oficiales, que en su día ocupaban varias salas del castillo de <a href="#">Nadir</a>, fueron sellados por orden del propio Hatman y posteriormente destruidos en un incendio del que no se conservan actas. Los pocos testimonios que han sobrevivido, en su mayoría fragmentos de cartas y diarios personales, aluden a una guerra de proporciones catastróficas que enfrentó a las sombras con los <a href="#">Hues</a> (la especie del color) en las postrimerías de la expansión imperial.</p>
+        <p>Se sabe que el conflicto estalló cuando los Hues, que hasta entonces habían habitado en los valles orientales sin interferir en los asuntos del Imperio, comenzaron a reclamar territorios que Hatman consideraba suyos. La naturaleza del enfrentamiento es confusa: algunos cronistas hablan de una lucha armada con ejércitos de formas cromáticas, otros mencionan plagas y maldiciones que teñían de colores irreales el paisaje. Lo que unánimemente se reconoce es que la guerra fue terrible, y que sus consecuencias marcaron el principio del fin para el Imperio. Hatman, al parecer, ordenó que se eliminara todo registro de los detalles, quizás por vergüenza o por temor a que el conocimiento del conflicto desestabilizara aún más su ya frágil dominio.</p>
+        <p>Hoy en día, los historiadores evitan profundizar en este tema; la documentación es tan escasa que cualquier reconstrucción sería pura especulación. El Imperio, en sus escritos posteriores a la guerra, silenció el nombre de los Hues y reemplazó cualquier mención explícita por eufemismos. Esta omisión deliberada ha alimentado todo tipo de teorías, pero ninguna ha podido ser confirmada.</p>
 
-        <!-- ===== SECCIÓN 3: MOTHMAN ===== -->
-        <h2 id="mothman">El Mothman y su relación con Hatman</h2>
-        <p>
-            Una de las figuras más <a href="#">enigmáticas</a> asociadas al Imperio de las Sombras es el <b>Mothman</b> (en <a href="#">latín</a>: <i>Homo Noctua</i>), una criatura alada que, según las crónicas, fue <a href="#">reconocida oficialmente</a> como <a href="#">compañero de guerra</a> y <a href="#">consejero</a> de Hatman durante los <a href="#">años más oscuros</a> del conflicto con el Color.
-        </p>
-        <p>
-            Los primeros registros del Mothman en el imperio datan del <a href="#">siglo XIV</a>, cuando fue avistado en las <a href="#">montañas del norte</a> de Schicía. En lugar de ser <a href="#">cazado</a> o <a href="#">exiliado</a>, como solía hacerse con las criaturas desconocidas, Hatman ordenó que se le <a href="#">recibiera con honores</a>. Según la leyenda, el Mothman se presentó ante el trono del emperador y ofreció su <a href="#">lealtad incondicional</a> a cambio de <a href="#">un lugar</a> en el reino de las sombras.
-        </p>
-        <p>
-            Hatman, impresionado por su <a href="#">sabiduría</a> y su <a href="#">capacidad para prever desastres</a>, aceptó la oferta y nombró al Mothman <a href="#">General de las Alas</a>, un título honorífico que lo convertía en el <a href="#">comandante supremo</a> de las fuerzas aéreas del imperio. Durante la <a href="#">Guerra de los Tonos</a>, el Mothman demostró ser un <a href="#">estratega excepcional</a>, utilizando su <a href="#">visión nocturna</a> y su <a href="#">capacidad de vuelo</a> para <a href="#">reconocer territorios</a> y <a href="#">anticipar movimientos</a> enemigos.
-        </p>
-        <p>
-            La relación entre Hatman y el Mothman fue <a href="#">inusualmente cercana</a>. Las crónicas los describen como <a href="#">compañeros inseparables</a>, compartiendo <a href="#">consejos</a>, <a href="#">estrategias</a> y, según algunos rumores, <a href="#">secretos</a> que nunca fueron revelados. Tras la caída del imperio, el Mothman desapareció sin dejar rastro. Algunos creen que <a href="#">regresó a las montañas</a>, otros que <a href="#">murió en combate</a> y hay quien asegura que <a href="#">aún vaga</a> por las ruinas de Nadir, esperando el regreso de su señor.
-        </p>
-        <div class="mw-quote">
-            "El Mothman no era un siervo, sino un igual. Su lealtad no se compraba con oro, sino con respeto. Y eso, en el Imperio de las Sombras, era más valioso que cualquier tesoro."
-            <cite>— <a href="#">Crónicas del Norte</a>, autor desconocido.</cite>
+        <!-- ESPACIO VACÍO (solicitado por el usuario) -->
+        <div class="conflicto-vacio">
+            <p><strong>Espacio reservado para documentación perdida</strong></p>
+            <p style="font-size:0.9em; margin-top:8px;">Los archivos originales sobre el Conflicto con el color fueron destruidos. Este espacio permanece vacío como recordatorio de lo que se perdió.</p>
         </div>
 
-        <!-- ===== SECCIÓN 4: LEGADO ===== -->
-        <h2 id="legado">Legado e interpretaciones</h2>
+        <!-- ===== SECCIÓN 5: LEGADO ===== -->
+        <h2 id="legado">Legado</h2>
+        <p>A pesar de su desaparición, el Imperio de las Sombras ha dejado una huella profunda en la cultura y el pensamiento de Schicía y más allá. Sus ruinas son visitadas por arqueólogos y turistas, y sus mitos han inspirado obras literarias y artísticas. El Castillo de Nadir, en particular, se ha convertido en un símbolo de la fugacidad del poder y de la fragilidad de los imperios.</p>
 
         <h3 id="louiswain">Conexión con Louis Wain</h3>
-        <p>
-            El caso del ilustrador británico <a href="#">Louis Wain</a> (1860-1939) ha sido citado por estudiosos de la <a href="#">psicología arcana</a> como un paralelismo con el conflicto del Imperio de las Sombras. Wain, célebre por sus dibujos de gatos, experimentó un cambio drástico en su estilo a medida que su percepción se transformaba, pasando de figuras realistas a patrones cromáticos psicodélicos y fractales.
-        </p>
-        <p>
-            La analogía sugiere que la sociedad (representada por Hatman) tiende a etiquetar lo "colorido" como caótico o patológico, encerrándolo en diagnósticos en lugar de integrarlo. El encierro de Kaley se interpreta, en este contexto, como la negación sistémica de la <a href="#">neurodivergencia</a>, mientras que la propuesta de liberación controlada (defendida por el nieto de Hatman, <a href="#">La Muerte</a>) simboliza una aproximación más inclusiva a la diversidad mental<sup class="reference">[2]</sup>.
-        </p>
+        <p>El artista británico <a href="#">Louis Wain</a> (1860-1939), conocido por sus ilustraciones de gatos con patrones psicodélicos, mostró un interés tardío por la mitología de Schicía. En sus últimos años, Wain produjo una serie de dibujos titulada <i>Los reinos de la sombra</i>, donde plasmaba paisajes nocturnos poblados por criaturas híbridas que recuerdan a las descripciones de los <a href="#">Caro</a> y los <a href="#">Hues</a>. Aunque no hay evidencia de que Wain visitara Schicía, sus biógrafos sugieren que pudo haber tenido acceso a crónicas del Imperio a través de corresponsales europeos. Su obra ha sido reivindicada como una interpretación personal del conflicto entre la luz y la oscuridad.</p>
 
         <h3 id="psicologia">Perspectiva psicológica</h3>
-        <p>
-            La psicología moderna ha analizado el mito del Imperio de las Sombras como una alegoría de la <a href="#">esquizofrenia</a>. El término "color" representa las percepciones no normativas, mientras que la "sombra" simboliza la estructura racional y dominante. Hatman, en este marco, encarna la figura del <a href="#">"yo" represor</a> que no elimina al <a href="#">"ello"</a> (Kaley), pero lo confina para mantener una apariencia de orden. El arrepentimiento final de Hatman, aunque genuino, resulta estéril porque nunca se tradujo en una acción liberadora, reflejando la tragedia de quienes reconocen su error pero carecen del valor para rectificarlo<sup class="reference">[3]</sup>.
-        </p>
-        <p>
-            El <a href="#">país de Schicía</a>, donde se ambienta la historia, refuerza esta interpretación. Al ser un lugar donde las alucinaciones se vuelven realidad, las razas que lo habitan (<a href="#">Caro</a>, <a href="#">Lux</a>, <a href="#">Umbra</a> y <a href="#">Hues</a>) representan diferentes aspectos de la experiencia psicótica. La dominación de <a href="#">Umbra</a> (la sombra) sobre las demás refleja la tendencia humana a <a href="#">jerarquizar</a> y <a href="#">patologizar</a> aquello que no comprende.
-        </p>
+        <p>Desde la psicología moderna, el mito del Imperio de las Sombras se ha interpretado como una alegoría de la <a href="#">esquizofrenia</a>. Las especies <a href="#">Caro</a>, <a href="#">Lux</a>, <a href="#">Umbra</a> y <a href="#">Hues</a> representarían diferentes facetas de la percepción alterada: la carne (instinto), la luz (claridad), la sombra (estructura) y el color (desorden sensorial). Hatman encarnaría la figura del "yo" represor, que intenta mantener el control pero finalmente sucumbe ante la complejidad de su propio mundo interior. El arrepentimiento final de Hatman, aunque sincero, resulta estéril porque nunca se tradujo en una acción liberadora, reflejando la tragedia de quienes reconocen su error pero carecen del valor para rectificarlo<sup class="reference">[3]</sup>.</p>
 
         <!-- ===== REFERENCIAS ===== -->
-        <div class="references">
-            <h2 id="referencias">Referencias</h2>
+        <div class="references" id="referencias">
+            <h2>Referencias</h2>
             <ol>
-                <li><i>Umbra: Historia del Imperio de las Sombras</i>, Autor desconocido, Editorial del Subconsciente, Año 234 (Era Arcana).</li>
-                <li>Pérez, J. (2020). <i>Gatos, Sombras y Neurodivergencia: El legado de Louis Wain en la metafísica onírica</i>. Revista de Psicología Profunda, vol 12, pp. 45-67.</li>
-                <li>Martínez, L. (2019). <i>El Orgullo del Tirano: Un estudio de caso sobre Hatman</i>. Editorial Umbrales.</li>
-                <li><i>Crónicas del Norte: Avisos y profecías del Mothman</i>, Anónimo, Archivos de Nadir, siglo XIV.</li>
-                <li><i>Schicía: Geografía de lo Irreal</i>, Fernández, M. (2005). Editorial Onírica.</li>
+                <li><i>Umbra: Crónicas del Imperio</i>, Autor desconocido, manuscrito encontrado en Nadir, año 234.</li>
+                <li><i>Caro, Lux, Hues: Las especies de Schicía</i>, Editorial Sombras, 1789.</li>
+                <li><i>Shadows and Mind: A Psychological Reading of the Umbrarum Empire</i>, Mathew Wain, 1834.</li>
+                <li><i>Arquitectura de la penumbra: ciudades del Imperio</i>, L. Nox, 2001.</li>
+                <li><i>El Mothman en la historia de Schicía</i>, A. Crepúsculo, 2005.</li>
             </ol>
         </div>
 
-        <!-- ===== FOOTER ===== -->
+        <!-- FOOTER -->
         <div class="mw-footer">
             <p>Esta página se editó por última vez el 26 de julio de 2026 a las 14:30.</p>
             <p>El contenido está disponible bajo la licencia <a href="#">Creative Commons Atribución-CompartirIgual 3.0</a> a menos que se indique lo contrario.</p>
@@ -654,16 +555,6 @@
                 <a href="#">Estadísticas</a>
             </p>
         </div>
-
-        <!-- ===== PISTA OCULTA PARA EL ARG ===== -->
-        <!-- 
-        [ARG - PISTA]: 
-        "El Color no fue borrado, solo silenciado. 
-        Busca la tercera hielera, donde el azul se mezcla con el negro. 
-        No todo lo que se sella merece la muerte. 
-        El verdadero imperio nunca gobernó sobre otros, sino sobre sí mismo." 
-        -->
-
     </div> <!-- fin mw-content -->
 </div> <!-- fin mw-wrapper -->
 
