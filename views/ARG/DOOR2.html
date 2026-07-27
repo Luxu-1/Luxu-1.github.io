@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Imperio de las Sombras - Wikipedia, la enciclopedia libre</title>
@@ -362,14 +361,1755 @@
             color: #72777d;
             font-style: italic;
             min-height: 120px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            user-select: none;
+        }
+        .conflicto-vacio:hover {
+            background: #e0e0e0;
+            transform: scale(1.01);
         }
         .conflicto-vacio p {
             text-align: center;
             margin: 0;
         }
+
+        /* ===================== MODO RAINBOW ===================== */
+        /* Capa de color que tiñe toda la página */
+        #rainbow-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9998;
+            mix-blend-mode: color;
+            opacity: 0;
+            background: linear-gradient(45deg, #ff0000, #ff8800, #ffff00, #00ff00, #0088ff, #8800ff, #ff00ff);
+            background-size: 400% 400%;
+            animation: rainbow-bg 3s ease infinite;
+            transition: opacity 1.2s ease;
+        }
+        #rainbow-overlay.active {
+            opacity: 0.85;
+        }
+        @keyframes rainbow-bg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Contenedor de los textos LIAR (por encima de la capa de color) */
+        #liar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            overflow: hidden;
+        }
+        .liar-text {
+            position: absolute;
+            font-size: 12vw;
+            font-weight: 900;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            color: white;
+            text-shadow: 0 0 20px rgba(0,0,0,0.5);
+            mix-blend-mode: overlay;
+            white-space: nowrap;
+            will-change: transform;
+            animation: liar-move 2.5s linear infinite;
+            opacity: 0.7;
+        }
+        /* Cada elemento tendrá diferentes posiciones y retrasos para simular un flujo continuo */
+        @keyframes liar-move {
+            0% {
+                transform: translate(100vw, 100vh) rotate(0deg) scale(1);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translate(-100vw, -100vh) rotate(720deg) scale(1.2);
+                opacity: 0.2;
+            }
+        }
     </style>
-</head>
-<body>
+<style>
+/* ============================================
+   HTML Visual Editor v2 — Injected Styles (embedded)
+   Design: Claude Design System
+   ============================================ */
+
+[data-hve-hovered] {
+  outline: 2px dashed #cc785c !important;
+  outline-offset: 2px !important;
+  cursor: pointer !important;
+}
+
+td[data-hve-hovered],
+th[data-hve-hovered],
+tr[data-hve-hovered] {
+  outline-offset: -2px !important;
+}
+
+[data-hve-selected] {
+  outline: 2px solid #cc785c !important;
+  outline-offset: 2px !important;
+  cursor: default;
+  touch-action: none;
+}
+
+[data-hve-dragging] {
+  touch-action: none;
+}
+
+[data-hve-handle] {
+  touch-action: none;
+}
+
+[data-hve-selected]:not(td):not(th):not(tr):not(thead):not(tbody):not(tfoot):not(table) {
+  position: relative;
+}
+
+
+td[data-hve-selected],
+th[data-hve-selected],
+tr[data-hve-selected] {
+  outline-offset: -2px !important;
+}
+
+table[data-hve-selected] {
+  outline-offset: 2px !important;
+  position: relative;
+}
+
+[data-hve-dragging] {
+  opacity: 0.85 !important;
+  outline: 2px dashed #a9583e !important;
+  cursor: grabbing !important;
+  box-shadow: 0 8px 32px rgba(20,20,19,0.2), 0 2px 8px rgba(204,120,92,0.15) !important;
+  transition: box-shadow 0.15s ease, opacity 0.15s ease !important;
+  z-index: 10000 !important;
+}
+
+[data-hve-editing] {
+  outline: 2px solid #a9583e !important;
+  outline-offset: 2px !important;
+  cursor: text !important;
+  min-height: 1em;
+}
+
+td[data-hve-editing],
+th[data-hve-editing] {
+  outline-offset: -2px !important;
+}
+
+/* Firefox scrollbar styling */
+[data-hve-editor],
+[data-hve-toolbar],
+[data-hve-context-menu],
+[data-hve-page-sorter],
+[data-hve-chart-panel] {
+  scrollbar-width: thin;
+  scrollbar-color: #8e8b82 transparent;
+}
+
+/* ---- Floating Toolbar ---- */
+[data-hve-toolbar] {
+  position: fixed;
+  display: none;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 10px;
+  background: #faf9f5;
+  border: 1px solid #e6dfd8;
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(20,20,19,0.12), 0 1px 4px rgba(20,20,19,0.08);
+  z-index: 2147483644;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  user-select: none;
+  backdrop-filter: blur(8px);
+  writing-mode: horizontal-tb;
+  direction: ltr;
+  text-align: left;
+  word-break: normal;
+  word-wrap: normal;
+  overflow-wrap: normal;
+  white-space: nowrap;
+  line-height: 1.4;
+  text-transform: none;
+  letter-spacing: normal;
+  text-indent: 0;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+[data-hve-toolbar] .hve-tb-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+[data-hve-toolbar] * {
+  writing-mode: horizontal-tb;
+  direction: ltr;
+  word-break: normal;
+  box-sizing: border-box;
+}
+
+[data-hve-toolbar] .hve-tb-sep {
+  width: 1px;
+  height: 22px;
+  background: #e6dfd8;
+  margin: 0 4px;
+}
+
+[data-hve-toolbar] button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  color: #3d3d3a;
+  transition: all 0.15s ease;
+  padding: 0;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+[data-hve-toolbar] button:hover {
+  background: #f5f0e8;
+  color: #141413;
+}
+
+[data-hve-toolbar] button:active {
+  background: #e6dfd8;
+  transform: scale(0.93);
+}
+
+[data-hve-toolbar] button.hve-active {
+  background: #cc785c;
+  color: white;
+}
+
+[data-hve-toolbar] button.hve-active:hover {
+  background: #a9583e;
+}
+
+[data-hve-toolbar] .hve-tb-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 64px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* ---- Dropdown ---- */
+[data-hve-dropdown] {
+  position: fixed;
+  background: #faf9f5;
+  border: 1px solid #e6dfd8;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(20,20,19,0.15);
+  padding: 6px;
+  z-index: 2147483645;
+  min-width: 140px;
+  max-height: 320px;
+  overflow-y: auto;
+  animation: hve-dropdown-in 0.15s ease;
+  white-space: normal;
+}
+
+[data-hve-dropdown] .hve-dd-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #3d3d3a;
+  transition: background 0.12s;
+  white-space: nowrap;
+}
+
+[data-hve-dropdown] .hve-dd-item:hover {
+  background: #f5f0e8;
+  color: #141413;
+}
+
+[data-hve-dropdown] .hve-dd-item .hve-dd-icon {
+  font-size: 15px;
+  width: 20px;
+  text-align: center;
+}
+
+[data-hve-dropdown] .hve-dd-divider {
+  height: 1px;
+  background: #e6dfd8;
+  margin: 4px 0;
+}
+
+@keyframes hve-dropdown-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ---- Insert Indicator ---- */
+[data-hve-insert-indicator] {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #cc785c;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 2147483640;
+  animation: hve-indicator-pulse 1.5s ease infinite;
+}
+
+@keyframes hve-indicator-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ---- Insert Panel ---- */
+[data-hve-insert-panel] {
+  position: fixed;
+  z-index: 2147483646;
+  background: #faf9f5;
+  border: 1px solid #e6dfd8;
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(20,20,19,0.18), 0 2px 8px rgba(20,20,19,0.08);
+  padding: 8px;
+  min-width: 200px;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  animation: hve-panel-in 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-hve-insert-panel] .hve-ip-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #8e8b82;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 8px 12px 6px;
+}
+
+[data-hve-insert-panel] .hve-ip-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+[data-hve-insert-panel] .hve-ip-item:hover {
+  background: #f5f0e8;
+}
+
+[data-hve-insert-panel] .hve-ip-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: #f5f0e8;
+}
+
+[data-hve-insert-panel] .hve-ip-text {
+  display: flex;
+  flex-direction: column;
+}
+
+[data-hve-insert-panel] .hve-ip-text span:first-child {
+  font-size: 13px;
+  font-weight: 500;
+  color: #141413;
+}
+
+[data-hve-insert-panel] .hve-ip-text span:last-child {
+  font-size: 11px;
+  color: #8e8b82;
+  margin-top: 1px;
+}
+
+@keyframes hve-panel-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ---- Dialog ---- */
+[data-hve-dialog-overlay] {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(20,20,19,0.4);
+  backdrop-filter: blur(4px);
+  z-index: 2147483645;
+  animation: hve-fade-in 0.2s ease;
+}
+
+[data-hve-dialog] {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 2147483646;
+  background: #faf9f5;
+  border: 1px solid #e6dfd8;
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(20,20,19,0.2);
+  padding: 28px;
+  min-width: 320px;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  animation: hve-dialog-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-hve-dialog] h3 {
+  font-size: 17px;
+  font-weight: 600;
+  color: #141413;
+  margin-bottom: 20px;
+}
+
+[data-hve-dialog] label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6c6a64;
+  margin-bottom: 6px;
+}
+
+[data-hve-dialog] input[type="number"],
+[data-hve-dialog] input[type="text"],
+[data-hve-dialog] select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e6dfd8;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #faf9f5;
+  color: #141413;
+  transition: border-color 0.2s;
+}
+
+[data-hve-dialog] input:focus,
+[data-hve-dialog] select:focus {
+  outline: none;
+  border-color: #cc785c;
+  box-shadow: 0 0 0 3px rgba(204,120,92,0.12);
+}
+
+[data-hve-dialog] .hve-dialog-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+[data-hve-dialog] .hve-btn-cancel {
+  padding: 9px 18px;
+  border: 1px solid #e6dfd8;
+  border-radius: 10px;
+  background: #faf9f5;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #3d3d3a;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+[data-hve-dialog] .hve-btn-cancel:hover {
+  background: #f5f0e8;
+}
+
+[data-hve-dialog] .hve-btn-confirm {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #cc785c, #a9583e);
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  box-shadow: 0 2px 8px rgba(204,120,92,0.3);
+  transition: all 0.15s;
+}
+
+[data-hve-dialog] .hve-btn-confirm:hover {
+  background: #a9583e;
+  box-shadow: 0 4px 12px rgba(204,120,92,0.4);
+}
+
+@keyframes hve-dialog-in {
+  from { opacity: 0; transform: translate(-50%,-50%) scale(0.95); }
+  to { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+}
+
+@keyframes hve-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ---- Toast ---- */
+@keyframes hve-toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ---- Resize Handles ---- */
+[data-hve-resize-container] {
+  pointer-events: none;
+}
+
+[data-hve-handle] {
+  pointer-events: all;
+  transition: background 0.15s, transform 0.15s;
+}
+
+[data-hve-handle]:hover {
+  background: #a9583e !important;
+  transform: scale(1.3);
+}
+
+/* ---- Context Menu ---- */
+[data-hve-context-menu] {
+  position: fixed;
+  z-index: 2147483647;
+  background: #faf9f5;
+  border: 1px solid #e6dfd8;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(20,20,19,0.15);
+  padding: 6px;
+  min-width: 180px;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  animation: hve-dropdown-in 0.15s ease;
+}
+
+[data-hve-context-menu] .hve-cm-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #3d3d3a;
+  transition: background 0.12s;
+}
+
+[data-hve-context-menu] .hve-cm-item:hover {
+  background: #f5f0e8;
+  color: #141413;
+}
+
+[data-hve-context-menu] .hve-cm-item.danger {
+  color: #EF4444;
+}
+
+[data-hve-context-menu] .hve-cm-item.danger:hover {
+  background: #FEF2F2;
+}
+
+[data-hve-context-menu] .hve-cm-divider {
+  height: 1px;
+  background: #e6dfd8;
+  margin: 4px 0;
+}
+
+[data-hve-context-menu] .hve-cm-icon {
+  width: 18px;
+  text-align: center;
+  font-size: 14px;
+}
+
+[data-hve-context-menu] .hve-cm-shortcut {
+  margin-left: auto;
+  font-size: 11px;
+  color: #e6dfd8;
+  font-family: 'SF Mono', monospace;
+}
+
+/* ---- Status Indicator ---- */
+[data-hve-status] {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #cc785c, #a9583e);
+  color: white;
+  border-radius: 24px;
+  font: 13px/1.4 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(204,120,92,0.35);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s;
+}
+
+[data-hve-status]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(204,120,92,0.45);
+}
+
+[data-hve-status] .hve-status-dot {
+  width: 8px;
+  height: 8px;
+  background: #10B981;
+  border-radius: 50%;
+  animation: hve-pulse 2s ease infinite;
+}
+
+@keyframes hve-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ---- Quick Add Button ---- */
+[data-hve-quick-add] {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ---- Multi-select ---- */
+[data-hve-multi-selected] {
+  outline: 2px solid #cc785c !important;
+  outline-offset: 2px !important;
+  cursor: move !important;
+  box-shadow: 0 0 0 4px rgba(204, 120, 92, 0.12) !important;
+}
+
+[data-hve-marquee-preview] {
+  outline: 2px dashed #cc785c !important;
+  outline-offset: 1px !important;
+  box-shadow: 0 0 0 3px rgba(204, 120, 92, 0.1) !important;
+}
+
+[data-hve-marquee] {
+  transition: none !important;
+}
+
+[data-hve-multi-toast] {
+  position: fixed;
+  bottom: 64px;
+  right: 20px;
+  z-index: 2147483647;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  background: #faf9f5;
+  border: 1px solid #e6dfd8;
+  border-radius: 14px;
+  font: 13px/1.4 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #3d3d3a;
+  box-shadow: 0 4px 16px rgba(20, 20, 19, 0.12);
+  user-select: none;
+  animation: hve-panel-in 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-hve-multi-toast] .hve-multi-info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+[data-hve-multi-toast] .hve-multi-dot {
+  width: 8px;
+  height: 8px;
+  background: #cc785c;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+[data-hve-multi-toast] b {
+  color: #cc785c;
+  font-weight: 700;
+}
+
+[data-hve-multi-toast] .hve-multi-actions {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 0;
+}
+
+[data-hve-multi-toast] .hve-multi-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  color: #3d3d3a;
+  transition: all 0.12s ease;
+  padding: 0;
+}
+
+[data-hve-multi-toast] .hve-multi-actions button:hover {
+  background: #f5f0e8;
+  color: #141413;
+}
+
+[data-hve-multi-toast] .hve-multi-actions button:active {
+  background: #e6dfd8;
+  transform: scale(0.92);
+}
+
+[data-hve-multi-toast] .hve-multi-actions .hve-multi-btn-danger:hover {
+  background: #FEF2F2;
+  color: #EF4444;
+}
+
+[data-hve-multi-toast] .hve-multi-sep {
+  width: 1px;
+  height: 18px;
+  background: #e6dfd8;
+  margin: 0 3px;
+  flex-shrink: 0;
+}
+
+[data-hve-multi-toast] .hve-multi-hint {
+  color: #e6dfd8;
+  font-size: 11px;
+}
+
+/* ---- Locked Elements ---- */
+[data-hve-locked] {
+  cursor: not-allowed !important;
+  position: relative;
+}
+
+[data-hve-group][data-hve-selected] {
+  outline-style: dashed !important;
+  outline-color: #5db8a6 !important;
+}
+
+[data-hve-group][data-hve-selected]::before {
+  content: 'Group' !important;
+  background: #5db8a6 !important;
+}
+
+[data-hve-locked]::after {
+  content: '🔒';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 12px;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+[data-hve-locked][data-hve-selected] {
+  outline-color: #8e8b82 !important;
+}
+
+[data-hve-context-menu] .hve-cm-item.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  cursor: default;
+}
+
+/* ---- Page Sorter ---- */
+[data-hve-page-sorter] {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  z-index: 2147483646;
+  background: #faf9f5;
+  border: 1px solid #e6dfd8;
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(20,20,19,0.18), 0 2px 8px rgba(20,20,19,0.08);
+  width: 340px;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  animation: hve-panel-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-hve-page-sorter] .hve-ps-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e6dfd8;
+  background: #f5f0e8;
+  border-radius: 16px 16px 0 0;
+  flex-shrink: 0;
+}
+
+[data-hve-page-sorter] .hve-ps-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #141413;
+}
+
+[data-hve-page-sorter] .hve-ps-count {
+  font-size: 11px;
+  color: #cc785c;
+  background: #efe9de;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+[data-hve-page-sorter] .hve-ps-close {
+  margin-left: auto;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #8e8b82;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+[data-hve-page-sorter] .hve-ps-close:hover {
+  background: #f5f0e8;
+  color: #141413;
+}
+
+[data-hve-page-sorter] .hve-ps-list {
+  overflow-y: auto;
+  padding: 8px;
+  flex: 1;
+}
+
+[data-hve-page-sorter] .hve-ps-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 2px solid transparent;
+  margin-bottom: 4px;
+}
+
+[data-hve-page-sorter] .hve-ps-item:hover {
+  background: #f5f0e8;
+}
+
+[data-hve-page-sorter] .hve-ps-item.active {
+  border-color: #cc785c;
+  background: #efe9de;
+}
+
+[data-hve-page-sorter] .hve-ps-item.dragging {
+  opacity: 0.5;
+  transform: scale(0.95);
+}
+
+[data-hve-page-sorter] .hve-ps-item.drag-over {
+  border-color: #cc785c;
+  background: #efe9de;
+}
+
+[data-hve-page-sorter] .hve-ps-thumb {
+  flex-shrink: 0;
+}
+
+[data-hve-page-sorter] .hve-ps-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+[data-hve-page-sorter] .hve-ps-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+[data-hve-page-sorter] .hve-ps-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: #cc785c;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+[data-hve-page-sorter] .hve-ps-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #141413;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-hve-page-sorter] .hve-ps-actions {
+  display: flex;
+  gap: 4px;
+}
+
+[data-hve-page-sorter] .hve-ps-btn {
+  width: 26px;
+  height: 26px;
+  border: 1px solid #e6dfd8;
+  border-radius: 6px;
+  background: #faf9f5;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  padding: 0;
+}
+
+[data-hve-page-sorter] .hve-ps-btn:hover:not(:disabled) {
+  background: #f5f0e8;
+  border-color: #cc785c;
+}
+
+[data-hve-page-sorter] .hve-ps-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* ---- Alignment Guides ---- */
+[data-hve-guide] {
+  pointer-events: none !important;
+  opacity: 0.8;
+}
+
+/* ---- Format Brush ---- */
+[data-hve-format-brush] * {
+  cursor: copy !important;
+}
+
+[data-hve-format-brush] [data-hve-hovered] {
+  outline-color: #5db8a6 !important;
+  outline-style: dashed !important;
+}
+
+/* ---- Color Panel ---- */
+[data-hve-color-panel] {
+  position: fixed;
+  background: #faf9f5;
+  border: 1px solid #e6dfd8;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(20,20,19,0.15);
+  padding: 12px;
+  z-index: 2147483646;
+  width: 240px;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  animation: hve-dropdown-in 0.15s ease;
+  white-space: normal;
+}
+
+[data-hve-color-panel] .hve-cp-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #8e8b82;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+[data-hve-color-panel] .hve-cp-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 3px;
+  margin-bottom: 10px;
+}
+
+[data-hve-color-panel] .hve-cp-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  box-sizing: border-box;
+}
+
+[data-hve-color-panel] .hve-cp-swatch:hover {
+  transform: scale(1.2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 1;
+  position: relative;
+}
+
+[data-hve-color-panel] .hve-cp-swatch.active {
+  outline: 2px solid #cc785c;
+  outline-offset: 2px;
+  transform: scale(1.15);
+}
+
+[data-hve-color-panel] .hve-cp-custom {
+  border-top: 1px solid #e6dfd8;
+  padding-top: 8px;
+}
+
+[data-hve-color-panel] .hve-cp-custom label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #8e8b82;
+  display: block;
+  margin-bottom: 6px;
+}
+
+[data-hve-color-panel] .hve-cp-custom-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+[data-hve-color-panel] .hve-cp-native {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e6dfd8;
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 2px;
+  background: #faf9f5;
+  flex-shrink: 0;
+}
+
+[data-hve-color-panel] .hve-cp-native::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+[data-hve-color-panel] .hve-cp-native::-webkit-color-swatch {
+  border: none;
+  border-radius: 5px;
+}
+
+[data-hve-color-panel] .hve-cp-hex {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #e6dfd8;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: 'SF Mono', monospace;
+  color: #141413;
+  background: #faf9f5;
+  text-transform: uppercase;
+}
+
+[data-hve-color-panel] .hve-cp-hex:focus {
+  outline: none;
+  border-color: #cc785c;
+  box-shadow: 0 0 0 3px rgba(204,120,92,0.12);
+}
+
+/* ---- Content Boxes ---- */
+[data-hve-content-box] {
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+[data-hve-content-box]:hover {
+  border-color: #e6dfd8 !important;
+}
+
+[data-hve-content-box][data-hve-selected] {
+  border-color: #cc785c !important;
+  box-shadow: 0 0 0 3px rgba(204, 120, 92, 0.1) !important;
+}
+
+[data-hve-content-box].hve-drop-hover {
+  border-color: #cc785c !important;
+  background: rgba(204, 120, 92, 0.04) !important;
+  box-shadow: 0 0 0 3px rgba(204, 120, 92, 0.12) !important;
+}
+
+[data-hve-box-toolbar] button:hover {
+  border-color: #cc785c !important;
+  background: #efe9de !important;
+  transform: scale(1.08);
+}
+
+[data-hve-box-toolbar] button:active {
+  transform: scale(0.95);
+}
+
+[data-hve-placeholder] {
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+[data-hve-content-box]:hover [data-hve-placeholder] {
+  opacity: 1;
+}
+
+/* ---- Image Drop Overlay ---- */
+[data-hve-drop-overlay] {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 2147483645;
+  background: rgba(204, 120, 92, 0.06);
+  border: 3px dashed #cc785c;
+  pointer-events: none;
+  animation: hve-drop-overlay-in 0.25s ease;
+}
+
+[data-hve-drop-overlay] .hve-drop-content {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 48px;
+  background: rgba(250, 249, 245, 0.95);
+  border: 2px solid #cc785c;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(204, 120, 92, 0.2);
+  backdrop-filter: blur(8px);
+}
+
+[data-hve-drop-overlay] .hve-drop-content span {
+  font: 16px/1.4 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-weight: 600;
+  color: #cc785c;
+  letter-spacing: 0.3px;
+}
+
+@keyframes hve-drop-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+[data-hve-drop-indicator] {
+  animation: hve-drop-indicator-pulse 1s ease infinite;
+}
+
+@keyframes hve-drop-indicator-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ---- Floating Elements (absolute-positioned, styled identically to flow-mode elements) ---- */
+
+/* Prevent [data-hve-selected] position:relative from overriding float absolute positioning.
+   Inline style (position:absolute) already wins over CSS rules, but this guard ensures
+   no specificity edge case can break it. */
+[data-hve-floating][data-hve-selected] {
+  position: absolute !important;
+}
+
+@keyframes hve-float-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+[data-hve-floating].hve-float-new {
+  animation: hve-float-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---- Insert Panel Mode Toggle ---- */
+.hve-ip-mode-toggle {
+  display: flex;
+  gap: 4px;
+  padding: 6px 8px;
+  background: #f5f0e8;
+  border-radius: 10px;
+  margin: 4px 8px;
+}
+
+.hve-ip-mode-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  color: #6c6a64;
+  transition: all 0.15s;
+}
+
+.hve-ip-mode-btn:hover {
+  color: #3d3d3a;
+  background: rgba(255,255,255,0.6);
+}
+
+.hve-ip-mode-btn.active {
+  background: #faf9f5;
+  color: #cc785c;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(20,20,19,0.08);
+}
+
+.hve-ip-divider {
+  height: 1px;
+  background: #e6dfd8;
+  margin: 4px 0;
+}
+
+/* ---- PDF Pagination ---- */
+[data-hve-pdf-panel] {
+  position: fixed;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 260px;
+  background: #faf9f5;
+  border: 1px solid #e6dfd8;
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(20,20,19,0.12), 0 1px 4px rgba(20,20,19,0.08);
+  z-index: 2147483645;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  animation: hve-pdf-panel-in 0.3s cubic-bezier(0.4,0,0.2,1);
+  overflow: hidden;
+}
+
+@keyframes hve-pdf-panel-in {
+  from { opacity: 0; transform: translateY(-50%) translateX(12px); }
+  to { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+
+.hve-pdf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid #e6dfd8;
+  background: #f5f0e8;
+}
+
+.hve-pdf-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #141413;
+}
+
+.hve-pdf-close {
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #6c6a64;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hve-pdf-close:hover {
+  background: #f5f0e8;
+  color: #141413;
+}
+
+.hve-pdf-body {
+  padding: 12px 14px;
+}
+
+.hve-pdf-row {
+  margin-bottom: 10px;
+}
+
+.hve-pdf-row label {
+  display: block;
+  font-size: 11px;
+  color: #6c6a64;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.hve-pdf-row select,
+.hve-pdf-row input[type="number"] {
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid #e6dfd8;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #141413;
+  background: #faf9f5;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.hve-pdf-row select:focus,
+.hve-pdf-row input:focus {
+  border-color: #cc785c;
+  box-shadow: 0 0 0 2px rgba(204,120,92,0.1);
+}
+
+.hve-pdf-row input[type="range"] {
+  width: calc(100% - 45px);
+  vertical-align: middle;
+  accent-color: #cc785c;
+}
+
+.hve-pdf-scale-label {
+  font-size: 11px;
+  color: #6c6a64;
+  margin-left: 4px;
+}
+
+.hve-pdf-toggle {
+  display: flex;
+  gap: 4px;
+}
+
+.hve-pdf-toggle button {
+  flex: 1;
+  padding: 5px 10px;
+  border: 1px solid #e6dfd8;
+  border-radius: 8px;
+  background: #faf9f5;
+  font-size: 12px;
+  color: #6c6a64;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.hve-pdf-toggle button.active {
+  background: #efe9de;
+  color: #cc785c;
+  border-color: #cc785c;
+  font-weight: 500;
+}
+
+.hve-pdf-margins {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 4px;
+}
+
+.hve-pdf-margins input {
+  width: 100% !important;
+  text-align: center;
+  padding: 4px 2px !important;
+  font-size: 11px !important;
+}
+
+.hve-pdf-divider {
+  height: 1px;
+  background: #e6dfd8;
+  margin: 10px 0;
+}
+
+.hve-pdf-info {
+  font-size: 13px;
+  color: #cc785c;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.hve-pdf-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hve-pdf-btn-primary {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #cc785c, #a9583e);
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.hve-pdf-btn-primary:hover {
+  box-shadow: 0 2px 12px rgba(204,120,92,0.3);
+  transform: translateY(-1px);
+}
+
+.hve-pdf-btn {
+  width: 100%;
+  padding: 6px 12px;
+  border: 1px solid #e6dfd8;
+  border-radius: 10px;
+  background: #faf9f5;
+  color: #3d3d3a;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.hve-pdf-btn:hover {
+  background: #f5f0e8;
+  border-color: #cc785c;
+}
+
+.hve-pdf-row-compact {
+  margin-bottom: 6px;
+}
+.hve-pdf-row-compact label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #3d3d3a;
+  cursor: pointer;
+}
+.hve-pdf-row-compact input[type="checkbox"] {
+  width: auto;
+  accent-color: #cc785c;
+}
+
+.hve-pdf-custom-size {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.hve-pdf-custom-size input {
+  flex: 1;
+  padding: 5px 6px;
+  border: 1px solid #e6dfd8;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #141413;
+  background: #faf9f5;
+  outline: none;
+  box-sizing: border-box;
+  text-align: center;
+}
+.hve-pdf-custom-size input:focus {
+  border-color: #cc785c;
+  box-shadow: 0 0 0 2px rgba(204,120,92,0.1);
+}
+.hve-pdf-custom-size span {
+  font-size: 12px;
+  color: #6c6a64;
+  flex-shrink: 0;
+}
+
+[data-hve-pdf-overlay] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  z-index: 2147483639;
+}
+
+.hve-pdf-break-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 2px dashed #cc785c;
+  pointer-events: none;
+}
+
+.hve-pdf-break-line.hve-pdf-break-manual {
+  border-top-color: #3B82F6;
+  border-top-style: solid;
+}
+
+.hve-pdf-break-line.hve-pdf-break-slide {
+  border-top-color: #10B981;
+  border-top-style: dotted;
+}
+
+.hve-pdf-break-label {
+  position: absolute;
+  left: 12px;
+  top: -18px;
+  font: 10px/1 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: white;
+  background: #cc785c;
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.hve-pdf-break-manual .hve-pdf-break-label {
+  background: #3B82F6;
+}
+
+.hve-pdf-break-slide .hve-pdf-break-label {
+  background: #10B981;
+}
+
+.hve-pdf-page-number {
+  position: absolute;
+  right: 12px;
+  top: -18px;
+  font: 10px/1 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: white;
+  background: #cc785c;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+[data-hve-toolbar] button[data-action="pdf-paginator"] {
+  display: none;
+}
+
+/* ---- Chart Typography ---- */
+[data-hve-chart-panel] {
+  position: fixed;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 260px;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: #faf9f5;
+  border: 1px solid #e6dfd8;
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(20,20,19,0.12), 0 1px 4px rgba(20,20,19,0.08);
+  z-index: 2147483645;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  animation: hve-chart-panel-in 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+@keyframes hve-chart-panel-in {
+  from { opacity: 0; transform: translateY(-50%) translateX(12px); }
+  to { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+
+[data-hve-chart-panel] {
+  scrollbar-width: thin;
+  scrollbar-color: #e6dfd8 transparent;
+}
+
+[data-hve-chart-panel]::-webkit-scrollbar {
+  width: 4px;
+}
+
+[data-hve-chart-panel]::-webkit-scrollbar-thumb {
+  background: #e6dfd8;
+  border-radius: 4px;
+}
+
+.hve-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid #e6dfd8;
+  background: #f5f0e8;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.hve-chart-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #141413;
+}
+
+.hve-chart-close {
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #6c6a64;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hve-chart-close:hover {
+  background: #f5f0e8;
+  color: #141413;
+}
+
+.hve-chart-body {
+  padding: 12px 14px;
+}
+
+.hve-chart-section {
+  margin-bottom: 4px;
+}
+
+.hve-chart-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #8e8b82;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.hve-chart-divider {
+  height: 1px;
+  background: #e6dfd8;
+  margin: 10px 0;
+}
+
+.hve-chart-template-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.hve-chart-template-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  border: 1px solid #e6dfd8;
+  border-radius: 10px;
+  background: #faf9f5;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.hve-chart-template-btn:hover {
+  background: #efe9de;
+  border-color: #cc785c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(204,120,92,0.12);
+}
+
+.hve-chart-template-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.hve-chart-template-name {
+  font-size: 10px;
+  color: #3d3d3a;
+  font-weight: 500;
+}
+
+.hve-chart-typo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hve-chart-typo-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid #e6dfd8;
+  border-radius: 8px;
+  background: #faf9f5;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+}
+
+.hve-chart-typo-btn:hover {
+  background: #f5f0e8;
+  border-color: #cc785c;
+}
+
+.hve-chart-typo-preview {
+  font-size: 14px;
+  color: #141413;
+  min-width: 55px;
+}
+
+.hve-chart-typo-name {
+  font-size: 11px;
+  color: #6c6a64;
+  font-weight: 500;
+}
+
+.hve-chart-fine-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hve-chart-ctrl-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hve-chart-ctrl-row label {
+  font-size: 11px;
+  color: #6c6a64;
+  min-width: 50px;
+  font-weight: 500;
+}
+
+.hve-chart-ctrl-row input[type="range"] {
+  flex: 1;
+  accent-color: #cc785c;
+  height: 4px;
+}
+
+.hve-chart-ctrl-row select {
+  flex: 1;
+  padding: 3px 6px;
+  border: 1px solid #e6dfd8;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #141413;
+  background: #faf9f5;
+}
+
+.hve-chart-ctrl-val {
+  font-size: 10px;
+  color: #8e8b82;
+  min-width: 32px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-hve-toolbar] button[data-action="chart-typo"].hve-tb-chart-active {
+  background: #ECFDF5;
+  color: #10B981;
+  box-shadow: inset 0 0 0 1px rgba(16,185,129,0.2);
+}
+</style></head>
+<body class="hve-web-active hve-edit-mode">
 
 <div class="mw-wrapper">
     <!-- SIDEBAR -->
@@ -403,7 +2143,7 @@
     </div>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <div class="mw-content">
+    <div class="mw-content" style="">
 
         <!-- Barra superior -->
         <div class="mw-top-bar">
@@ -432,20 +2172,20 @@
                 <span style="color:#72777d;">Emblema oscuro (representación)</span>
             </div>
             <table>
-                <tr><td class="label">Tipo</td><td>Imperio</td></tr>
+                <tbody><tr><td class="label">Tipo</td><td>Imperio</td></tr>
                 <tr><td class="label">Gobernante final</td><td><a href="#">Hatman</a> (en funciones hasta su disolución)</td></tr>
-                <tr><td class="label">Capital</td><td><a href="#">Nadir</a> (en <a href="#">Schicía</a>)</td></tr>
+                <tr><td class="label">Capital</td><td><a href="#">Nadir</a> (en <a href="#" style="" target="_blank" rel="noopener noreferrer">Schícia</a>)</td></tr>
                 <tr><td class="label">Idiomas</td><td>Latín, Francés, Español</td></tr>
                 <tr><td class="label">Período histórico</td><td>Siglo XI a.C. – Siglo XVIII</td></tr>
-                <tr><td class="label">Disolución</td><td>ca. 1763 (caída administrativa)</td></tr>
+                <tr><td class="label">Disolución</td><td style="cursor: move;">ca. 1763 (caída administrativa)</td></tr>
                 <tr><td class="label">Sucesor</td><td>—</td></tr>
-            </table>
+            </tbody></table>
         </div>
 
         <!-- INTRODUCCIÓN -->
-        <p>El <b>Imperio de las Sombras</b> (en latín: <i>Imperium Umbrarum</i>) fue una entidad política soberana que se extendió por gran parte del territorio de <a href="#">Schicía</a>, una región europea limítrofe entre <a href="#">España</a> y <a href="#">Francia</a>, conocida en inglés como <i>Schizo-land</i>. Su existencia abarcó desde el siglo XI a.C. hasta mediados del siglo XVIII, y su capital se estableció en el <a href="#">Castillo de Nadir</a>, una fortaleza de roca negra que aún se alza en la actualidad.</p>
-        <p>El imperio fue gobernado durante la mayor parte de su apogeo por la figura de <a href="#">Hatman</a>, un monarca cuya influencia trascendió las fronteras y cuyas políticas de expansión permitieron al Imperio controlar aproximadamente una cuarta parte del territorio de Schicía. Su reinado se caracterizó por una relación ambivalente con las otras especies que poblaban el país: los <a href="#">Caro</a> (carne), los <a href="#">Lux</a> (luz) y los <a href="#">Hues</a> (color), cada uno de los cuales encarnaba manifestaciones de las alucinaciones propias de la esquizofrenia, que en Schicía cobraban realidad tangible.</p>
-        <p>El legado del Imperio perdura en las ruinas de sus ciudades, en la literatura y en la psicología moderna, que ha visto en su mitología una alegoría de la lucha entre la razón y la percepción.</p>
+        <p style="cursor: move;">El <b>Imperio de las Sombras</b> (en latín: <i>Imperium Umbrarum</i>) fue una entidad política soberana que se extendió por gran parte del territorio de <a href="#" target="_blank" rel="noopener noreferrer">Schícia</a>, una región europea limítrofe entre <a href="#">España</a> y <a href="#">Francia</a>, conocida en inglés como <i>Schizo-land</i>. Su existencia abarcó desde el siglo XI a.C. hasta mediados del siglo XVIII, y su capital se estableció en el <a href="#" style="cursor: text;">Castillo de Nadir</a>, una fortaleza de roca negra que aún se alza en la actualidad.</p>
+        <p style="cursor: move;">El imperio fue gobernado durante la mayor parte de su apogeo por la figura de <a href="#">Hatman</a>, un monarca cuya influencia trascendió las fronteras y cuyas políticas de expansión permitieron al Imperio controlar aproximadamente una cuarta parte del territorio de Schícia. Su reinado se caracterizó por una relación ambivalente con las otras especies que poblaban el país: los <a href="#" style="cursor: text;">Caro</a> (carne), los <a href="#" style="cursor: text;">Lux</a> (luz) y los <a href="#" style="cursor: text;">Hues</a> (color).</p>
+        <p style="cursor: move;">El legado del Imperio perdura en las ruinas de su capital y las ciudades que todavía se habitan, en las civilizaciones modernas, ha visto en su mitología una alegoría de la lucha entre la razón y la ambición.</p>
 
         <!-- TABLA DE CONTENIDO -->
         <div class="toc" id="toc">
@@ -465,10 +2205,10 @@
                     </ul>
                 </li>
                 <li><span class="toc-number">4</span> <a href="#conflicto-color" class="toc-link" data-target="conflicto-color">Conflicto con el color</a></li>
-                <li><span class="toc-number">5</span> <a href="#legado" class="toc-link" data-target="legado">Legado</a>
+                <li style=""><span class="toc-number">5</span> <a href="#legado" class="toc-link" data-target="legado">Legado</a>
                     <ul>
-                        <li><span class="toc-number">5.1</span> <a href="#louiswain" class="toc-link" data-target="louiswain">Conexión con Louis Wain</a></li>
-                        <li><span class="toc-number">5.2</span> <a href="#psicologia" class="toc-link" data-target="psicologia">Perspectiva psicológica</a></li>
+                        
+                        
                     </ul>
                 </li>
                 <li><span class="toc-number">6</span> <a href="#referencias" class="toc-link" data-target="referencias">Referencias</a></li>
@@ -479,65 +2219,65 @@
         <h2 id="historia">Historia</h2>
 
         <h3 id="fundacion">Fundación y auge</h3>
-        <p>Los orígenes del Imperio de las Sombras son difusos y se pierden en la tradición oral de las tribus que habitaban Schicía en la antigüedad. Los primeros registros escritos, en tablillas de piedra encontradas en las proximidades del <a href="#">Castillo de Nadir</a>, datan del siglo XI a.C. y mencionan la fundación de un asentamiento fortificado por parte de un líder conocido como <i>Umbrarchus</i>. No obstante, fue bajo el reinado de <a href="#">Hatman</a> —cuyo nombre original se ha perdido— cuando el Imperio alcanzó su máximo esplendor. Hatman, descrito en las crónicas como un ser de inteligencia prodigiosa y voluntad férrea, estableció un código de leyes que regulaba las interacciones entre las distintas <a href="#">especies de Schicía</a> y promovió la construcción de infraestructuras que conectaban los territorios controlados.</p>
-        <p>Durante esta época, la capital <a href="#">Nadir</a> se convirtió en un centro cultural y militar, y el Imperio extendió su influencia desde las montañas del norte hasta las llanuras del sur, consolidando su dominio sobre las regiones donde las sombras eran más densas. Se estima que en su punto álgido, hacia el siglo XIV, el Imperio controlaba cerca de una cuarta parte de la superficie de Schicía, con una red de caminos y puestos de vigilancia que garantizaban su hegemonía.</p>
+        <p style="cursor: move;">Los orígenes del Imperio de las Sombras son difusos y se pierden en la tradición oral de las tribus que habitaban Schícia en la antigüedad. Los primeros registros escritos, en tablillas de piedra encontradas en las proximidades del <a href="#">Castillo de Nadir</a>, datan del siglo XI a.C. pero no mencionan al fundador original. No obstante, fue bajo el reinado de <a href="#">Hatman</a>&nbsp;cuando el Imperio alcanzó su máximo esplendor. Hatman, descrito en las crónicas como un ser de poder prodigioso y voluntad férrea, estableció un código de leyes que regulaba las interacciones entre las distintas <a href="#" style="cursor: text;" target="_blank" rel="noopener noreferrer">especies de Schícia</a> y promovió la construcción de infraestructuras que conectaban los territorios controlados.</p>
+        <p style="cursor: move;">Durante esta época, la capital <a href="#" style="cursor: text;">Nadir</a> se convirtió en un centro cultural y militar, y el Imperio extendió su influencia desde las montañas del norte hasta las llanuras del sur, consolidando su dominio sobre las regiones donde las sombras eran más densas. Se estima que en su punto álgido, hacia el siglo IV a.C., el Imperio controlaba cerca de una cuarta parte de la superficie de Schícia, con una red de caminos y puestos de vigilancia que garantizaban su hegemonía.</p>
 
-        <h3 id="expansion">Expansión territorial</h3>
-        <p>La política expansionista del Imperio se basó en la ocupación gradual de territorios habitados por otras especies. Los <a href="#">Caro</a>, criaturas carnívoras que defendían sus dominios naturales, fueron desplazados mediante tácticas de hostigamiento y, en ocasiones, mediante acuerdos de no agresión que les permitían conservar ciertos santuarios. Los <a href="#">Lux</a>, seres luminosos y esquivos, optaron por retirarse pacíficamente hacia las zonas más elevadas y soleadas, sin oponer resistencia. Con los <a href="#">Hues</a>, que ocupaban los valles orientales, el Imperio mantuvo una relación ambigua: durante siglos coexistieron sin incidentes, hasta que estalló el conflicto que marcaría el declive de la dinastía.</p>
-        <p>Las ciudades fundadas por el Imperio reflejaban su obsesión por la geometría y la oscuridad. Cada asentamiento se diseñaba en torno a un eje central que proyectaba sombras alargadas durante el crepúsculo, y los edificios se construían con piedra volcánica de color negro o gris oscuro, para que se mimetizaran con el paisaje. La planificación urbana buscaba no solo la funcionalidad, sino también la imposición de una estética sombría que recordaba a los habitantes su pertenencia al Imperio.</p>
+        <h3 id="expansion" style="cursor: move;">Expansión territorial</h3>
+        <p style="cursor: move;">La política expansionista del Imperio en el reinado de Hatman se basó en la ocupación gradual de territorios habitados por otras especies. Los <a href="#">Caro</a>, criaturas carnívoras que defendían sus dominios naturales, fueron desplazados mediante tácticas de hostigamiento y, en ocasiones, mediante acuerdos de no agresión que les permitían reubicaciones. Los <a href="#" style="cursor: move;">Lux</a>, seres luminosos y esquivos, optaron por retirarse pacíficamente hacia las zonas más elevadas y soleadas, sin oponer resistencia. Con los <a href="#">Hues</a>, que ocupaban los valles orientales, el Imperio mantuvo una relación ambigua: no hubo disputas territoriales con ellos.</p>
+        <p style="cursor: move;">Las ciudades fundadas por el Imperio reflejaban su obsesión por enaltecer la oscuridad. Cada asentamiento se diseñaba en torno a un eje central que proyectaba sombras alargadas durante el crepúsculo, y los edificios se construían con piedra volcánica de color negro o gris oscuro, para que se mimetizaran con el paisaje. La planificación urbana buscaba no solo la funcionalidad, sino también la imposición de una estética sombría que recordaba a los habitantes su pertenencia al Imperio.</p>
 
-        <h3 id="caida">La caída administrativa</h3>
-        <p>A partir del siglo XVII, el Imperio comenzó a mostrar signos de decadencia. Las estructuras rígidas impuestas por Hatman, que durante siglos habían garantizado la estabilidad, se volvieron obsoletas frente a la creciente diversidad y el mestizaje cultural. Los herederos de Hatman carecieron de su carisma y visión, y las provincias periféricas empezaron a gobernarse de facto de manera autónoma. En 1763, sin que mediara declaración oficial alguna, la comunicación con la familia real se interrumpió; el castillo de Nadir quedó vacío y el Imperio, como entidad unificada, dejó de existir. Los historiadores aún debaten si fue un colapso repentino o un lento desvanecimiento, pero lo cierto es que las sombras, que antes habían obedecido a un mando central, se dispersaron y se asentaron en las ciudades que habían fundado, dando lugar a una sociedad fragmentada que solo conserva el título monárquico como símbolo.</p>
+        <h3 id="caida" style="cursor: move;">La caída administrativa</h3>
+        <p style="cursor: move;">A partir del siglo XVII, el Imperio comenzó a mostrar signos de decadencia. Las estructuras rígidas impuestas por Hatman, que durante siglos habían garantizado la estabilidad, se volvieron obsoletas frente a la creciente diversidad y el mestizaje cultural. Los herederos de Hatman carecieron de su carisma y visión, y las provincias periféricas empezaron a gobernarse de facto de <span style="cursor: text;">manera</span><b style="cursor: text;"> autónoma</b>. En 1763, sin que mediara declaración oficial alguna, la comunicación con la familia real se interrumpió; el castillo de Nadir fue vaciandose y el Imperio, como entidad unificada, dejó de existir. Los historiadores aún debaten si fue un colapso repentino o un lento desvanecimiento, pero lo cierto es que las sombras, que antes habían obedecido a un mando central, se dispersaron y se asentaron en las ciudades que habían fundado, dando lugar a una sociedad fragmentada que solo conserva el título monárquico como símbolo.</p>
 
         <!-- ===== SECCIÓN 2: CIUDADES ===== -->
-        <h2 id="ciudades">Ciudades del Imperio</h2>
-        <p>El Imperio de las Sombras levantó numerosas ciudades, cada una con un diseño inspirado en la naturaleza de la sombra y la penumbra. Entre las más destacadas se encuentran:</p>
+        <h2 id="ciudades" style="cursor: move;">Ciudades del Imperio</h2>
+        <p style="cursor: move;">El Imperio de las Sombras levantó numerosas ciudades, cada una con un diseño inspirado en la naturaleza de la sombra y la penumbra. Entre las más destacadas se encuentran:</p>
         <ul>
-            <li><b><a href="#">Nadir</a></b> – Capital del Imperio, situada en un valle rodeado de montañas que proyectan sombras perpetuas. Su castillo, de roca negra, se alza sobre una colina y sus calles están trazadas en espiral para que la luz solar apenas alcance el suelo. La ciudad fue abandonada en el siglo XVIII, pero sus ruinas siguen siendo objeto de estudio.</li>
-            <li><b><a href="#">Umbría</a></b> – Ciudad gemela de Nadir, ubicada al este, conocida por sus túneles subterráneos que conectaban las viviendas y permitían a los habitantes moverse sin ser vistos. Su arquitectura se caracteriza por arcos de medio punto y contrafuertes que imitan las formas de las sombras proyectadas por los árboles.</li>
-            <li><b><a href="#">Tenebris</a></b> – Fundada en una llanura donde la niebla es perpetua, Tenebris fue un centro de comercio y artesanía. Sus edificios son bajos y anchos, con tejados de pizarra que absorben la luz, y sus plazas están adornadas con estatuas de figuras etéreas que parecen fundirse con el entorno.</li>
-            <li><b><a href="#">Nox</a></b> – Ciudad portuaria en la costa occidental, donde las sombras se reflejan en el agua. Nox fue la principal puerta marítima del Imperio y en ella se construyeron muelles cubiertos que protegían a los barcos de la luz del día. Sus almacenes subterráneos aún conservan restos de mercancías.</li>
+            <li style="cursor: move;"><b><a href="#">Nadir</a></b> – Capital del Imperio, situada en un valle rodeado de montañas que proyectan sombras perpetuas. Su castillo, de roca negra, se alza sobre una colina y sus calles están trazadas en espiral para que la luz solar apenas alcance el suelo. Repleta de documentación en piedra y monumentos al rey. La ciudad fue abandonada lentamente, pero sus ruinas siguen siendo objeto de estudio.</li>
+            <li style="cursor: move;"><b><a href="#">Umbría</a></b> – Ciudad gemela de Nadir, ubicada al este, conocida por sus bellos monumentos a los reyes. Su arquitectura se caracteriza por arcos de medio punto y contrafuertes que imitan las formas de las sombras proyectadas por los árboles.</li>
+            <li style="cursor: move;"><b><a href="#">Tenebris</a></b> – Fundada en una llanura donde la niebla es perpetua, Tenebris fue un centro de comercio y artesanía (Venta de ídolos o recuerdos). Sus edificios son bajos y anchos, con tejados de pizarra que absorben la luz, y sus plazas están adornadas con estatuas de figuras etéreas que parecen fundirse con el entorno.</li>
+            <li style="cursor: move;"><b><a href="#">Nox</a></b> – Ciudad portuaria en la costa occidental, donde las sombras se reflejan en el agua. Nox fue la principal puerta marítima del Imperio y en ella se construyeron muelles cubiertos que protegían a los barcos de la luz del día. Sus almacenes subterráneos aún conservan restos de mercancías.</li>
         </ul>
-        <p>Estas ciudades, aunque hoy despobladas, son testimonio del esplendor arquitectónico del Imperio y de su obsesión por dominar la oscuridad.</p>
+        <p style="cursor: move;">Estas ciudades, aunque algunas despobladas, representan la ambición que las sombras tuvieron años atras.</p>
 
         <!-- ===== SECCIÓN 3: RELACIONES CON OTRAS ESPECIES ===== -->
-        <h2 id="relaciones">Relaciones con otras especies</h2>
-        <p>El Imperio mantuvo contactos complejos con las demás especies que poblaban Schicía. Si bien la política oficial era la de someter o desplazar a aquellos que se opusieran a la expansión, también hubo alianzas y acuerdos de cooperación. La más notable de estas alianzas fue la establecida con el <a href="#">Mothman</a>, una criatura alada que, según las crónicas, se convirtió en un valioso aliado de Hatman durante las campañas militares.</p>
+        <h2 id="relaciones" style="cursor: move;">Relaciones con otras especies</h2>
+        <p style="cursor: move;">El Imperio mantuvo contactos complejos con las demás especies que poblaban Schicía. Si bien la política oficial era la de&nbsp; desplazar a aquellos que se opusieran a la expansión, también hubo alianzas y acuerdos de cooperación. La más notable de estas alianzas fue la establecida con el <a href="#">Mothman</a>, una criatura alada que, según las crónicas, se convirtió en un valioso aliado de Hatman durante las campañas políticas.</p>
 
-        <h3 id="mothman">El Mothman y su papel en el Imperio</h3>
-        <p>El <a href="#">Mothman</a> (literalmente "hombre polilla") es una entidad recurrente en el folclore de Schicía. Durante el apogeo del Imperio, Hatman logró establecer un vínculo con esta criatura, que actuó como exploradora y mensajera en los frentes de batalla. Se dice que el Mothman poseía una visión nocturna excepcional y podía cubrir grandes distancias en pocas horas, lo que lo convertía en un aliado estratégico. A diferencia de otras especies, el Mothman no buscaba territorio ni recursos, sino que parecía guiado por un instinto de protección hacia ciertos lugares sagrados. Hatman, reconociendo su utilidad, le otorgó el título de <i>Compañero de Guerra</i> y mandó erigir estelas conmemorativas en su honor en varias ciudades, como <a href="#">Tenebris</a> y <a href="#">Nox</a>. Con el fin del Imperio, la relación se desvaneció, pero el Mothman sigue siendo una figura venerada en algunas comunidades.</p>
+        <h3 id="mothman" style="cursor: move;">El Mothman y su papel en el Imperio</h3>
+        <p style="cursor: move;">El <a href="#">Mothman</a> (literalmente "hombre polilla") es una entidad recurrente en el folclore de Schícia. Durante el apogeo del Imperio, Hatman logró establecer un vínculo con este críptido, que actuó como segundo al mando. Se dice que el Mothman poseía una visión nocturna excepcional y podía cubrir grandes distancias en pocas horas, lo que lo convertía en un aliado estratégico. A diferencia de otras especies, el Mothman no buscaba territorio ni recursos, sino que parecía guiado por las tranquilidades que le brindaban formar parte del Imperio. Hatman, reconociendo su utilidad, le otorgó el título de <i style="cursor: text;">Compañero del Rey</i>&nbsp;y mandó erigir estatuas y monumentos conmemorativas en su honor en varias ciudades, como <a href="#">Tenebris</a> y <a href="#">Nox</a>. Con el fin del Imperio, se desconoce la actual relación entre Hatman y Mothman, pero este último sigue siendo una figura venerada en algunas comunidades.</p>
 
         <!-- ===== SECCIÓN 4: CONFLICTO CON EL COLOR (CENTRAL) ===== -->
-        <h2 id="conflicto-color">Conflicto con el color</h2>
-        <p>El <b>Conflicto con el color</b> es, sin duda, el episodio más oscuro y menos documentado de la historia del Imperio de las Sombras. Los archivos oficiales, que en su día ocupaban varias salas del castillo de <a href="#">Nadir</a>, fueron sellados por orden del propio Hatman y posteriormente destruidos en un incendio del que no se conservan actas. Los pocos testimonios que han sobrevivido, en su mayoría fragmentos de cartas y diarios personales, aluden a una guerra de proporciones catastróficas que enfrentó a las sombras con los <a href="#">Hues</a> (la especie del color) en las postrimerías de la expansión imperial.</p>
-        <p>Se sabe que el conflicto estalló cuando los Hues, que hasta entonces habían habitado en los valles orientales sin interferir en los asuntos del Imperio, comenzaron a reclamar territorios que Hatman consideraba suyos. La naturaleza del enfrentamiento es confusa: algunos cronistas hablan de una lucha armada con ejércitos de formas cromáticas, otros mencionan plagas y maldiciones que teñían de colores irreales el paisaje. Lo que unánimemente se reconoce es que la guerra fue terrible, y que sus consecuencias marcaron el principio del fin para el Imperio. Hatman, al parecer, ordenó que se eliminara todo registro de los detalles, quizás por vergüenza o por temor a que el conocimiento del conflicto desestabilizara aún más su ya frágil dominio.</p>
-        <p>Hoy en día, los historiadores evitan profundizar en este tema; la documentación es tan escasa que cualquier reconstrucción sería pura especulación. El Imperio, en sus escritos posteriores a la guerra, silenció el nombre de los Hues y reemplazó cualquier mención explícita por eufemismos. Esta omisión deliberada ha alimentado todo tipo de teorías, pero ninguna ha podido ser confirmada.</p>
+        <h2 id="conflicto-color" style="cursor: move;">Conflicto con el color</h2>
+        
+        
+        
 
         <!-- ESPACIO VACÍO (solicitado por el usuario) -->
-        <div class="conflicto-vacio">
-            <p><strong>Espacio reservado para documentación perdida</strong></p>
-            <p style="font-size:0.9em; margin-top:8px;">Los archivos originales sobre el Conflicto con el color fueron destruidos. Este espacio permanece vacío como recordatorio de lo que se perdió.</p>
+        <div class="conflicto-vacio" style="cursor: pointer;">
+            <p><strong style="cursor: pointer;">Espacio reservado para documentación insuficiente</strong></p>
+            <p style="font-size: 0.9em; margin-top: 8px; cursor: pointer; width: 721.778px; height: 46.0833px; transform: translate(128.889px, -7.99999px);">Las leyendas que envuelven al conflicto con el color son diversas. Este espacio permanece vacío como recordatorio de un momento clave para el Imperio, pero que tiene una documentación pobre o nula.</p>
         </div>
 
         <!-- ===== SECCIÓN 5: LEGADO ===== -->
         <h2 id="legado">Legado</h2>
-        <p>A pesar de su desaparición, el Imperio de las Sombras ha dejado una huella profunda en la cultura y el pensamiento de Schicía y más allá. Sus ruinas son visitadas por arqueólogos y turistas, y sus mitos han inspirado obras literarias y artísticas. El Castillo de Nadir, en particular, se ha convertido en un símbolo de la fugacidad del poder y de la fragilidad de los imperios.</p>
+        <p style="cursor: move;">A pesar de su desaparición, el Imperio de las Sombras ha dejado una huella profunda en la cultura y el pensamiento de Schícia y más allá. El Castillo de Nadir, en particular, se ha convertido en un símbolo de la fugacidad del poder y de la fragilidad de los imperios.</p>
 
-        <h3 id="louiswain">Conexión con Louis Wain</h3>
-        <p>El artista británico <a href="#">Louis Wain</a> (1860-1939), conocido por sus ilustraciones de gatos con patrones psicodélicos, mostró un interés tardío por la mitología de Schicía. En sus últimos años, Wain produjo una serie de dibujos titulada <i>Los reinos de la sombra</i>, donde plasmaba paisajes nocturnos poblados por criaturas híbridas que recuerdan a las descripciones de los <a href="#">Caro</a> y los <a href="#">Hues</a>. Aunque no hay evidencia de que Wain visitara Schicía, sus biógrafos sugieren que pudo haber tenido acceso a crónicas del Imperio a través de corresponsales europeos. Su obra ha sido reivindicada como una interpretación personal del conflicto entre la luz y la oscuridad.</p>
+        <h3 id="louiswain" style="cursor: move;">Herederos</h3>
+        <p style="cursor: move;">Se sabe que Hatman si tuvo familia durante épocas del Imperio, pero tras su caída y la perdida de comunicación, se desconoce su estado actual. Toda información actual sobre ellos son meros rumores, los cuales no tienen referencias acreditadas.</p>
 
-        <h3 id="psicologia">Perspectiva psicológica</h3>
-        <p>Desde la psicología moderna, el mito del Imperio de las Sombras se ha interpretado como una alegoría de la <a href="#">esquizofrenia</a>. Las especies <a href="#">Caro</a>, <a href="#">Lux</a>, <a href="#">Umbra</a> y <a href="#">Hues</a> representarían diferentes facetas de la percepción alterada: la carne (instinto), la luz (claridad), la sombra (estructura) y el color (desorden sensorial). Hatman encarnaría la figura del "yo" represor, que intenta mantener el control pero finalmente sucumbe ante la complejidad de su propio mundo interior. El arrepentimiento final de Hatman, aunque sincero, resulta estéril porque nunca se tradujo en una acción liberadora, reflejando la tragedia de quienes reconocen su error pero carecen del valor para rectificarlo<sup class="reference">[3]</sup>.</p>
+        
+        
 
         <!-- ===== REFERENCIAS ===== -->
         <div class="references" id="referencias">
             <h2>Referencias</h2>
             <ol>
-                <li><i>Umbra: Crónicas del Imperio</i>, Autor desconocido, manuscrito encontrado en Nadir, año 234.</li>
-                <li><i>Caro, Lux, Hues: Las especies de Schicía</i>, Editorial Sombras, 1789.</li>
-                <li><i>Shadows and Mind: A Psychological Reading of the Umbrarum Empire</i>, Mathew Wain, 1834.</li>
-                <li><i>Arquitectura de la penumbra: ciudades del Imperio</i>, L. Nox, 2001.</li>
-                <li><i>El Mothman en la historia de Schicía</i>, A. Crepúsculo, 2005.</li>
+                <li style="cursor: move;"><i style="cursor: move;">Umbra</i>, Autor desconocido, manuscrito en piedra encontrado en Nadir, año 217.</li>
+                <li style="cursor: move;"><i style="cursor: move;">Caro, Lux, Hues</i>, Autor desconocido, 754 a.C.</li>
+                <li style="cursor: move;"><i style="transform: translate(-3px, 0px); cursor: move;">Les ombres sont réelles: mon expérience à Schizo-Land</i>, Mathew Wain, 1834.</li>
+                
+                
             </ol>
         </div>
 
@@ -622,5 +2362,83 @@
     })();
 </script>
 
-</body>
-</html>
+<!-- ===== RAINBOW + LIAR ===== -->
+<div id="rainbow-overlay"></div>
+<div id="liar-container"></div>
+
+<script>
+    (function() {
+        // Elemento que recibe los clics
+        const trigger = document.querySelector('.conflicto-vacio');
+        if (!trigger) return;
+
+        let clickCount = 0;
+        let rainbowActivated = false;
+
+        // Capa rainbow y contenedor de textos
+        const overlay = document.getElementById('rainbow-overlay');
+        const container = document.getElementById('liar-container');
+
+        // Función para crear los textos LIAR
+        function spawnLiars() {
+            const count = 20; // cantidad de elementos para flujo continuo
+            const fragment = document.createDocumentFragment();
+            for (let i = 0; i < count; i++) {
+                const span = document.createElement('span');
+                span.className = 'liar-text';
+                span.textContent = 'LIAR';
+                // Posiciones iniciales aleatorias dentro de la pantalla
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                span.style.left = x + '%';
+                span.style.top = y + '%';
+                // Retrasos y duraciones escalonadas
+                const delay = (i / count) * 2.5; // hasta 2.5s
+                const duration = 2.0 + Math.random() * 1.0;
+                span.style.animationDuration = duration + 's';
+                span.style.animationDelay = delay + 's';
+                // Tamaño variable para mayor caos
+                const size = 8 + Math.random() * 8;
+                span.style.fontSize = size + 'vw';
+                // Opacidad y rotación inicial
+                span.style.opacity = 0.3 + Math.random() * 0.5;
+                fragment.appendChild(span);
+            }
+            container.appendChild(fragment);
+        }
+
+        // Activar el efecto rainbow
+        function activateRainbow() {
+            if (rainbowActivated) return;
+            rainbowActivated = true;
+
+            // Mostrar la capa de color
+            overlay.classList.add('active');
+
+            // Generar los textos LIAR
+            spawnLiars();
+
+            // Redirigir después de 5 segundos
+            setTimeout(function() {
+                window.location.href = 'views/ARG/688715.html';
+            }, 5000);
+        }
+
+        // Contador de clics
+        trigger.addEventListener('click', function(e) {
+            if (rainbowActivated) return;
+            clickCount++;
+            if (clickCount >= 25) {
+                activateRainbow();
+            }
+        });
+
+        // Opcional: feedback visual del contador (no solicitado, pero útil)
+        // Podríamos mostrar el conteo en el tooltip o en el propio elemento
+        // pero no es necesario para la funcionalidad.
+
+        console.log('🌈 Door2: Haz 25 clics en "documentación insuficiente" para activar el efecto.');
+    })();
+</script>
+
+</body></html>
