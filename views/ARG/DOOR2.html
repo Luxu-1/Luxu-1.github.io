@@ -304,10 +304,6 @@
             text-align: left;
         }
 
-        /* ============================================================
-           RESPONSIVE MEJORADO: el espacio "documentación insuficiente"
-           ahora se adapta perfectamente a móviles.
-           ============================================================ */
         @media (max-width: 992px) {
             .mw-sidebar {
                 display: none;
@@ -346,7 +342,6 @@
                 width: 100%;
                 max-width: 100%;
             }
-            /* Ajuste específico para el bloque de "documentación insuficiente" */
             .conflicto-vacio {
                 padding: 20px 12px !important;
                 min-height: 80px !important;
@@ -369,10 +364,6 @@
             display: table;
         }
 
-        /* ============================================================
-           Espacio vacío para la sección "Conflicto con el color"
-           (ahora completamente responsive)
-           ============================================================ */
         .conflicto-vacio {
             background: #f0f0f0;
             border: 2px dashed #a2a9b1;
@@ -402,9 +393,7 @@
             word-wrap: break-word;
         }
 
-        /* ============================================================
-           EFECTO DE PREGUNTAS (antes efecto "LIAR")
-           ============================================================ */
+        /* OVERLAY OSCURO */
         #dark-overlay {
             position: fixed;
             top: 0;
@@ -427,7 +416,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* ===== TERMINAL ESTILO CMD PARA LA SECUENCIA DE PREGUNTAS ===== */
+        /* TERMINAL - ESTILO MINIMALISTA, SIN BRILLO VERDE */
         #terminal-container {
             position: fixed;
             top: 0;
@@ -439,23 +428,24 @@
             align-items: center;
             z-index: 9999;
             pointer-events: none;
+            background: rgba(0,0,0,0.7);
         }
         #terminal-container.show {
             pointer-events: auto;
         }
         #terminal-box {
-            width: min(700px, 92vw);
-            max-height: 72vh;
+            width: min(800px, 92vw);
+            max-height: 80vh;
             background: #0c0c0c;
-            border: 2px solid #2b2b2b;
-            border-radius: 3px;
-            box-shadow: 0 0 50px rgba(0, 255, 120, 0.12), inset 0 0 60px rgba(0,0,0,0.6);
-            font-family: 'Consolas', 'Lucida Console', 'Courier New', monospace;
-            padding: 18px 20px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.8);
+            font-family: 'Georgia', 'Times New Roman', serif;
+            padding: 30px 35px;
             display: flex;
             flex-direction: column;
             opacity: 0;
-            transform: scale(0.98);
+            transform: scale(0.97);
             transition: opacity 0.6s ease, transform 0.6s ease;
         }
         #terminal-container.show #terminal-box {
@@ -463,36 +453,39 @@
             transform: scale(1);
         }
         #terminal-titlebar {
-            font-size: 11px;
-            color: #6b6b6b;
-            border-bottom: 1px solid #2b2b2b;
-            padding-bottom: 8px;
-            margin-bottom: 10px;
-            letter-spacing: 0.5px;
+            font-size: 12px;
+            color: #555;
+            border-bottom: 1px solid #222;
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+            letter-spacing: 1px;
+            font-family: 'Consolas', 'Lucida Console', monospace;
+            text-align: center;
         }
         #terminal-output {
             flex: 1;
             overflow-y: auto;
-            max-height: 46vh;
-            color: #c8c8c8;
-            font-size: 14.5px;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            margin-bottom: 10px;
+            max-height: 50vh;
+            color: #eaeaea;
+            font-size: 24px;
+            line-height: 1.7;
+            margin-bottom: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 200px;
+            text-align: center;
         }
         #terminal-output::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
         #terminal-output::-webkit-scrollbar-thumb {
             background: #333;
+            border-radius: 3px;
         }
         .terminal-line {
-            margin-bottom: 4px;
+            margin-bottom: 6px;
             text-align: center;
             width: 100%;
             transition: opacity 0.8s ease;
@@ -504,28 +497,38 @@
             opacity: 1;
         }
         .terminal-question {
-            font-weight: 900;
-            font-size: 1.12em;
+            font-weight: 700;
+            font-size: 1.1em;
             letter-spacing: 0.02em;
-            background: linear-gradient(45deg, #ff0000, #ff8800, #ffff00, #00ff00, #0088ff, #8800ff, #ff00ff);
+            background: linear-gradient(45deg, #ff6b6b, #ffa94d, #ffd93d, #6bcb77, #4d96ff, #9b59b6);
             background-size: 400% 400%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: rainbow-text 2s ease infinite;
+            animation: rainbow-text 3s ease infinite;
             display: inline-block;
         }
-        .terminal-feedback-muted { color: #7d7d7d; }
+        .terminal-suggestion {
+            color: #888;
+            font-size: 0.5em;
+            font-family: 'Consolas', 'Lucida Console', monospace;
+            margin-top: 8px;
+            display: block;
+            font-style: italic;
+            letter-spacing: 0.5px;
+        }
         #terminal-input-row {
             display: flex;
             align-items: center;
-            border-top: 1px solid #2b2b2b;
-            padding-top: 8px;
-            color: #4dff4d;
+            border-top: 1px solid #222;
+            padding-top: 12px;
+            color: #aaa;
         }
         .terminal-prompt {
-            margin-right: 6px;
-            color: #4dff4d;
+            margin-right: 10px;
+            color: #aaa;
+            font-family: 'Consolas', monospace;
+            font-size: 18px;
         }
         #terminal-input {
             flex: 1;
@@ -533,17 +536,32 @@
             border: none;
             outline: none;
             color: #eaeaea;
-            font-family: inherit;
-            font-size: 14.5px;
-            caret-color: #4dff4d;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 20px;
+            caret-color: #aaa;
+            padding: 4px 0;
+        }
+        #terminal-input::placeholder {
+            color: #444;
+            font-style: italic;
         }
 
         @media (max-width: 600px) {
             #terminal-box {
-                padding: 14px 14px;
+                padding: 20px 18px;
+            }
+            #terminal-output {
+                font-size: 18px;
+                min-height: 120px;
             }
             .terminal-question {
                 font-size: 1em;
+            }
+            #terminal-input {
+                font-size: 16px;
+            }
+            .terminal-prompt {
+                font-size: 15px;
             }
         }
     </style>
@@ -788,7 +806,7 @@
     })();
 </script>
 
-<!-- ===== EFECTO DE PREGUNTAS (25 clics, secuencia arcoíris estilo CMD) ===== -->
+<!-- ===== EFECTO DE PREGUNTAS CON SUGERENCIAS ===== -->
 <div id="dark-overlay"></div>
 
 <div id="terminal-container">
@@ -799,7 +817,7 @@
         </div>
         <div id="terminal-input-row">
             <span class="terminal-prompt">&gt;</span>
-            <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" placeholder="">
+            <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" placeholder="Escribe tu respuesta...">
         </div>
     </div>
 </div>
@@ -830,6 +848,7 @@
         let questions = [];
         let qIndex = 0;
         let currentQuestionLine = null;
+        let currentSuggestionLine = null;
 
         function parseQuestions(text) {
             const parsed = [];
@@ -839,13 +858,33 @@
                 const questionText = match[1].trim();
                 const body = match[2];
                 const answers = [];
+                const suggestions = [];
+                
+                // Buscar respuestas (correctas)
                 const ansRegex = /respuesta\s*=\s*"([^"]*)"/g;
                 let aMatch;
                 while ((aMatch = ansRegex.exec(body)) !== null) {
                     answers.push(aMatch[1].trim().toLowerCase());
                 }
-                if (questionText && answers.length > 0) {
-                    parsed.push({ question: questionText, answers: answers });
+                
+                // Buscar sugerencias (incorrectas)
+                const sugRegex = /sugerencia\s*=\s*"([^"]*)"/g;
+                let sMatch;
+                while ((sMatch = sugRegex.exec(body)) !== null) {
+                    suggestions.push(sMatch[1].trim());
+                }
+                
+                // Las preguntas que tienen llaves son incorrectas (tienen sugerencia)
+                // Si tiene sugerencia, es incorrecta por defecto
+                const isIncorrect = suggestions.length > 0;
+                
+                if (questionText) {
+                    parsed.push({ 
+                        question: questionText, 
+                        answers: answers, 
+                        suggestions: suggestions,
+                        isIncorrect: isIncorrect
+                    });
                 }
             }
             return parsed;
@@ -865,17 +904,35 @@
 
         function showQuestion() {
             if (qIndex >= questions.length) {
-                // Última pregunta respondida correctamente
                 finishSequence();
                 return;
             }
 
-            // Crear nuevo elemento de pregunta
-            const line = document.createElement('div');
-            line.className = 'terminal-line fade-in';
-            line.innerHTML = '<span class="terminal-question">' + questions[qIndex].question + '</span>';
-            output.appendChild(line);
-            currentQuestionLine = line;
+            const qData = questions[qIndex];
+            
+            // Crear contenedor para pregunta y sugerencia
+            const container = document.createElement('div');
+            container.className = 'terminal-line fade-in';
+            
+            // Pregunta
+            const questionSpan = document.createElement('span');
+            questionSpan.className = 'terminal-question';
+            questionSpan.textContent = qData.question;
+            container.appendChild(questionSpan);
+            
+            // Sugerencia (si existe)
+            if (qData.suggestions.length > 0) {
+                const sugSpan = document.createElement('span');
+                sugSpan.className = 'terminal-suggestion';
+                sugSpan.textContent = '💡 ' + qData.suggestions[0];
+                container.appendChild(sugSpan);
+                currentSuggestionLine = sugSpan;
+            } else {
+                currentSuggestionLine = null;
+            }
+            
+            output.appendChild(container);
+            currentQuestionLine = container;
             isWaitingForAnswer = true;
             output.scrollTop = output.scrollHeight;
             inputEl.focus();
@@ -890,12 +947,13 @@
             const current = questions[qIndex];
             const normalized = value.toLowerCase();
 
-            // Verificar si la respuesta es correcta
-            if (current.answers.includes(normalized)) {
+            // Si la pregunta es incorrecta (tiene sugerencia), cualquier respuesta es válida
+            // pero solo avanzamos si el usuario escribió algo (ya lo validamos con el trim)
+            if (current.isIncorrect) {
+                // Respuesta incorrecta - avanzamos igual
                 isWaitingForAnswer = false;
                 inputEl.value = '';
 
-                // Desvanecer la pregunta actual
                 if (currentQuestionLine) {
                     currentQuestionLine.classList.remove('fade-in');
                     currentQuestionLine.classList.add('fade-out');
@@ -903,16 +961,40 @@
 
                 qIndex++;
 
-                // Esperar a que termine la transición y mostrar la siguiente
                 setTimeout(function() {
-                    // Limpiar el output completamente
                     output.innerHTML = '';
                     currentQuestionLine = null;
+                    currentSuggestionLine = null;
                     
                     if (qIndex < questions.length) {
                         showQuestion();
                     } else {
-                        // Última pregunta respondida correctamente
+                        finishSequence();
+                    }
+                }, 800);
+                return;
+            }
+
+            // Pregunta correcta - verificar respuesta
+            if (current.answers.length > 0 && current.answers.includes(normalized)) {
+                isWaitingForAnswer = false;
+                inputEl.value = '';
+
+                if (currentQuestionLine) {
+                    currentQuestionLine.classList.remove('fade-in');
+                    currentQuestionLine.classList.add('fade-out');
+                }
+
+                qIndex++;
+
+                setTimeout(function() {
+                    output.innerHTML = '';
+                    currentQuestionLine = null;
+                    currentSuggestionLine = null;
+                    
+                    if (qIndex < questions.length) {
+                        showQuestion();
+                    } else {
                         finishSequence();
                     }
                 }, 800);
@@ -923,10 +1005,9 @@
         function finishSequence() {
             inputRow.style.display = 'none';
             
-            // Mostrar mensaje final de despedida
             const line = document.createElement('div');
             line.className = 'terminal-line fade-in';
-            line.innerHTML = '<span style="color: #7d7d7d;">Verificación completada...</span>';
+            line.innerHTML = '<span style="color: #888; font-size: 1.2em;">Verificación completada...</span>';
             output.appendChild(line);
 
             setTimeout(function() {
@@ -938,19 +1019,14 @@
             if (activated) return;
             activated = true;
 
-            // 1) Oscurecer la página
             overlay.classList.add('active');
-
-            // Cargar preguntas
             await loadQuestions();
 
-            // 2) Esperar 2.5 segundos y mostrar la terminal
             setTimeout(function() {
                 terminalContainer.style.display = 'flex';
                 void terminalContainer.offsetWidth;
                 terminalContainer.classList.add('show');
 
-                // Reproducir música desde la primera pregunta
                 bgAudio.currentTime = 0;
                 bgAudio.play().catch(function(e) {
                     console.warn('No se pudo reproducir surprise.mp3:', e);
@@ -977,7 +1053,6 @@
             }
         });
 
-        // Contador de clics
         trigger.addEventListener('click', function(e) {
             if (activated) return;
             clickCount++;
@@ -986,7 +1061,7 @@
             }
         });
 
-        console.log('🔮 Door2: Haz 25 clics en "documentación insuficiente" para activar la secuencia de preguntas.');
+        console.log('🔮 Haz 25 clics en "documentación insuficiente" para activar la secuencia de preguntas.');
     })();
 </script>
 
