@@ -7,6 +7,12 @@ respuesta="El que predijo su nacimiento"
 respuesta="el que predijo su nacimiento"
 respuesta="El profeta del rey"
 respuesta="el profeta del rey"
+respuesta="P" {
+sugerencia="Incompleto"
+}
+respuesta="p" {
+sugerencia="Incompleto"
+}
 }
 
 pregunta="Nombra al Rey diferente" {
