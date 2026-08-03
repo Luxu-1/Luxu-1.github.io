@@ -393,14 +393,16 @@
             word-wrap: break-word;
         }
 
-        /* OVERLAY OSCURO */
+        /* ============================================================
+           OVERLAY OSCURO PARA EL MODO PREGUNTAS
+           ============================================================ */
         #dark-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000;
+            background: #0a0a0a;
             z-index: 9998;
             opacity: 0;
             pointer-events: none;
@@ -416,8 +418,8 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* TERMINAL - ESTILO MINIMALISTA, SIN BRILLO VERDE */
-        #terminal-container {
+        /* ===== CONTENEDOR DE PREGUNTAS (fuera de la consola) ===== */
+        #question-container {
             position: fixed;
             top: 0;
             left: 0;
@@ -428,140 +430,134 @@
             align-items: center;
             z-index: 9999;
             pointer-events: none;
-            background: rgba(0,0,0,0.7);
-        }
-        #terminal-container.show {
-            pointer-events: auto;
-        }
-        #terminal-box {
-            width: min(800px, 92vw);
-            max-height: 80vh;
-            background: #0c0c0c;
-            border: 1px solid #333;
-            border-radius: 6px;
-            box-shadow: 0 0 60px rgba(0,0,0,0.8);
-            font-family: 'Georgia', 'Times New Roman', serif;
-            padding: 30px 35px;
-            display: flex;
             flex-direction: column;
-            opacity: 0;
-            transform: scale(0.97);
-            transition: opacity 0.6s ease, transform 0.6s ease;
+            padding: 20px;
         }
-        #terminal-container.show #terminal-box {
+        #question-container.show {
+            pointer-events: auto;
+            display: flex;
+        }
+
+        #question-box {
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+            padding: 30px 40px;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        #question-container.show #question-box {
             opacity: 1;
             transform: scale(1);
         }
-        #terminal-titlebar {
-            font-size: 12px;
-            color: #555;
-            border-bottom: 1px solid #222;
-            padding-bottom: 12px;
-            margin-bottom: 18px;
-            letter-spacing: 1px;
-            font-family: 'Consolas', 'Lucida Console', monospace;
-            text-align: center;
-        }
-        #terminal-output {
-            flex: 1;
-            overflow-y: auto;
-            max-height: 50vh;
-            color: #eaeaea;
-            font-size: 24px;
-            line-height: 1.7;
-            margin-bottom: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 200px;
-            text-align: center;
-        }
-        #terminal-output::-webkit-scrollbar {
-            width: 6px;
-        }
-        #terminal-output::-webkit-scrollbar-thumb {
-            background: #333;
-            border-radius: 3px;
-        }
-        .terminal-line {
-            margin-bottom: 6px;
-            text-align: center;
-            width: 100%;
-            transition: opacity 0.8s ease;
-        }
-        .terminal-line.fade-out {
-            opacity: 0;
-        }
-        .terminal-line.fade-in {
-            opacity: 1;
-        }
-        .terminal-question {
-            font-weight: 700;
-            font-size: 1.1em;
-            letter-spacing: 0.02em;
-            background: linear-gradient(45deg, #ff6b6b, #ffa94d, #ffd93d, #6bcb77, #4d96ff, #9b59b6);
+
+        #question-text {
+            font-size: 2.8em;
+            font-weight: 900;
+            letter-spacing: 0.03em;
+            background: linear-gradient(45deg, #ff0000, #ff8800, #ffff00, #00ff00, #0088ff, #8800ff, #ff00ff);
             background-size: 400% 400%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: rainbow-text 3s ease infinite;
-            display: inline-block;
+            animation: rainbow-text 2s ease infinite;
+            line-height: 1.3;
+            margin-bottom: 20px;
+            text-shadow: 0 0 60px rgba(255,255,255,0.05);
         }
-        .terminal-suggestion {
+
+        #suggestion-text {
+            font-size: 1.3em;
             color: #888;
-            font-size: 0.5em;
-            font-family: 'Consolas', 'Lucida Console', monospace;
-            margin-top: 8px;
-            display: block;
-            font-style: italic;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            min-height: 2em;
+            font-weight: 300;
             letter-spacing: 0.5px;
         }
-        #terminal-input-row {
+        #suggestion-text.show {
+            opacity: 1;
+        }
+
+        #question-input-row {
+            margin-top: 30px;
             display: flex;
+            justify-content: center;
             align-items: center;
-            border-top: 1px solid #222;
-            padding-top: 12px;
-            color: #aaa;
+            gap: 12px;
+            opacity: 0;
+            transition: opacity 0.6s ease;
         }
-        .terminal-prompt {
-            margin-right: 10px;
-            color: #aaa;
-            font-family: 'Consolas', monospace;
-            font-size: 18px;
+        #question-container.show #question-input-row {
+            opacity: 1;
         }
-        #terminal-input {
-            flex: 1;
+
+        #question-prompt {
+            color: #aaa;
+            font-size: 1.4em;
+            font-weight: 300;
+        }
+
+        #question-input {
             background: transparent;
             border: none;
+            border-bottom: 2px solid #555;
             outline: none;
-            color: #eaeaea;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            font-size: 20px;
-            caret-color: #aaa;
-            padding: 4px 0;
+            color: #eee;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            font-size: 1.3em;
+            padding: 6px 10px;
+            width: 300px;
+            max-width: 60vw;
+            text-align: center;
+            transition: border-color 0.3s;
         }
-        #terminal-input::placeholder {
+        #question-input:focus {
+            border-bottom-color: #aaa;
+        }
+        #question-input::placeholder {
             color: #444;
-            font-style: italic;
+            font-size: 0.7em;
+        }
+
+        /* Título sutil en la parte superior */
+        #question-titlebar {
+            position: fixed;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: #444;
+            font-size: 13px;
+            font-family: 'Segoe UI', sans-serif;
+            letter-spacing: 2px;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 1s ease;
+            pointer-events: none;
+            text-transform: uppercase;
+        }
+        #question-titlebar.show {
+            opacity: 1;
         }
 
         @media (max-width: 600px) {
-            #terminal-box {
-                padding: 20px 18px;
+            #question-text {
+                font-size: 1.8em;
             }
-            #terminal-output {
-                font-size: 18px;
-                min-height: 120px;
+            #question-box {
+                padding: 20px;
             }
-            .terminal-question {
+            #question-input {
+                font-size: 1em;
+                width: 200px;
+            }
+            #question-prompt {
                 font-size: 1em;
             }
-            #terminal-input {
-                font-size: 16px;
-            }
-            .terminal-prompt {
-                font-size: 15px;
+            #suggestion-text {
+                font-size: 1em;
             }
         }
     </style>
@@ -602,7 +598,6 @@
     <!-- CONTENIDO PRINCIPAL -->
     <div class="mw-content">
 
-        <!-- Barra superior -->
         <div class="mw-top-bar">
             <span>No has accedido</span>
             <div class="user-menu">
@@ -613,15 +608,12 @@
             </div>
         </div>
 
-        <!-- Título -->
         <h1>Imperio de las Sombras</h1>
 
-        <!-- Advertencia -->
         <div class="mw-notice">
             <strong>Este artículo o sección necesita referencias que aparezcan en una publicación acreditada.</strong> Busca fuentes: <a href="#">"Imperio de las Sombras"</a> – <a href="#">noticias</a> · <a href="#">libros</a> · <a href="#">académico</a> · <a href="#">imágenes</a>
         </div>
 
-        <!-- INFOBOX -->
         <div class="infobox">
             <div class="infobox-title">Imperio de las Sombras</div>
             <div class="infobox-image">
@@ -639,12 +631,10 @@
             </tbody></table>
         </div>
 
-        <!-- INTRODUCCIÓN -->
         <p>El <b>Imperio de las Sombras</b> (en latín: <i>Imperium Umbrarum</i>) fue una entidad política soberana que se extendió por gran parte del territorio de <a href="#">Schícia</a>, una región europea limítrofe entre <a href="#">España</a> y <a href="#">Francia</a>, conocida en inglés como <i>Schizo-land</i>. Su existencia abarcó desde el siglo XI a.C. hasta mediados del siglo XVIII, y su capital se estableció en el <a href="#">Castillo de Nadir</a>, una fortaleza de roca negra que aún se alza en la actualidad.</p>
         <p>El imperio fue gobernado durante la mayor parte de su apogeo por la figura de <a href="#">Hatman</a>, un monarca cuya influencia trascendió las fronteras y cuyas políticas de expansión permitieron al Imperio controlar aproximadamente una cuarta parte del territorio de Schícia. Su reinado se caracterizó por una relación ambivalente con las otras especies que poblaban el país: los <a href="#">Caro</a> (carne), los <a href="#">Lux</a> (luz) y los <a href="#">Hues</a> (color).</p>
         <p>El legado del Imperio perdura en las ruinas de su capital y las ciudades que todavía se habitan, en las civilizaciones modernas, ha visto en su mitología una alegoría de la lucha entre la razón y la ambición.</p>
 
-        <!-- TABLA DE CONTENIDO -->
         <div class="toc" id="toc">
             <div class="toc-title">Contenido</div>
             <ul>
@@ -667,7 +657,6 @@
             </ul>
         </div>
 
-        <!-- ===== SECCIÓN 1: HISTORIA ===== -->
         <h2 id="historia">Historia</h2>
 
         <h3 id="fundacion">Fundación y auge</h3>
@@ -681,7 +670,6 @@
         <h3 id="caida">La caída administrativa</h3>
         <p>A partir del siglo XVII, el Imperio comenzó a mostrar signos de decadencia. Las estructuras rígidas impuestas por Hatman, que durante siglos habían garantizado la estabilidad, se volvieron obsoletas frente a la creciente diversidad y el mestizaje cultural. Los herederos de Hatman carecieron de su carisma y visión, y las provincias periféricas empezaron a gobernarse de facto de manera autónoma. En 1763, sin que mediara declaración oficial alguna, la comunicación con la familia real se interrumpió; el castillo de Nadir fue vaciandose y el Imperio, como entidad unificada, dejó de existir. Los historiadores aún debaten si fue un colapso repentino o un lento desvanecimiento, pero lo cierto es que las sombras, que antes habían obedecido a un mando central, se dispersaron y se asentaron en las ciudades que habían fundado, dando lugar a una sociedad fragmentada que solo conserva el título monárquico como símbolo.</p>
 
-        <!-- ===== SECCIÓN 2: CIUDADES ===== -->
         <h2 id="ciudades">Ciudades del Imperio</h2>
         <p>El Imperio de las Sombras levantó numerosas ciudades, cada una con un diseño inspirado en la naturaleza de la sombra y la penumbra. Entre las más destacadas se encuentran:</p>
         <ul>
@@ -692,30 +680,25 @@
         </ul>
         <p>Estas ciudades, aunque algunas despobladas, representan la ambición que las sombras tuvieron años atras.</p>
 
-        <!-- ===== SECCIÓN 3: RELACIONES CON OTRAS ESPECIES ===== -->
         <h2 id="relaciones">Relaciones con otras especies</h2>
         <p>El Imperio mantuvo contactos complejos con las demás especies que poblaban Schicía. Si bien la política oficial era la de desplazar a aquellos que se opusieran a la expansión, también hubo alianzas y acuerdos de cooperación. La más notable de estas alianzas fue la establecida con el <a href="#">Mothman</a>, una criatura alada que, según las crónicas, se convirtió en un valioso aliado de Hatman durante las campañas políticas.</p>
 
         <h3 id="mothman">El Mothman y su papel en el Imperio</h3>
         <p>El <a href="#">Mothman</a> (literalmente "hombre polilla") es una entidad recurrente en el folclore de Schícia. Durante el apogeo del Imperio, Hatman logró establecer un vínculo con este críptido, que actuó como segundo al mando. Se dice que el Mothman poseía una visión nocturna excepcional y podía cubrir grandes distancias en pocas horas, lo que lo convertía en un aliado estratégico. A diferencia de otras especies, el Mothman no buscaba territorio ni recursos, sino que parecía guiado por las tranquilidades que le brindaba formar parte del Imperio. Hatman, reconociendo su utilidad, le otorgó el título de <i>Compañero del Rey</i> y mandó erigir estatuas y monumentos conmemorativas en su honor en varias ciudades, como <a href="#">Tenebris</a> y <a href="#">Nox</a>. Con el fin del Imperio, se desconoce la actual relación entre Hatman y Mothman, pero este último sigue siendo una figura venerada en algunas comunidades.</p>
 
-        <!-- ===== SECCIÓN 4: CONFLICTO CON EL COLOR (CENTRAL) ===== -->
         <h2 id="conflicto-color">Conflicto con el color</h2>
 
-        <!-- ESPACIO VACÍO (responsive) con el texto ajustado -->
         <div class="conflicto-vacio" id="trigger-doc">
             <p><strong>Espacio reservado para documentación insuficiente</strong></p>
             <p style="font-size: 0.9em; margin-top: 8px;">Las leyendas que envuelven al conflicto con el color son diversas. Este espacio permanece vacío como recordatorio de un momento clave para el Imperio, pero que tiene una documentación pobre o nula.</p>
         </div>
 
-        <!-- ===== SECCIÓN 5: LEGADO ===== -->
         <h2 id="legado">Legado</h2>
         <p>A pesar de su desaparición, el Imperio de las Sombras ha dejado una huella profunda en la cultura y el pensamiento de Schícia y más allá. El Castillo de Nadir, en particular, se ha convertido en un símbolo de la fugacidad del poder y de la fragilidad de los imperios.</p>
 
         <h3 id="herederos">Herederos</h3>
         <p>Se sabe que Hatman sí tuvo familia durante épocas del Imperio, pero tras su caída y la pérdida de comunicación, se desconoce su estado actual. Toda información actual sobre ellos son meros rumores, los cuales no tienen referencias acreditadas.</p>
 
-        <!-- ===== REFERENCIAS ===== -->
         <div class="references" id="referencias">
             <h2>Referencias</h2>
             <ol>
@@ -725,7 +708,6 @@
             </ol>
         </div>
 
-        <!-- FOOTER -->
         <div class="mw-footer">
             <p>Esta página se editó por última vez el 26 de julio de 2026 a las 14:30.</p>
             <p>El contenido está disponible bajo la licencia <a href="#">Creative Commons Atribución-CompartirIgual 3.0</a> a menos que se indique lo contrario.</p>
@@ -739,10 +721,9 @@
                 <a href="#">Estadísticas</a>
             </p>
         </div>
-    </div> <!-- fin mw-content -->
-</div> <!-- fin mw-wrapper -->
+    </div>
+</div>
 
-<!-- ===== JAVASCRIPT: Resaltado de sección activa ===== -->
 <script>
     (function() {
         'use strict';
@@ -806,18 +787,20 @@
     })();
 </script>
 
-<!-- ===== EFECTO DE PREGUNTAS CON SUGERENCIAS ===== -->
+<!-- ===== OVERLAY OSCURO ===== -->
 <div id="dark-overlay"></div>
 
-<div id="terminal-container">
-    <div id="terminal-box">
-        <div id="terminal-titlebar">El es un mentiroso</div>
-        <div id="terminal-output">
-            <!-- Aquí solo aparecerán las preguntas una a una -->
-        </div>
-        <div id="terminal-input-row">
-            <span class="terminal-prompt">&gt;</span>
-            <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" placeholder="Escribe tu respuesta...">
+<!-- ===== TÍTULO SUPERIOR ===== -->
+<div id="question-titlebar">El es un mentiroso</div>
+
+<!-- ===== CONTENEDOR DE PREGUNTAS (fuera de la consola) ===== -->
+<div id="question-container">
+    <div id="question-box">
+        <div id="question-text"></div>
+        <div id="suggestion-text"></div>
+        <div id="question-input-row">
+            <span id="question-prompt">›</span>
+            <input type="text" id="question-input" autocomplete="off" spellcheck="false" placeholder="escribe tu respuesta...">
         </div>
     </div>
 </div>
@@ -830,26 +813,31 @@
         let clickCount = 0;
         let activated = false;
         let isWaitingForAnswer = false;
+        let suggestionTimeout = null;
 
         const overlay = document.getElementById('dark-overlay');
-        const terminalContainer = document.getElementById('terminal-container');
-        const output = document.getElementById('terminal-output');
-        const inputEl = document.getElementById('terminal-input');
-        const inputRow = document.getElementById('terminal-input-row');
+        const container = document.getElementById('question-container');
+        const questionText = document.getElementById('question-text');
+        const suggestionText = document.getElementById('suggestion-text');
+        const inputEl = document.getElementById('question-input');
+        const inputRow = document.getElementById('question-input-row');
+        const titlebar = document.getElementById('question-titlebar');
 
-        // Audio de fondo - se reproduce desde la primera pregunta
+        // Audio de fondo
         const bgAudio = new Audio('/media/sound/surprise.mp3');
         bgAudio.loop = false;
         bgAudio.volume = 0.8;
 
-        // Ruta del archivo de preguntas
         const QUESTIONS_FILE = 'preguntas.txt';
 
         let questions = [];
         let qIndex = 0;
-        let currentQuestionLine = null;
-        let currentSuggestionLine = null;
 
+        // ============================================================
+        // PARSEADOR: 
+        // Respuesta con llaves { sugerencia="..." } → incorrecta
+        // Respuesta sin llaves → correcta
+        // ============================================================
         function parseQuestions(text) {
             const parsed = [];
             const blockRegex = /pregunta\s*=\s*"([^"]*)"\s*\{([\s\S]*?)\}/g;
@@ -857,34 +845,33 @@
             while ((match = blockRegex.exec(text)) !== null) {
                 const questionText = match[1].trim();
                 const body = match[2];
-                const answers = [];
-                const suggestions = [];
                 
-                // Buscar respuestas (correctas)
-                const ansRegex = /respuesta\s*=\s*"([^"]*)"/g;
+                // Buscar todas las respuestas
+                const answers = [];
+                const ansRegex = /respuesta\s*=\s*"([^"]*)"\s*(?:\{([\s\S]*?)\})?/g;
                 let aMatch;
                 while ((aMatch = ansRegex.exec(body)) !== null) {
-                    answers.push(aMatch[1].trim().toLowerCase());
-                }
-                
-                // Buscar sugerencias (incorrectas)
-                const sugRegex = /sugerencia\s*=\s*"([^"]*)"/g;
-                let sMatch;
-                while ((sMatch = sugRegex.exec(body)) !== null) {
-                    suggestions.push(sMatch[1].trim());
-                }
-                
-                // Las preguntas que tienen llaves son incorrectas (tienen sugerencia)
-                // Si tiene sugerencia, es incorrecta por defecto
-                const isIncorrect = suggestions.length > 0;
-                
-                if (questionText) {
-                    parsed.push({ 
-                        question: questionText, 
-                        answers: answers, 
-                        suggestions: suggestions,
-                        isIncorrect: isIncorrect
+                    const answerText = aMatch[1].trim().toLowerCase();
+                    const suggestionBlock = aMatch[2] || '';
+                    
+                    // Buscar sugerencia dentro del bloque de llaves
+                    let suggestion = null;
+                    if (suggestionBlock) {
+                        const sugRegex = /sugerencia\s*=\s*"([^"]*)"/;
+                        const sugMatch = sugRegex.exec(suggestionBlock);
+                        if (sugMatch) {
+                            suggestion = sugMatch[1].trim();
+                        }
+                    }
+                    
+                    answers.push({
+                        text: answerText,
+                        suggestion: suggestion  // null = correcta, string = incorrecta con sugerencia
                     });
+                }
+                
+                if (questionText && answers.length > 0) {
+                    parsed.push({ question: questionText, answers: answers });
                 }
             }
             return parsed;
@@ -908,34 +895,39 @@
                 return;
             }
 
-            const qData = questions[qIndex];
+            isWaitingForAnswer = true;
+            suggestionText.classList.remove('show');
+            suggestionText.textContent = '';
+            questionText.textContent = questions[qIndex].question;
             
-            // Crear contenedor para pregunta y sugerencia
-            const container = document.createElement('div');
-            container.className = 'terminal-line fade-in';
+            // Reiniciar transición de entrada
+            const box = document.getElementById('question-box');
+            box.style.opacity = '0';
+            box.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                box.style.opacity = '1';
+                box.style.transform = 'scale(1)';
+            }, 50);
+
+            inputEl.value = '';
+            inputEl.focus();
+        }
+
+        function showSuggestion(suggestion) {
+            suggestionText.textContent = suggestion;
+            suggestionText.classList.add('show');
             
-            // Pregunta
-            const questionSpan = document.createElement('span');
-            questionSpan.className = 'terminal-question';
-            questionSpan.textContent = qData.question;
-            container.appendChild(questionSpan);
-            
-            // Sugerencia (si existe)
-            if (qData.suggestions.length > 0) {
-                const sugSpan = document.createElement('span');
-                sugSpan.className = 'terminal-suggestion';
-                sugSpan.textContent = '💡 ' + qData.suggestions[0];
-                container.appendChild(sugSpan);
-                currentSuggestionLine = sugSpan;
-            } else {
-                currentSuggestionLine = null;
+            // Limpiar timeout anterior si existe
+            if (suggestionTimeout) {
+                clearTimeout(suggestionTimeout);
+                suggestionTimeout = null;
             }
             
-            output.appendChild(container);
-            currentQuestionLine = container;
-            isWaitingForAnswer = true;
-            output.scrollTop = output.scrollHeight;
-            inputEl.focus();
+            // Ocultar sugerencia después de 3 segundos
+            suggestionTimeout = setTimeout(() => {
+                suggestionText.classList.remove('show');
+                suggestionTimeout = null;
+            }, 3000);
         }
 
         function handleSubmit(rawValue) {
@@ -947,68 +939,57 @@
             const current = questions[qIndex];
             const normalized = value.toLowerCase();
 
-            // Si la pregunta es incorrecta (tiene sugerencia), cualquier respuesta es válida
-            // pero solo avanzamos si el usuario escribió algo (ya lo validamos con el trim)
-            if (current.isIncorrect) {
-                // Respuesta incorrecta - avanzamos igual
-                isWaitingForAnswer = false;
-                inputEl.value = '';
-
-                if (currentQuestionLine) {
-                    currentQuestionLine.classList.remove('fade-in');
-                    currentQuestionLine.classList.add('fade-out');
-                }
-
-                qIndex++;
-
-                setTimeout(function() {
-                    output.innerHTML = '';
-                    currentQuestionLine = null;
-                    currentSuggestionLine = null;
-                    
-                    if (qIndex < questions.length) {
-                        showQuestion();
+            // Buscar coincidencia exacta
+            for (let i = 0; i < current.answers.length; i++) {
+                const ans = current.answers[i];
+                if (ans.text === normalized) {
+                    // Si tiene sugerencia → es incorrecta
+                    if (ans.suggestion !== null) {
+                        // Respuesta incorrecta con sugerencia
+                        showSuggestion(ans.suggestion);
+                        inputEl.value = '';
+                        return;
                     } else {
-                        finishSequence();
+                        // Respuesta correcta (sin sugerencia)
+                        isWaitingForAnswer = false;
+                        inputEl.value = '';
+                        
+                        // Ocultar sugerencia si estaba visible
+                        if (suggestionTimeout) {
+                            clearTimeout(suggestionTimeout);
+                            suggestionTimeout = null;
+                        }
+                        suggestionText.classList.remove('show');
+                        
+                        // Desvanecer pregunta y avanzar
+                        const box = document.getElementById('question-box');
+                        box.style.opacity = '0';
+                        box.style.transform = 'scale(0.95)';
+                        
+                        qIndex++;
+                        
+                        setTimeout(() => {
+                            if (qIndex < questions.length) {
+                                showQuestion();
+                            } else {
+                                finishSequence();
+                            }
+                        }, 600);
+                        return;
                     }
-                }, 800);
-                return;
-            }
-
-            // Pregunta correcta - verificar respuesta
-            if (current.answers.length > 0 && current.answers.includes(normalized)) {
-                isWaitingForAnswer = false;
-                inputEl.value = '';
-
-                if (currentQuestionLine) {
-                    currentQuestionLine.classList.remove('fade-in');
-                    currentQuestionLine.classList.add('fade-out');
                 }
-
-                qIndex++;
-
-                setTimeout(function() {
-                    output.innerHTML = '';
-                    currentQuestionLine = null;
-                    currentSuggestionLine = null;
-                    
-                    if (qIndex < questions.length) {
-                        showQuestion();
-                    } else {
-                        finishSequence();
-                    }
-                }, 800);
             }
-            // Si es incorrecto, simplemente no pasa nada
+            
+            // Si no coincide con ninguna respuesta, no pasa nada (se queda igual)
         }
 
         function finishSequence() {
+            isWaitingForAnswer = false;
             inputRow.style.display = 'none';
-            
-            const line = document.createElement('div');
-            line.className = 'terminal-line fade-in';
-            line.innerHTML = '<span style="color: #888; font-size: 1.2em;">Verificación completada...</span>';
-            output.appendChild(line);
+            questionText.textContent = '✦';
+            suggestionText.textContent = 'Verificación completada...';
+            suggestionText.classList.add('show');
+            suggestionText.style.color = '#888';
 
             setTimeout(function() {
                 window.location.href = 'https://luxu-1.github.io/views/ARG/688715.html';
@@ -1023,9 +1004,8 @@
             await loadQuestions();
 
             setTimeout(function() {
-                terminalContainer.style.display = 'flex';
-                void terminalContainer.offsetWidth;
-                terminalContainer.classList.add('show');
+                container.classList.add('show');
+                titlebar.classList.add('show');
 
                 bgAudio.currentTime = 0;
                 bgAudio.play().catch(function(e) {
@@ -1033,10 +1013,7 @@
                 });
 
                 if (questions.length === 0) {
-                    const line = document.createElement('div');
-                    line.className = 'terminal-line';
-                    line.innerHTML = '<span style="color: #ff5c5c;">No se encontraron preguntas.</span>';
-                    output.appendChild(line);
+                    questionText.textContent = 'No se encontraron preguntas.';
                     inputRow.style.display = 'none';
                     return;
                 }
@@ -1061,7 +1038,7 @@
             }
         });
 
-        console.log('🔮 Haz 25 clics en "documentación insuficiente" para activar la secuencia de preguntas.');
+        console.log('🔮 Door2: Haz 25 clics en "documentación insuficiente" para activar la secuencia de preguntas.');
     })();
 </script>
 
