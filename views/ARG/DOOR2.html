@@ -834,46 +834,56 @@
         let qIndex = 0;
 
         // ============================================================
-        // PARSEADOR: 
-        // Respuesta con llaves { sugerencia="..." } → incorrecta
-        // Respuesta sin llaves → correcta
+        // PARSEADOR MEJORADO - Detecta correctamente respuestas con llaves
         // ============================================================
         function parseQuestions(text) {
             const parsed = [];
-            const blockRegex = /pregunta\s*=\s*"([^"]*)"\s*\{([\s\S]*?)\}/g;
+            
+            // Dividir el texto en bloques de pregunta
+            const blockRegex = /pregunta\s*=\s*"([^"]*)"\s*\{([\s\S]*?)\}(?=\s*pregunta\s*=|$)/g;
             let match;
+            
             while ((match = blockRegex.exec(text)) !== null) {
                 const questionText = match[1].trim();
                 const body = match[2];
                 
-                // Buscar todas las respuestas
                 const answers = [];
-                const ansRegex = /respuesta\s*=\s*"([^"]*)"\s*(?:\{([\s\S]*?)\})?/g;
-                let aMatch;
-                while ((aMatch = ansRegex.exec(body)) !== null) {
-                    const answerText = aMatch[1].trim().toLowerCase();
-                    const suggestionBlock = aMatch[2] || '';
+                
+                // Buscar respuestas individuales - cada respuesta termina en } o en el siguiente "respuesta="
+                const answerLines = body.split(/respuesta\s*=/);
+                
+                for (let i = 1; i < answerLines.length; i++) {
+                    let line = answerLines[i].trim();
                     
-                    // Buscar sugerencia dentro del bloque de llaves
-                    let suggestion = null;
-                    if (suggestionBlock) {
-                        const sugRegex = /sugerencia\s*=\s*"([^"]*)"/;
-                        const sugMatch = sugRegex.exec(suggestionBlock);
-                        if (sugMatch) {
-                            suggestion = sugMatch[1].trim();
-                        }
+                    // Extraer el texto de la respuesta
+                    const textMatch = line.match(/^"([^"]*)"/);
+                    if (!textMatch) continue;
+                    
+                    const answerText = textMatch[1].trim().toLowerCase();
+                    
+                    // Verificar si tiene un bloque de sugerencia
+                    const suggestionMatch = line.match(/\{\s*sugerencia\s*=\s*"([^"]*)"\s*\}/);
+                    
+                    if (suggestionMatch) {
+                        // Respuesta incorrecta con sugerencia
+                        answers.push({
+                            text: answerText,
+                            suggestion: suggestionMatch[1].trim()
+                        });
+                    } else {
+                        // Respuesta correcta (sin sugerencia)
+                        answers.push({
+                            text: answerText,
+                            suggestion: null
+                        });
                     }
-                    
-                    answers.push({
-                        text: answerText,
-                        suggestion: suggestion  // null = correcta, string = incorrecta con sugerencia
-                    });
                 }
                 
                 if (questionText && answers.length > 0) {
                     parsed.push({ question: questionText, answers: answers });
                 }
             }
+            
             return parsed;
         }
 
@@ -883,6 +893,10 @@
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 const text = await res.text();
                 questions = parseQuestions(text);
+                console.log('Preguntas cargadas:', questions.length);
+                questions.forEach((q, i) => {
+                    console.log(`P${i+1}: "${q.question}" - ${q.answers.length} respuestas`);
+                });
             } catch (err) {
                 console.warn('No se pudo cargar ' + QUESTIONS_FILE + ':', err);
                 questions = [];
@@ -911,19 +925,19 @@
 
             inputEl.value = '';
             inputEl.focus();
+            
+            console.log(`Mostrando pregunta ${qIndex+1}: "${questions[qIndex].question}"`);
         }
 
         function showSuggestion(suggestion) {
             suggestionText.textContent = suggestion;
             suggestionText.classList.add('show');
             
-            // Limpiar timeout anterior si existe
             if (suggestionTimeout) {
                 clearTimeout(suggestionTimeout);
                 suggestionTimeout = null;
             }
             
-            // Ocultar sugerencia después de 3 segundos
             suggestionTimeout = setTimeout(() => {
                 suggestionText.classList.remove('show');
                 suggestionTimeout = null;
@@ -939,29 +953,30 @@
             const current = questions[qIndex];
             const normalized = value.toLowerCase();
 
+            console.log(`Respuesta: "${normalized}"`);
+
             // Buscar coincidencia exacta
             for (let i = 0; i < current.answers.length; i++) {
                 const ans = current.answers[i];
                 if (ans.text === normalized) {
-                    // Si tiene sugerencia → es incorrecta
                     if (ans.suggestion !== null) {
                         // Respuesta incorrecta con sugerencia
+                        console.log('❌ Incorrecta - Mostrando sugerencia:', ans.suggestion);
                         showSuggestion(ans.suggestion);
                         inputEl.value = '';
                         return;
                     } else {
                         // Respuesta correcta (sin sugerencia)
+                        console.log('✅ Correcta! Avanzando...');
                         isWaitingForAnswer = false;
                         inputEl.value = '';
                         
-                        // Ocultar sugerencia si estaba visible
                         if (suggestionTimeout) {
                             clearTimeout(suggestionTimeout);
                             suggestionTimeout = null;
                         }
                         suggestionText.classList.remove('show');
                         
-                        // Desvanecer pregunta y avanzar
                         const box = document.getElementById('question-box');
                         box.style.opacity = '0';
                         box.style.transform = 'scale(0.95)';
@@ -980,7 +995,8 @@
                 }
             }
             
-            // Si no coincide con ninguna respuesta, no pasa nada (se queda igual)
+            // Si no coincide con ninguna respuesta
+            console.log('⚠️ Sin coincidencia - esperando respuesta válida');
         }
 
         function finishSequence() {
