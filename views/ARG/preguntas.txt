@@ -3,31 +3,63 @@ respuesta="Praevidens"
 respuesta="praevidens"
 respuesta="El vidente real"
 respuesta="el vidente real"
-respuesta="Quién predijo su llegada"
-respuesta="Quién predijo su llegada"
+respuesta="El que predijo su nacimiento"
+respuesta="el que predijo su nacimiento"
+respuesta="El profeta del rey"
+respuesta="el profeta del rey"
 }
 
-pregunta="Quién fue aquel que el tiempo lo cambió?" {
+pregunta="Nombra al Rey diferente" {
+respuesta="Kaley"
+respuesta="kaley"
+respuesta="El Rey de Colores"
+respuesta="el rey de colores"
+respuesta="King Of Colors"
+respuesta="king of colors"
+}
+
+pregunta="A quién el tiempo lo hizo cambiar?" {
 respuesta="Hatman"
 respuesta="hatman"
 respuesta="Kaley"
 respuesta="kaley"
+respuesta="A Hatman"
+respuesta="a hatman"
+respuesta="A Kaley"
+respuesta="a kaley"
 respuesta="Praevidens"
 respuesta="praevidens"
+respuesta="El Rey de Sombra"
+respuesta="el rey de sombra"
+respuesta="El Rey de Colores"
+respuesta="el rey de colores"
+respuesta="A Praevidens"
+respuesta="a praevidens"
+respuesta="A el Rey de Sombra"
+respuesta="a el rey de sombra"
+respuesta="A el Rey de Colores"
+respuesta="a el rey de colores"
 }
 
-pregunta="Nombre del mentiroso" {
+pregunta="Nombra a quién con mentiras habla" {
 respuesta="Hatman"
 respuesta="hatman"
 }
 
-pregunta="Que pasó con el color después?" {
-respuesta="Bajaron la cabeza"
-respuesta="bajaron la cabeza"
-respuesta="Dejaron de intentar"
-respuesta="dejaron de intentar"
-respuesta="Rendición"
-respuesta="rendición"
+pregunta="El heredero diferente" {
+respuesta="La Muerte"
+respuesta="la muerte"
+respuesta="El nieto"
+respuesta="el nieto"
+respuesta="El niño llorón"
+respuesta="el niño llorón"
+respuesta="El que no repitió el error"
+respuesta="el que no repitió el error"
+}
+
+pregunta="Lo único bueno que quedó tras el tiempo" {
+respuesta="Familia"
+respuesta="familia"
 }
 
 pregunta="Realmente estás arrepentido?" {
