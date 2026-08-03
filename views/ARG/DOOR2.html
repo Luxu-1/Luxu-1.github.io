@@ -403,7 +403,7 @@
         }
 
         /* ============================================================
-           EFECTO "LIAR" (antes "MENTIROSO")
+           EFECTO DE PREGUNTAS (antes efecto "LIAR")
            ============================================================ */
         #dark-overlay {
             position: fixed;
@@ -421,7 +421,14 @@
             opacity: 1;
         }
 
-        #word-container {
+        @keyframes rainbow-text {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ===== TERMINAL ESTILO CMD PARA LA SECUENCIA DE PREGUNTAS ===== */
+        #terminal-container {
             position: fixed;
             top: 0;
             left: 0;
@@ -433,39 +440,99 @@
             z-index: 9999;
             pointer-events: none;
         }
-        #word-container .liar-word {
-            font-family: 'Impact', 'Arial Black', sans-serif;
-            font-size: clamp(3rem, 15vw, 10rem);
+        #terminal-container.show {
+            pointer-events: auto;
+        }
+        #terminal-box {
+            width: min(700px, 92vw);
+            max-height: 72vh;
+            background: #0c0c0c;
+            border: 2px solid #2b2b2b;
+            border-radius: 3px;
+            box-shadow: 0 0 50px rgba(0, 255, 120, 0.12), inset 0 0 60px rgba(0,0,0,0.6);
+            font-family: 'Consolas', 'Lucida Console', 'Courier New', monospace;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transform: scale(0.98);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        #terminal-container.show #terminal-box {
+            opacity: 1;
+            transform: scale(1);
+        }
+        #terminal-titlebar {
+            font-size: 11px;
+            color: #6b6b6b;
+            border-bottom: 1px solid #2b2b2b;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+        #terminal-output {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 46vh;
+            color: #c8c8c8;
+            font-size: 14.5px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+        }
+        #terminal-output::-webkit-scrollbar {
+            width: 8px;
+        }
+        #terminal-output::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+        .terminal-line {
+            margin-bottom: 4px;
+        }
+        .terminal-question {
             font-weight: 900;
-            text-align: center;
-            letter-spacing: 0.05em;
+            font-size: 1.12em;
+            letter-spacing: 0.02em;
             background: linear-gradient(45deg, #ff0000, #ff8800, #ffff00, #00ff00, #0088ff, #8800ff, #ff00ff);
             background-size: 400% 400%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             animation: rainbow-text 2s ease infinite;
-            text-shadow: 0 0 30px rgba(255,255,255,0.3);
-            opacity: 0;
-            transition: opacity 0.01s;
-            line-height: 1.2;
-            padding: 0 20px;
-            word-break: break-word;
+            display: inline-block;
         }
-        #word-container.show .liar-word {
-            opacity: 1;
+        .terminal-feedback-ok { color: #4dff4d; }
+        .terminal-feedback-fail { color: #ff5c5c; }
+        .terminal-feedback-muted { color: #7d7d7d; }
+        .terminal-echo { color: #888; }
+        #terminal-input-row {
+            display: flex;
+            align-items: center;
+            border-top: 1px solid #2b2b2b;
+            padding-top: 8px;
+            color: #4dff4d;
+        }
+        .terminal-prompt {
+            margin-right: 6px;
+            color: #4dff4d;
+        }
+        #terminal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #eaeaea;
+            font-family: inherit;
+            font-size: 14.5px;
+            caret-color: #4dff4d;
         }
 
-        @keyframes rainbow-text {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* Ajustes extra para móviles en el efecto */
         @media (max-width: 600px) {
-            #word-container .liar-word {
-                font-size: clamp(2.5rem, 20vw, 6rem);
+            #terminal-box {
+                padding: 14px 14px;
+            }
+            .terminal-question {
+                font-size: 1em;
             }
         }
     </style>
@@ -710,11 +777,18 @@
     })();
 </script>
 
-<!-- ===== EFECTO "LIAR" (25 clics, palabra LIAR, 7 segundos) ===== -->
+<!-- ===== EFECTO DE PREGUNTAS (25 clics, secuencia arcoíris estilo CMD) ===== -->
 <div id="dark-overlay"></div>
 
-<div id="word-container">
-    <span class="liar-word">LIAR</span>
+<div id="terminal-container">
+    <div id="terminal-box">
+        <div id="terminal-titlebar">SCHICIA-ARCHIVE // terminal de verificación</div>
+        <div id="terminal-output"></div>
+        <div id="terminal-input-row">
+            <span class="terminal-prompt">&gt;</span>
+            <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" placeholder="escribe tu respuesta y presiona Enter">
+        </div>
+    </div>
 </div>
 
 <script>
@@ -726,38 +800,145 @@
         let activated = false;
 
         const overlay = document.getElementById('dark-overlay');
-        const wordContainer = document.getElementById('word-container');
+        const terminalContainer = document.getElementById('terminal-container');
+        const output = document.getElementById('terminal-output');
+        const inputEl = document.getElementById('terminal-input');
+        const inputRow = document.getElementById('terminal-input-row');
 
-        // Audio surprise
+        // Audio sorpresa (se reproduce solo al terminar todas las preguntas)
         const surpriseAudio = new Audio('/media/sound/surprise.mp3');
         surpriseAudio.volume = 1;
 
-        function startEffect() {
+        // Ruta del archivo de preguntas, separado del HTML para no exponer
+        // las respuestas dentro del código fuente de esta página.
+        const QUESTIONS_FILE = 'preguntas.txt';
+
+        let questions = [];
+        let qIndex = 0;
+
+        // Formato esperado en preguntas.txt:
+        // pregunta="Contenido" {
+        // respuesta="Contenido"
+        // respuesta="Otra respuesta válida"
+        // }
+        function parseQuestions(text) {
+            const parsed = [];
+            const blockRegex = /pregunta\s*=\s*"([^"]*)"\s*\{([\s\S]*?)\}/g;
+            let match;
+            while ((match = blockRegex.exec(text)) !== null) {
+                const questionText = match[1].trim();
+                const body = match[2];
+                const answers = [];
+                const ansRegex = /respuesta\s*=\s*"([^"]*)"/g;
+                let aMatch;
+                while ((aMatch = ansRegex.exec(body)) !== null) {
+                    answers.push(aMatch[1].trim().toLowerCase());
+                }
+                if (questionText && answers.length > 0) {
+                    parsed.push({ question: questionText, answers: answers });
+                }
+            }
+            return parsed;
+        }
+
+        async function loadQuestions() {
+            try {
+                const res = await fetch(QUESTIONS_FILE);
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const text = await res.text();
+                questions = parseQuestions(text);
+            } catch (err) {
+                console.warn('No se pudo cargar ' + QUESTIONS_FILE + ':', err);
+                questions = [];
+            }
+        }
+
+        function printLine(html) {
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.innerHTML = html;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function showQuestion() {
+            if (qIndex >= questions.length) {
+                finishSequence();
+                return;
+            }
+            printLine('<span class="terminal-question">' + questions[qIndex].question + '</span>');
+        }
+
+        function handleSubmit(rawValue) {
+            const value = rawValue.trim();
+            if (!value) return;
+            printLine('<span class="terminal-echo">&gt; ' + value + '</span>');
+
+            const current = questions[qIndex];
+            const normalized = value.toLowerCase();
+
+            if (current.answers.includes(normalized)) {
+                printLine('<span class="terminal-feedback-ok">Correcto.</span>');
+                qIndex++;
+                setTimeout(showQuestion, 500);
+            } else {
+                printLine('<span class="terminal-feedback-fail">Incorrecto. Intenta de nuevo.</span>');
+            }
+        }
+
+        function finishSequence() {
+            printLine('<span class="terminal-feedback-ok">Verificación completa.</span>');
+            printLine('<span class="terminal-feedback-muted">Redirigiendo...</span>');
+            inputRow.style.display = 'none';
+
+            setTimeout(function() {
+                surpriseAudio.currentTime = 0;
+                surpriseAudio.play().catch(function(e) {
+                    console.warn('No se pudo reproducir surprise.mp3:', e);
+                });
+
+                setTimeout(function() {
+                    window.location.href = 'https://luxu-1.github.io/views/ARG/688715.html';
+                }, 7000);
+            }, 1000);
+        }
+
+        async function startEffect() {
             if (activated) return;
             activated = true;
 
             // 1) Oscurecer la página
             overlay.classList.add('active');
 
-            // 2) Esperar 2.5 segundos, mostrar "LIAR"
-            setTimeout(function() {
-                wordContainer.style.display = 'flex';
-                void wordContainer.offsetWidth;
-                wordContainer.classList.add('show');
+            // Cargar preguntas en paralelo mientras se oscurece la pantalla
+            const loadPromise = loadQuestions();
 
-                // Sonido
-                surpriseAudio.currentTime = 0;
-                surpriseAudio.play().catch(function(e) {
-                    console.warn('No se pudo reproducir surprise.mp3:', e);
-                });
+            // 2) Esperar 2.5 segundos y mostrar la terminal
+            setTimeout(async function() {
+                await loadPromise;
 
-                // 3) Esperar 7 segundos y redirigir
-                setTimeout(function() {
-                    window.location.href = 'https://luxu-1.github.io/views/ARG/688715.html';
-                }, 7000);
+                terminalContainer.style.display = 'flex';
+                void terminalContainer.offsetWidth;
+                terminalContainer.classList.add('show');
 
+                if (questions.length === 0) {
+                    printLine('<span class="terminal-feedback-fail">No se encontraron preguntas (' + QUESTIONS_FILE + ').</span>');
+                    inputRow.style.display = 'none';
+                    return;
+                }
+
+                showQuestion();
+                inputEl.focus();
             }, 2500);
         }
+
+        inputEl.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const value = inputEl.value;
+                inputEl.value = '';
+                handleSubmit(value);
+            }
+        });
 
         // Contador de clics
         trigger.addEventListener('click', function(e) {
@@ -768,7 +949,7 @@
             }
         });
 
-        console.log('🔮 Door2: Haz 25 clics en "documentación insuficiente" para activar el efecto LIAR.');
+        console.log('🔮 Door2: Haz 25 clics en "documentación insuficiente" para activar la secuencia de preguntas.');
     })();
 </script>
 
