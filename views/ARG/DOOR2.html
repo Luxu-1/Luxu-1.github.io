@@ -479,6 +479,11 @@
             line-height: 1.6;
             white-space: pre-wrap;
             margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
         }
         #terminal-output::-webkit-scrollbar {
             width: 8px;
@@ -488,6 +493,15 @@
         }
         .terminal-line {
             margin-bottom: 4px;
+            text-align: center;
+            width: 100%;
+            transition: opacity 0.8s ease;
+        }
+        .terminal-line.fade-out {
+            opacity: 0;
+        }
+        .terminal-line.fade-in {
+            opacity: 1;
         }
         .terminal-question {
             font-weight: 900;
@@ -501,10 +515,7 @@
             animation: rainbow-text 2s ease infinite;
             display: inline-block;
         }
-        .terminal-feedback-ok { color: #4dff4d; }
-        .terminal-feedback-fail { color: #ff5c5c; }
         .terminal-feedback-muted { color: #7d7d7d; }
-        .terminal-echo { color: #888; }
         #terminal-input-row {
             display: flex;
             align-items: center;
@@ -782,11 +793,13 @@
 
 <div id="terminal-container">
     <div id="terminal-box">
-        <div id="terminal-titlebar">SCHICIA-ARCHIVE // terminal de verificación</div>
-        <div id="terminal-output"></div>
+        <div id="terminal-titlebar">El es un mentiroso</div>
+        <div id="terminal-output">
+            <!-- Aquí solo aparecerán las preguntas una a una -->
+        </div>
         <div id="terminal-input-row">
             <span class="terminal-prompt">&gt;</span>
-            <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" placeholder="escribe tu respuesta y presiona Enter">
+            <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" placeholder="">
         </div>
     </div>
 </div>
@@ -798,6 +811,7 @@
 
         let clickCount = 0;
         let activated = false;
+        let isWaitingForAnswer = false;
 
         const overlay = document.getElementById('dark-overlay');
         const terminalContainer = document.getElementById('terminal-container');
@@ -805,22 +819,18 @@
         const inputEl = document.getElementById('terminal-input');
         const inputRow = document.getElementById('terminal-input-row');
 
-        // Audio sorpresa (se reproduce solo al terminar todas las preguntas)
-        const surpriseAudio = new Audio('/media/sound/surprise.mp3');
-        surpriseAudio.volume = 1;
+        // Audio de fondo - se reproduce desde la primera pregunta
+        const bgAudio = new Audio('/media/sound/surprise.mp3');
+        bgAudio.loop = false;
+        bgAudio.volume = 0.8;
 
-        // Ruta del archivo de preguntas, separado del HTML para no exponer
-        // las respuestas dentro del código fuente de esta página.
+        // Ruta del archivo de preguntas
         const QUESTIONS_FILE = 'preguntas.txt';
 
         let questions = [];
         let qIndex = 0;
+        let currentQuestionLine = null;
 
-        // Formato esperado en preguntas.txt:
-        // pregunta="Contenido" {
-        // respuesta="Contenido"
-        // respuesta="Otra respuesta válida"
-        // }
         function parseQuestions(text) {
             const parsed = [];
             const blockRegex = /pregunta\s*=\s*"([^"]*)"\s*\{([\s\S]*?)\}/g;
@@ -853,54 +863,75 @@
             }
         }
 
-        function printLine(html) {
-            const line = document.createElement('div');
-            line.className = 'terminal-line';
-            line.innerHTML = html;
-            output.appendChild(line);
-            output.scrollTop = output.scrollHeight;
-        }
-
         function showQuestion() {
             if (qIndex >= questions.length) {
+                // Última pregunta respondida correctamente
                 finishSequence();
                 return;
             }
-            printLine('<span class="terminal-question">' + questions[qIndex].question + '</span>');
+
+            // Crear nuevo elemento de pregunta
+            const line = document.createElement('div');
+            line.className = 'terminal-line fade-in';
+            line.innerHTML = '<span class="terminal-question">' + questions[qIndex].question + '</span>';
+            output.appendChild(line);
+            currentQuestionLine = line;
+            isWaitingForAnswer = true;
+            output.scrollTop = output.scrollHeight;
+            inputEl.focus();
         }
 
         function handleSubmit(rawValue) {
+            if (!isWaitingForAnswer || qIndex >= questions.length) return;
+            
             const value = rawValue.trim();
             if (!value) return;
-            printLine('<span class="terminal-echo">&gt; ' + value + '</span>');
 
             const current = questions[qIndex];
             const normalized = value.toLowerCase();
 
+            // Verificar si la respuesta es correcta
             if (current.answers.includes(normalized)) {
-                printLine('<span class="terminal-feedback-ok">Correcto.</span>');
+                isWaitingForAnswer = false;
+                inputEl.value = '';
+
+                // Desvanecer la pregunta actual
+                if (currentQuestionLine) {
+                    currentQuestionLine.classList.remove('fade-in');
+                    currentQuestionLine.classList.add('fade-out');
+                }
+
                 qIndex++;
-                setTimeout(showQuestion, 500);
-            } else {
-                printLine('<span class="terminal-feedback-fail">Incorrecto. Intenta de nuevo.</span>');
+
+                // Esperar a que termine la transición y mostrar la siguiente
+                setTimeout(function() {
+                    // Limpiar el output completamente
+                    output.innerHTML = '';
+                    currentQuestionLine = null;
+                    
+                    if (qIndex < questions.length) {
+                        showQuestion();
+                    } else {
+                        // Última pregunta respondida correctamente
+                        finishSequence();
+                    }
+                }, 800);
             }
+            // Si es incorrecto, simplemente no pasa nada
         }
 
         function finishSequence() {
-            printLine('<span class="terminal-feedback-ok">Verificación completa.</span>');
-            printLine('<span class="terminal-feedback-muted">Redirigiendo...</span>');
             inputRow.style.display = 'none';
+            
+            // Mostrar mensaje final de despedida
+            const line = document.createElement('div');
+            line.className = 'terminal-line fade-in';
+            line.innerHTML = '<span style="color: #7d7d7d;">Verificación completada...</span>';
+            output.appendChild(line);
 
             setTimeout(function() {
-                surpriseAudio.currentTime = 0;
-                surpriseAudio.play().catch(function(e) {
-                    console.warn('No se pudo reproducir surprise.mp3:', e);
-                });
-
-                setTimeout(function() {
-                    window.location.href = 'https://luxu-1.github.io/views/ARG/688715.html';
-                }, 7000);
-            }, 1000);
+                window.location.href = 'https://luxu-1.github.io/views/ARG/688715.html';
+            }, 3000);
         }
 
         async function startEffect() {
@@ -910,19 +941,26 @@
             // 1) Oscurecer la página
             overlay.classList.add('active');
 
-            // Cargar preguntas en paralelo mientras se oscurece la pantalla
-            const loadPromise = loadQuestions();
+            // Cargar preguntas
+            await loadQuestions();
 
             // 2) Esperar 2.5 segundos y mostrar la terminal
-            setTimeout(async function() {
-                await loadPromise;
-
+            setTimeout(function() {
                 terminalContainer.style.display = 'flex';
                 void terminalContainer.offsetWidth;
                 terminalContainer.classList.add('show');
 
+                // Reproducir música desde la primera pregunta
+                bgAudio.currentTime = 0;
+                bgAudio.play().catch(function(e) {
+                    console.warn('No se pudo reproducir surprise.mp3:', e);
+                });
+
                 if (questions.length === 0) {
-                    printLine('<span class="terminal-feedback-fail">No se encontraron preguntas (' + QUESTIONS_FILE + ').</span>');
+                    const line = document.createElement('div');
+                    line.className = 'terminal-line';
+                    line.innerHTML = '<span style="color: #ff5c5c;">No se encontraron preguntas.</span>';
+                    output.appendChild(line);
                     inputRow.style.display = 'none';
                     return;
                 }
@@ -935,7 +973,6 @@
         inputEl.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 const value = inputEl.value;
-                inputEl.value = '';
                 handleSubmit(value);
             }
         });
