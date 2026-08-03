@@ -1,0 +1,38 @@
+pregunta="Quién escribió los carteles de la DOOR1?" {
+respuesta="Praevidens"
+respuesta="praevidens"
+respuesta="El vidente real"
+respuesta="el vidente real"
+respuesta="Quién predijo su llegada"
+respuesta="Quién predijo su llegada"
+}
+
+pregunta="Quién fue aquel que el tiempo lo cambió?" {
+respuesta="Hatman"
+respuesta="hatman"
+respuesta="Kaley"
+respuesta="kaley"
+respuesta="Praevidens"
+respuesta="praevidens"
+}
+
+pregunta="Nombre del mentiroso" {
+respuesta="Hatman"
+respuesta="hatman"
+}
+
+pregunta="Que pasó con el color después?" {
+respuesta="Bajaron la cabeza"
+respuesta="bajaron la cabeza"
+respuesta="Dejaron de intentar"
+respuesta="dejaron de intentar"
+respuesta="Rendición"
+respuesta="rendición"
+}
+
+pregunta="Realmente estás arrepentido?" {
+respuesta="Si"
+respuesta="No"
+respuesta="si"
+respuesta="no"
+}
